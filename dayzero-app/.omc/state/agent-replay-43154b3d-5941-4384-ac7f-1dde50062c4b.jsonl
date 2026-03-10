@@ -6,3 +6,4 @@
 {"t":0,"agent":"aff1c43","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":34587}
 {"t":0,"agent":"a02c0a5","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":51964}
 {"t":0,"agent":"a20d8e1","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":55012}
+{"t":0,"agent":"a01a158","agent_type":"unknown","event":"agent_stop","success":true}

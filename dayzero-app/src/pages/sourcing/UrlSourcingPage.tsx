@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { SOURCING_PROVIDERS, MOCK_URL_TO_PROVIDER } from '../../types/sourcing';
@@ -17,19 +17,21 @@ interface ParsedUrl {
 
 export default function UrlSourcingPage() {
     const navigate = useNavigate();
-    const { addJob, addProduct } = useSourcingStore();
+    const { addJob, addProduct, addNotification, updateNotification, triggerParticle } = useSourcingStore();
 
     const [inputValue, setInputValue] = useState('');
     const [parsedUrls, setParsedUrls] = useState<ParsedUrl[]>([]);
     const [showProviders, setShowProviders] = useState(false);
     const [isCollecting, setIsCollecting] = useState(false);
     const [collectionStarted, setCollectionStarted] = useState(false);
+    const [showEditToast, setShowEditToast] = useState(false);
+    const startButtonRef = useRef<HTMLButtonElement>(null);
 
     // Parse URLs on input change
     useEffect(() => {
-        if (collectionStarted) return; // Don't parse while collecting
+        if (collectionStarted) return;
 
-        const urls = inputValue.split('\\n').map(s => s.trim()).filter(s => s);
+        const urls = inputValue.split('\n').map(s => s.trim()).filter(s => s);
         const uniqueUrls = Array.from(new Set(urls));
 
         const newParsed: ParsedUrl[] = uniqueUrls.slice(0, 20).map((url, index) => {
@@ -56,21 +58,38 @@ export default function UrlSourcingPage() {
     const handleStartCollection = async () => {
         if (validCount === 0) return;
 
+        // Trigger particle animation from the start button
+        if (startButtonRef.current) {
+            const rect = startButtonRef.current.getBoundingClientRect();
+            triggerParticle({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+        }
+
+        // Add notification
+        const notifId = `notif-url-${Date.now()}`;
+        addNotification({
+            id: notifId,
+            type: 'url',
+            title: `URL 수집 (${validCount}건)`,
+            status: 'running',
+            currentCount: 0,
+            totalCount: validCount,
+            createdAt: new Date().toISOString(),
+        });
+
         setCollectionStarted(true);
         setIsCollecting(true);
 
-        // Mock sequence
-        for (let i = 0; i < parsedUrls.length; i++) {
-            const current = parsedUrls[i];
-            if (current.error) continue; // Skip invalid
+        const urlsSnapshot = parsedUrls;
+        let successProcessed = 0;
 
-            // Set running
+        for (let i = 0; i < urlsSnapshot.length; i++) {
+            const current = urlsSnapshot[i];
+            if (current.error) continue;
+
             setParsedUrls(prev => prev.map(p => p.id === current.id ? { ...p, status: 'running' } : p));
 
-            // Simulate network delay 1.5s - 3s
             await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1500));
 
-            // Simulate 80% success rate
             const isSuccess = Math.random() > 0.2;
 
             if (isSuccess && current.provider) {
@@ -89,30 +108,36 @@ export default function UrlSourcingPage() {
                 };
 
                 addProduct(mockProduct);
-
                 setParsedUrls(prev => prev.map(p =>
                     p.id === current.id ? { ...p, status: 'completed', product: mockProduct } : p
                 ));
+                successProcessed++;
             } else {
                 setParsedUrls(prev => prev.map(p =>
                     p.id === current.id ? { ...p, status: 'failed', error: '소싱처 접속이 일시적으로 불안정해요. 잠시 후 재시도해보세요' } : p
                 ));
             }
+
+            updateNotification(notifId, { currentCount: successProcessed });
         }
 
-        // Finalize
         setIsCollecting(false);
 
-        // Add historic job
-        if (successCount > 0) {
+        updateNotification(notifId, {
+            status: 'completed',
+            currentCount: successProcessed,
+            completedAt: new Date().toISOString(),
+        });
+
+        if (successProcessed > 0) {
             addJob({
                 id: `job-url-${Date.now()}`,
                 type: 'URL',
-                provider: parsedUrls.find(p => p.status === 'completed')?.provider || '기타' as any,
-                categorySummary: `${successCount}건 수동 수집`,
+                provider: urlsSnapshot.find(p => !p.error)?.provider || '기타' as any,
+                categorySummary: `${successProcessed}건 수동 수집`,
                 status: 'completed',
-                totalCount: parsedUrls.filter(p => !p.error).length,
-                currentCount: successCount,
+                totalCount: urlsSnapshot.filter(p => !p.error).length,
+                currentCount: successProcessed,
                 createdAt: new Date().toISOString(),
                 completedAt: new Date().toISOString(),
             });
@@ -129,7 +154,7 @@ export default function UrlSourcingPage() {
                 id: `prod-retry-${Date.now()}`,
                 jobId: 'manual-url-job',
                 provider: current.provider,
-                title: `${current.provider} 재설도 상품`,
+                title: `${current.provider} 재시도 상품`,
                 thumbnailUrl: 'https://via.placeholder.com/150/F5F6F8/8B95A1?text=Retry',
                 originalPriceKrw: 15000,
                 optionCount: 2,
@@ -143,6 +168,11 @@ export default function UrlSourcingPage() {
                 p.id === id ? { ...p, status: 'completed', product: mockProduct } : p
             ));
         }
+    };
+
+    const handleEditClick = () => {
+        setShowEditToast(true);
+        setTimeout(() => setShowEditToast(false), 2000);
     };
 
     return (
@@ -170,7 +200,7 @@ export default function UrlSourcingPage() {
                                 <textarea
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
-                                    placeholder={'소싱처 상품 URL을 입력하세요 (줄바꿈으로 여러 개 입력 가능)\\n예) https://www.oliveyoung.co.kr/store/...'}
+                                    placeholder={'소싱처 상품 URL을 입력하세요 (줄바꿈으로 여러 개 입력 가능)\n예) https://www.oliveyoung.co.kr/store/...'}
                                     style={{
                                         width: '100%',
                                         minHeight: '160px',
@@ -186,8 +216,8 @@ export default function UrlSourcingPage() {
                                         outline: 'none',
                                         transition: 'border-color 0.2s'
                                     }}
-                                    onFocus={(e) => e.target.style.borderColor = '#3182F6'}
-                                    onBlur={(e) => e.target.style.borderColor = '#D1D6DB'}
+                                    onFocus={(e) => (e.target.style.borderColor = '#3182F6')}
+                                    onBlur={(e) => (e.target.style.borderColor = '#D1D6DB')}
                                 />
                             </div>
 
@@ -241,6 +271,7 @@ export default function UrlSourcingPage() {
 
                 {!collectionStarted && (
                     <button
+                        ref={startButtonRef}
                         className="btn-primary"
                         disabled={validCount === 0}
                         onClick={handleStartCollection}
@@ -330,7 +361,7 @@ export default function UrlSourcingPage() {
                                     소싱 메인으로
                                 </button>
                                 {successCount > 0 && (
-                                    <button className="btn-primary" style={{ flex: 2, background: '#191F28', color: 'white' }}>
+                                    <button className="btn-primary" onClick={handleEditClick} style={{ flex: 2, background: '#191F28', color: 'white' }}>
                                         편집으로 이동하기 <ArrowRight size={18} />
                                     </button>
                                 )}
@@ -339,6 +370,26 @@ export default function UrlSourcingPage() {
                     </div>
                 )}
             </div>
+
+            {/* 편집 준비 중 Toast */}
+            {showEditToast && (
+                <div style={{
+                    position: 'fixed',
+                    bottom: '100px',
+                    right: '24px',
+                    background: 'rgba(25, 31, 40, 0.9)',
+                    color: '#FFFFFF',
+                    padding: '12px 20px',
+                    borderRadius: '10px',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    zIndex: 9999,
+                    animation: 'fadeInUp 0.25s ease',
+                    fontFamily: 'Pretendard, sans-serif',
+                }}>
+                    준비 중이에요
+                </div>
+            )}
 
             <style>{`
             @keyframes spinner {

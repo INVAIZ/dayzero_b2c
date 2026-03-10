@@ -149,6 +149,12 @@
       "type": "file"
     },
     {
+      "path": "src/store/useSourcingStore.ts",
+      "accessCount": 7,
+      "lastAccessed": 1773106305790,
+      "type": "file"
+    },
+    {
       "path": "src/pages/onboarding/BasicInfoPage.tsx",
       "accessCount": 4,
       "lastAccessed": 1773098411872,
@@ -156,20 +162,32 @@
     },
     {
       "path": "",
-      "accessCount": 3,
-      "lastAccessed": 1773065587617,
+      "accessCount": 4,
+      "lastAccessed": 1773100333384,
       "type": "directory"
+    },
+    {
+      "path": "src/index.css",
+      "accessCount": 4,
+      "lastAccessed": 1773100748059,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/sourcing/UrlSourcingPage.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1773100909126,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/Sidebar.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1773106182910,
+      "type": "file"
     },
     {
       "path": "src/App.tsx",
       "accessCount": 2,
       "lastAccessed": 1773064615704,
-      "type": "file"
-    },
-    {
-      "path": "src/index.css",
-      "accessCount": 2,
-      "lastAccessed": 1773065755959,
       "type": "file"
     },
     {
@@ -185,16 +203,34 @@
       "type": "file"
     },
     {
+      "path": "src",
+      "accessCount": 2,
+      "lastAccessed": 1773100337673,
+      "type": "directory"
+    },
+    {
+      "path": "src/components/layout/MainLayout.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773100812062,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/sourcing/AutoSourcingPage.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773100977215,
+      "type": "file"
+    },
+    {
       "path": "src/pages/SourcingPage.tsx",
       "accessCount": 1,
       "lastAccessed": 1773064604409,
       "type": "file"
     },
     {
-      "path": "src",
+      "path": "src/components/common/NotificationPanel.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773098381275,
-      "type": "directory"
+      "lastAccessed": 1773100804204,
+      "type": "file"
     }
   ],
   "userDirectives": []

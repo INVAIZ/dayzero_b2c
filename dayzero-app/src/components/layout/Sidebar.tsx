@@ -1,22 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, Edit3, PackageSearch, PackageOpen, ChevronRight } from 'lucide-react';
+import { Search, Edit3, PackageOpen, ChevronRight } from 'lucide-react';
+import { useSourcingStore } from '../../store/useSourcingStore';
 
-type NavItem = '소싱하기' | '상품 편집하기' | '등록된 상품 보기';
+type NavItem = '소싱하기' | '수집된 상품 확인' | '등록된 상품 보기';
 
 export const Sidebar: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [showToast, setShowToast] = useState(false);
+    const [badgeAnimating, setBadgeAnimating] = useState(false);
 
-    // active path helper
+    const { unprocessedProductCount } = useSourcingStore();
+    const prevCountRef = useRef(unprocessedProductCount);
+
     const isSourcingActive = location.pathname.startsWith('/sourcing');
+
+    useEffect(() => {
+        if (unprocessedProductCount > prevCountRef.current) {
+            setBadgeAnimating(true);
+            setTimeout(() => setBadgeAnimating(false), 600);
+        }
+        prevCountRef.current = unprocessedProductCount;
+    }, [unprocessedProductCount]);
 
     const handleNav = (item: NavItem) => {
         if (item === '소싱하기') {
             navigate('/sourcing');
         } else {
-            // Show toast for non-implemented menus
             setShowToast(true);
             setTimeout(() => setShowToast(false), 2000);
         }
@@ -26,7 +37,7 @@ export const Sidebar: React.FC = () => {
         <aside style={{
             width: '280px',
             height: '100vh',
-            background: '#F9FAFB', // Reference shows light grey sidebar
+            background: '#F9FAFB',
             borderRight: '1px solid #E5E8EB',
             position: 'fixed',
             left: 0,
@@ -77,7 +88,7 @@ export const Sidebar: React.FC = () => {
                 </button>
 
                 <button
-                    onClick={() => handleNav('상품 편집하기')}
+                    onClick={() => handleNav('수집된 상품 확인')}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -93,11 +104,32 @@ export const Sidebar: React.FC = () => {
                         fontSize: '15px',
                         transition: 'all 0.2s',
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.background = '#F2F4F6'}
-                    onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                    onMouseOver={(e) => (e.currentTarget.style.background = '#F2F4F6')}
+                    onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
                     <Edit3 size={20} color="#8B95A1" />
-                    상품 편집하기
+                    수집된 상품 확인
+                    {unprocessedProductCount > 0 && (
+                        <div
+                            id="sidebar-badge"
+                            className={badgeAnimating ? 'badge-bounce' : ''}
+                            style={{
+                                marginLeft: 'auto',
+                                background: '#3182F6',
+                                color: '#FFFFFF',
+                                borderRadius: '10px',
+                                padding: '2px 8px',
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                fontFamily: 'Pretendard, sans-serif',
+                                minWidth: '20px',
+                                textAlign: 'center',
+                                boxShadow: '0 2px 4px rgba(49,130,246,0.2)'
+                            }}
+                        >
+                            {unprocessedProductCount}
+                        </div>
+                    )}
                 </button>
 
                 <button
@@ -117,8 +149,8 @@ export const Sidebar: React.FC = () => {
                         fontSize: '15px',
                         transition: 'all 0.2s',
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.background = '#F2F4F6'}
-                    onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                    onMouseOver={(e) => (e.currentTarget.style.background = '#F2F4F6')}
+                    onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
                     <PackageOpen size={20} color="#8B95A1" />
                     등록된 상품 보기
@@ -141,9 +173,9 @@ export const Sidebar: React.FC = () => {
                     fontWeight: 500,
                     zIndex: 2000,
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    animation: 'fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                    animation: 'fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}>
-                    준비 중이에요 🚧
+                    준비 중이에요
                 </div>
             )}
         </aside>

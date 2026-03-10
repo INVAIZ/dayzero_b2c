@@ -223,21 +223,145 @@ body {
 
 /* ── 완료 화면 애니메이션 ── */
 @keyframes completeFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes checkCircle {
-  from { stroke-dashoffset: 200; }
-  to { stroke-dashoffset: 0; }
+  from {
+    stroke-dashoffset: 200;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes checkMark {
-  from { stroke-dashoffset: 50; }
-  to { stroke-dashoffset: 0; }
+  from {
+    stroke-dashoffset: 50;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes riseUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── 알림 패널 슬라이드업 ── */
+@keyframes panelSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── 파티클 플라이 ── */
+@keyframes particleFly {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  60% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.2);
+  }
+}
+
+/* ── 뱃지 바운스 ── */
+@keyframes badgeBounce {
+  0% {
+    transform: scale(1);
+  }
+
+  35% {
+    transform: scale(1.5);
+  }
+
+  65% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.badge-bounce {
+  animation: badgeBounce 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ── 플라잉 볼 (Flying Ball Parabolic) ── */
+.flying-ball-x {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  /* Horizontal: smooth, slowing down slightly at the end */
+  animation: flyingBallX 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.flying-ball-y {
+  width: 20px;
+  height: 20px;
+  background: #3182F6;
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgba(49, 130, 246, 0.6);
+  /* Vertical: jumps up, then falls down */
+  animation: flyingBallY 1.6s cubic-bezier(0.5, 0, 1, 0.5) forwards;
+}
+
+@keyframes flyingBallX {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(var(--target-x));
+  }
+}
+
+@keyframes flyingBallY {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.6);
+  }
+
+  20% {
+    transform: translateY(-80px) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(var(--target-y)) scale(0.3);
+  }
 }

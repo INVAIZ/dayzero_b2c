@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { SOURCING_PROVIDERS } from '../../types/sourcing';
@@ -10,25 +10,25 @@ import { Sparkles, Check } from 'lucide-react';
 const MOCK_CATEGORIES: Record<string, string[]> = {
     '올리브영': ['뷰티 > 스킨케어', '뷰티 > 메이크업', '헬스/푸드', '멘즈케어'],
     '쿠팡': ['로켓배송 > 생활용품', '가전/디지털', '식품', '홈/인테리어'],
-    // Default fallback
     'default': ['전체', '인기 카테고리 1', '인기 카테고리 2']
 };
 
 export default function AutoSourcingPage() {
     const navigate = useNavigate();
-    const { addSchedule, addJob } = useSourcingStore();
+    const { addSchedule, addJob, addNotification, updateNotification, triggerParticle } = useSourcingStore();
 
     const [selectedProviders, setSelectedProviders] = useState<SourcingProvider[]>(['올리브영']);
     const [selectedCriteria, setSelectedCriteria] = useState<'인기상품' | '신상품'>('인기상품');
     const [selectedCategory, setSelectedCategory] = useState<string>('뷰티 > 스킨케어');
     const [targetCount, setTargetCount] = useState<string>('50');
     const [timeString, setTimeString] = useState<string>('06:00');
+    const [showStartToast, setShowStartToast] = useState(false);
+    const submitButtonRef = useRef<HTMLButtonElement>(null);
 
     const toggleProvider = (provider: SourcingProvider) => {
         setSelectedProviders(prev =>
             prev.includes(provider) ? prev.filter(p => p !== provider) : [...prev, provider]
         );
-        // Reset category on provider change for simplicity in mock
         const newCats = MOCK_CATEGORIES[provider] || MOCK_CATEGORIES['default'];
         setSelectedCategory(newCats[0]);
     };
@@ -42,7 +42,49 @@ export default function AutoSourcingPage() {
             return;
         }
 
-        // 1. Create Schedules
+        // Particle animation from submit button
+        if (submitButtonRef.current) {
+            const rect = submitButtonRef.current.getBoundingClientRect();
+            triggerParticle({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+        }
+
+        // Add notification
+        const notifId = `notif-auto-${Date.now()}`;
+        const total = numCount * selectedProviders.length;
+        const title = selectedProviders.length > 1
+            ? `${selectedProviders[0]} 외 ${selectedProviders.length - 1}개 자동 수집`
+            : `${selectedProviders[0]} 자동 수집`;
+
+        addNotification({
+            id: notifId,
+            type: 'auto',
+            title,
+            status: 'running',
+            currentCount: 0,
+            totalCount: total,
+            createdAt: new Date().toISOString(),
+        });
+
+        // Mock progress: 5 steps over 15 seconds
+        for (let step = 1; step <= 5; step++) {
+            setTimeout(() => {
+                if (step < 5) {
+                    updateNotification(notifId, { currentCount: Math.floor(total * step / 5) });
+                } else {
+                    updateNotification(notifId, {
+                        status: 'completed',
+                        currentCount: total,
+                        completedAt: new Date().toISOString(),
+                    });
+                }
+            }, step * 3000);
+        }
+
+        // Show start toast
+        setShowStartToast(true);
+        setTimeout(() => setShowStartToast(false), 2500);
+
+        // Create schedules
         selectedProviders.forEach(provider => {
             addSchedule({
                 id: `sched-${Date.now()}-${provider}`,
@@ -55,20 +97,19 @@ export default function AutoSourcingPage() {
             });
         });
 
-        // 2. Create immediate run Job
+        // Create immediate run job
         addJob({
             id: `job-auto-${Date.now()}`,
             type: 'AUTO',
-            provider: selectedProviders[0], // Represent the first one in mock job
+            provider: selectedProviders[0],
             categorySummary: selectedCriteria,
             status: 'running',
-            totalCount: numCount * selectedProviders.length,
+            totalCount: total,
             currentCount: 0,
             createdAt: new Date().toISOString()
         });
 
-        // Navigate to running state
-        navigate('/sourcing/result');
+        navigate('/sourcing');
     };
 
     const isFormValid = selectedProviders.length > 0 &&
@@ -146,7 +187,6 @@ export default function AutoSourcingPage() {
                     </h2>
 
                     <div style={{ background: '#FFFFFF', border: '1px solid #E5E8EB', borderRadius: '16px', padding: '24px' }}>
-                        {/* Selected Provider Tabs logic simplified to just show settings for the primary selected one in this mock */}
                         {selectedProviders.length > 0 && (
                             <>
                                 <div style={{ fontSize: '14px', fontWeight: 600, color: '#3182F6', marginBottom: '16px' }}>
@@ -238,6 +278,7 @@ export default function AutoSourcingPage() {
                         <div style={{ display: 'flex', gap: '12px' }}>
                             <button onClick={() => navigate('/sourcing')} className="btn-google" style={{ width: '120px' }}>취소</button>
                             <button
+                                ref={submitButtonRef}
                                 onClick={handleStart}
                                 className="btn-primary"
                                 disabled={!isFormValid}
@@ -249,6 +290,28 @@ export default function AutoSourcingPage() {
                     </div>
                 </div>
             </div>
+
+            {/* 시작 토스트 */}
+            {showStartToast && (
+                <div style={{
+                    position: 'fixed',
+                    bottom: '100px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'rgba(25, 31, 40, 0.9)',
+                    color: '#FFFFFF',
+                    padding: '12px 24px',
+                    borderRadius: '10px',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    zIndex: 9999,
+                    animation: 'fadeInUp 0.25s ease',
+                    fontFamily: 'Pretendard, sans-serif',
+                    whiteSpace: 'nowrap',
+                }}>
+                    자동 수집이 시작됐어요
+                </div>
+            )}
         </MainLayout>
     );
 }
