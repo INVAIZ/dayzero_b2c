@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 import type { ProductDetail } from '../../../types/editing';
 import { getProviderLogo } from '../../../types/sourcing';
 import { Checkbox } from '../../../components/common/Checkbox';
@@ -62,7 +63,11 @@ const FloatingTooltip: React.FC<{ data: TooltipData }> = ({ data }) => {
                 padding: `${spacing['3']} ${spacing['4']}`,
                 boxShadow: shadow.lg,
                 pointerEvents: 'none',
-                maxWidth: '300px',
+                maxWidth: '400px',
+                width: 'max-content',
+                fontSize: font.size.base,
+                wordBreak: 'keep-all',
+                lineHeight: font.lineHeight.normal,
                 animation: 'tooltipFadeIn 0.12s ease',
             }}
         >
@@ -78,9 +83,27 @@ const WeightSection: React.FC<{
     const hasWeight = product.weightKg > 0;
     const isAi = product.isWeightEstimated;
 
-    const tooltipContent = isAi
-        ? "상품 무게 정보가 없어 AI가 예측한 무게입니다."
-        : "실제 상품 페이지에서 수집한 무게 정보입니다.";
+    const tooltipContent = (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {isAi && (
+                <div style={{
+                    fontSize: '11px',
+                    background: colors.primary,
+                    color: '#fff',
+                    padding: '2px 5px',
+                    borderRadius: '4px',
+                    fontWeight: 800,
+                    lineHeight: 1,
+                    flexShrink: 0
+                }}>AI</div>
+            )}
+            <span>
+                {isAi
+                    ? "상품 무게 정보가 없어 AI가 예측한 무게입니다."
+                    : "실제 상품 페이지에서 수집한 무게 정보입니다."}
+            </span>
+        </div>
+    );
 
     return (
         <div
@@ -137,9 +160,11 @@ export const ProductListItem: React.FC<Props> = ({
     const [tooltip, setTooltip] = useState<TooltipData | null>(null);
     const [imgError, setImgError] = useState(false);
 
-    const isProcessing = product.translationStatus === 'processing';
-    const isTranslated = !!product.titleJa;
-    const displayTitle = stripPrefix(product.titleJa ?? product.titleKo);
+    const isProcessing = product.translationStatus === 'processing' || !!product.isReTranslating;
+    const isTranslated = product.translationStatus === 'completed' && !!product.titleJa;
+    const displayTitle = isTranslated
+        ? stripPrefix(product.titleJa!)
+        : stripPrefix(product.titleKo);
 
     // 한화 환산 계산
     const krwEquivalent = Math.round(product.salePriceJpy * EXCHANGE_RATE);
@@ -154,17 +179,17 @@ export const ProductListItem: React.FC<Props> = ({
 
     return (
         <div
-            onClick={onClick}
+            onClick={isProcessing ? undefined : onClick}
             data-job-id={jobId}
             style={{
                 display: 'flex', alignItems: 'center', gap: spacing['5'],
                 padding: `14px ${spacing['5']}`,
-                background: isUnread
-                    ? (selected ? '#DBEAFE' : '#F0F9FF')
-                    : (selected ? colors.primaryLight : colors.bg.surface),
+                background: isProcessing
+                    ? colors.bg.info
+                    : selected ? colors.primaryLight : colors.bg.surface,
                 borderRadius: radius.lg,
-                cursor: 'pointer',
-                transition: 'background 0.15s, border-color 0.15s',
+                cursor: isProcessing ? 'default' : 'pointer',
+                transition: 'background 0.15s',
                 position: 'relative',
                 borderBottom: `1px solid ${colors.border.default}`,
             }}
@@ -172,14 +197,18 @@ export const ProductListItem: React.FC<Props> = ({
             {isProcessing && (
                 <div style={{
                     position: 'absolute', inset: 0,
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%)',
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(200,220,255,0.35) 50%, transparent 100%)',
                     backgroundSize: '200% 100%',
-                    animation: 'shimmer 1.4s infinite',
+                    animation: 'shimmer 1.8s infinite',
                     pointerEvents: 'none',
+                    borderRadius: radius.lg,
                 }} />
             )}
 
-            <Checkbox checked={selected} onClick={() => onToggle()} />
+            {/* 번역 중에는 체크박스 비활성화 */}
+            <div style={{ pointerEvents: isProcessing ? 'none' : 'auto', opacity: isProcessing ? 0.3 : 1 }}>
+                <Checkbox checked={selected} onClick={() => onToggle()} />
+            </div>
 
             {/* 썸네일 */}
             {imgError || !product.thumbnailUrl ? (
@@ -223,16 +252,47 @@ export const ProductListItem: React.FC<Props> = ({
                     src={getProviderLogo(product.provider)} alt={product.provider}
                     style={{ width: '18px', height: '18px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
                 />
-                <span style={{
-                    fontSize: font.size.base, fontWeight: 600, color: colors.text.primary,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    textDecoration: isTranslated ? 'underline' : 'none',
-                    textDecorationStyle: 'dotted',
-                    textUnderlineOffset: '3px',
-                    textDecorationColor: colors.text.muted,
-                }}>
-                    {displayTitle}
-                </span>
+                {isProcessing ? (
+                    <span style={{
+                        fontSize: font.size.base, fontWeight: 600,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        background: `linear-gradient(90deg, ${colors.text.muted} 0%, ${colors.text.primary} 40%, ${colors.text.muted} 80%)`,
+                        backgroundSize: '200% 100%',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        animation: 'shimmer 1.6s infinite',
+                    }}>
+                        {displayTitle}
+                    </span>
+                ) : (
+                    <span
+                        key={product.translationStatus}
+                        style={{
+                            fontSize: font.size.base, fontWeight: 600, color: colors.text.primary,
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            textDecoration: isTranslated ? 'underline' : 'none',
+                            textDecorationStyle: 'dotted',
+                            textUnderlineOffset: '3px',
+                            textDecorationColor: colors.text.muted,
+                            animation: product.translationStatus === 'completed' && isTranslated ? 'fadeInUp 0.5s ease' : 'none',
+                        }}
+                    >
+                        {displayTitle}
+                    </span>
+                )}
+                {isProcessing && (
+                    <span style={{
+                        flexShrink: 0, display: 'flex', alignItems: 'center', gap: '4px',
+                        padding: '3px 8px', borderRadius: radius.xs,
+                        fontSize: font.size.xs, fontWeight: 600,
+                        background: colors.primaryLight, color: colors.primary,
+                        whiteSpace: 'nowrap',
+                    }}>
+                        <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} />
+                        AI 번역 중
+                    </span>
+                )}
                 {product.translationStatus === 'failed' && (
                     <span style={{
                         flexShrink: 0, padding: '2px 7px', borderRadius: radius.xs,

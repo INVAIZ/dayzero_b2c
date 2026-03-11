@@ -50,7 +50,7 @@ export const NotificationPanel: React.FC = () => {
     const navigate = useNavigate();
 
     const { notifications, unreadCount, particleOrigin, markAllRead: markSourcingRead, triggerParticle, removeNotification } = useSourcingStore();
-    const { translationBatches, registrationBatches, markTranslationsRead, markRegistrationsRead, removeTranslationBatch, removeRegistrationBatch } = useEditingStore();
+    const { translationBatches, registrationBatches, markTranslationsRead, markRegistrationsRead, removeTranslationBatch, removeRegistrationBatch, selectAll, setActiveTab: setEditingActiveTab } = useEditingStore();
 
     const sortedNotifications = [...notifications].sort((a, b) => {
         // 우선순위: running 은 항상 위로
@@ -370,11 +370,23 @@ export const NotificationPanel: React.FC = () => {
                                             <div key={batch.id}
                                                 onMouseEnter={() => setHoveredId(`t-${batch.id}`)}
                                                 onMouseLeave={() => setHoveredId(null)}
+                                                onClick={() => {
+                                                    if (batch.status === 'completed') {
+                                                        setEditingActiveTab('translated');
+                                                        if (batch.productIds?.length > 0) {
+                                                            selectAll(batch.productIds);
+                                                        }
+                                                        markTranslationsRead();
+                                                        setIsOpen(false);
+                                                        navigate('/editing');
+                                                    }
+                                                }}
                                                 style={{
                                                     padding: `${spacing['5']} ${spacing['6']}`,
                                                     borderBottom: `1px solid ${colors.bg.page}`,
                                                     background: !batch.isRead ? '#F8FAFF' : 'transparent',
                                                     transition: 'background 0.2s',
+                                                    cursor: batch.status === 'completed' ? 'pointer' : 'default',
                                                 }}>
                                                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: spacing['4'] }}>
                                                     <StatusIcon status={isRunning ? 'running' : batch.status} />

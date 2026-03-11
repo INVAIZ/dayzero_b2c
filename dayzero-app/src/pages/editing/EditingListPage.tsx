@@ -6,7 +6,7 @@ import { useEditingStore } from '../../store/useEditingStore';
 import { useSourcingStore } from '../../store/useSourcingStore';
 import { useOnboarding } from '../../components/onboarding/OnboardingContext';
 import { SOURCING_PROVIDERS } from '../../types/sourcing';
-import type { EditTabFilter } from '../../types/editing';
+import type { EditTabFilter, ProductDetail } from '../../types/editing';
 import { ProductListItem } from './components/ProductListItem';
 import { BulkActionBar } from './components/BulkActionBar';
 import { TranslationModal } from './components/TranslationModal';
@@ -21,6 +21,8 @@ const TAB_LABELS: { key: EditTabFilter; label: string }[] = [
     { key: 'translated', label: '번역 완료' },
 ];
 
+type SortKey = 'createdAt' | 'salePriceJpy' | 'title';
+type SortDir = 'asc' | 'desc';
 
 const SortHeader: React.FC<{
     label: string;
@@ -50,9 +52,6 @@ const SortHeader: React.FC<{
         </div>
     );
 };
-
-type SortKey = 'createdAt' | 'salePriceJpy' | 'title';
-type SortDir = 'asc' | 'desc';
 
 export default function EditingListPage() {
     const navigate = useNavigate();
@@ -112,7 +111,7 @@ export default function EditingListPage() {
 
     useEffect(() => {
         // 일괄 업데이트를 위해 변경사항 수집
-        const updates: { id: string, updates: Partial<any> }[] = [];
+        const updates: { id: string, updates: Partial<ProductDetail> }[] = [];
 
         products.forEach(p => {
             const intlShippingFromWeight = calculateIntlShippingKrw(p.weightKg);
@@ -132,35 +131,16 @@ export default function EditingListPage() {
         }
     }, [products.length, onboardingState, updateProduct]);
 
-    useEffect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (window as any).updateProductWeight = (id: string, weightKg: number) => {
-            updateProduct(id, { weightKg, isWeightEstimated: false });
-        };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (window as any).predictProductWeight = (id: string) => {
-            // 무게 예측 시뮬레이션: 0.2kg ~ 0.8kg 사이의 랜덤 값 생성
-            const predicted = parseFloat((Math.random() * 0.6 + 0.2).toFixed(2));
-            updateProduct(id, { weightKg: predicted, isWeightEstimated: true });
-        };
-        return () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            delete (window as any).updateProductWeight;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            delete (window as any).predictProductWeight;
-        };
-    }, [updateProduct]);
-
     // 탭별 건수 (providerFilter 무관하게 계산)
     const counts = useMemo(() => ({
         all: products.length,
-        needs_translation: products.filter((p) => p.translationStatus === 'pending' || p.translationStatus === 'failed').length,
+        needs_translation: products.filter((p) => ['pending', 'failed', 'processing'].includes(p.translationStatus)).length,
         translated: products.filter((p) => p.translationStatus === 'completed').length,
     }), [products]);
 
     // 탭 기준 필터링 (소싱처 필터 전)
     const tabFiltered = useMemo(() => products.filter((p) => {
-        if (activeTab === 'needs_translation') return p.translationStatus === 'pending' || p.translationStatus === 'failed';
+        if (activeTab === 'needs_translation') return ['pending', 'failed', 'processing'].includes(p.translationStatus);
         if (activeTab === 'translated') return p.translationStatus === 'completed';
         return true;
     }), [products, activeTab]);
@@ -189,17 +169,16 @@ export default function EditingListPage() {
     const allFilteredSelected = filtered.length > 0 && filtered.every((p) => selectedProductIds.includes(p.id));
 
     const selectedTranslateCount = useMemo(() =>
-        products.filter((p) => selectedProductIds.includes(p.id) && (p.translationStatus === 'pending' || p.translationStatus === 'failed')).length,
+        products.filter((p) => selectedProductIds.includes(p.id) && ['pending', 'failed', 'completed'].includes(p.translationStatus)).length,
         [products, selectedProductIds]
     );
-    const selectedRegisterCount = useMemo(() =>
-        products.filter((p) => selectedProductIds.includes(p.id) && p.translationStatus === 'completed').length,
-        [products, selectedProductIds]
-    );
+
     const selectedTranslatedIds = useMemo(() =>
         products.filter(p => selectedProductIds.includes(p.id) && p.translationStatus === 'completed').map(p => p.id),
         [products, selectedProductIds]
     );
+    const selectedAlreadyTranslatedCount = selectedTranslatedIds.length;
+    const selectedRegisterCount = selectedTranslatedIds.length;
 
     const handleSelectAll = () => {
         if (allFilteredSelected) clearSelection();
@@ -211,6 +190,8 @@ export default function EditingListPage() {
             <style>{`
                 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
                 @keyframes tooltipFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+                @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+                @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
             `}</style>
 
             {/* 페이지 헤더 */}
@@ -406,6 +387,7 @@ export default function EditingListPage() {
                 isOpen={isTranslationModalOpen}
                 onClose={closeTranslationModal}
                 selectedCount={selectedProductIds.length}
+                alreadyTranslatedCount={selectedAlreadyTranslatedCount}
                 onStart={(targets) => {
                     startTranslationJobs(selectedProductIds, targets);
                     closeTranslationModal();

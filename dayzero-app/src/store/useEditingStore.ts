@@ -1,5 +1,30 @@
 import { create } from 'zustand';
 import type { ProductDetail, TranslationJob, EditTabFilter, TranslationBatch, RegistrationBatch } from '../types/editing';
+import { PENDING_JA_TITLES } from '../mock/editingMock';
+
+const PROVIDER_PREFIX_MAP: Record<string, string> = {
+    '[위버스샵]': '[Weverse Shop]',
+    '[Ktown4u]': '[Ktown4u]',
+    '[메이크스타]': '[Makestar]',
+    '[위치폼]': '[Wicefom]',
+    '[FANS]': '[FANS]',
+    '[올리브영]': '[Olive Young]',
+    '[쿠팡]': '[Coupang]',
+    '[다이소]': '[Daiso]',
+    '[yes24]': '[yes24]',
+    '[알라딘]': '[aladin]',
+};
+
+const toJaTitle = (titleKo: string): string => {
+    let result = titleKo;
+    for (const [ko, en] of Object.entries(PROVIDER_PREFIX_MAP)) {
+        if (result.includes(ko)) {
+            result = result.replace(ko, en);
+            break;
+        }
+    }
+    return result;
+};
 
 interface EditingState {
     products: ProductDetail[];
@@ -92,6 +117,7 @@ export const useEditingStore = create<EditingState>((set, get) => ({
         const batchId = `tb-${Date.now()}`;
         const newBatch: TranslationBatch = {
             id: batchId,
+            productIds,
             totalCount: productIds.length,
             currentCount: 0,
             status: 'processing',
@@ -111,40 +137,45 @@ export const useEditingStore = create<EditingState>((set, get) => ({
             };
         });
 
-        // Update local state first
         set((state) => ({
             translationJobs: [...newJobs, ...state.translationJobs],
             translationBatches: [newBatch, ...state.translationBatches],
-            products: state.products.map((p) =>
-                productIds.includes(p.id) ? { ...p, translationStatus: 'processing' } : p
-            ),
+            products: state.products.map((p) => {
+                if (!productIds.includes(p.id)) return p;
+                if (p.translationStatus === 'completed') return { ...p, isReTranslating: true };
+                return { ...p, translationStatus: 'processing' as const };
+            }),
         }));
 
-        // Simulate progress
-        let processedCount = 0;
-        const interval = setInterval(() => {
-            processedCount++;
-
-            const currentJob = newJobs[processedCount - 1];
-            if (currentJob) {
+        // setTimeout × N (setInterval 금지) — 상품당 2~3초 간격으로 순차 완료
+        let cumulativeDelay = 0;
+        productIds.forEach((_pid, i) => {
+            const currentJob = newJobs[i];
+            const completedCount = i + 1;
+            cumulativeDelay += 2000 + Math.floor(Math.random() * 1500);
+            const delay = cumulativeDelay;
+            setTimeout(() => {
                 get().updateTranslationJob(currentJob.id, { status: 'completed' });
-            }
-
-            set((state) => ({
-                translationBatches: state.translationBatches.map(b =>
-                    b.id === batchId ? { ...b, currentCount: processedCount } : b
-                )
-            }));
-
-            if (processedCount >= productIds.length) {
-                clearInterval(interval);
                 set((state) => ({
                     translationBatches: state.translationBatches.map(b =>
-                        b.id === batchId ? { ...b, status: 'completed', completedAt: new Date().toISOString() } : b
+                        b.id === batchId ? { ...b, currentCount: completedCount } : b
                     )
                 }));
-            }
-        }, 1500 + Math.random() * 1000);
+                if (completedCount >= productIds.length) {
+                    // 완료 시 isRead: false → 알림 패널 뱃지 표시
+                    set((state) => ({
+                        translationBatches: state.translationBatches.map(b =>
+                            b.id === batchId ? {
+                                ...b,
+                                status: 'completed',
+                                completedAt: new Date().toISOString(),
+                                isRead: false,
+                            } : b
+                        )
+                    }));
+                }
+            }, delay);
+        });
     },
 
     updateTranslationJob: (jobId, updates) =>
@@ -163,7 +194,8 @@ export const useEditingStore = create<EditingState>((set, get) => ({
                             ? {
                                 ...p,
                                 translationStatus: 'completed' as const,
-                                titleJa: p.titleJa ?? `[번역완료] ${p.titleKo}`,
+                                isReTranslating: false,
+                                titleJa: PENDING_JA_TITLES[p.id] ?? p.titleJa ?? toJaTitle(p.titleKo),
                             }
                             : p
                     );
@@ -259,29 +291,30 @@ export const useEditingStore = create<EditingState>((set, get) => ({
             ),
         }));
 
-        // Simulate progress
-        let processedCount = 0;
-        const interval = setInterval(() => {
-            processedCount++;
-
-            set((state) => ({
-                registrationBatches: state.registrationBatches.map(b =>
-                    b.id === batchId ? { ...b, currentCount: processedCount } : b
-                )
-            }));
-
-            if (processedCount >= productIds.length) {
-                clearInterval(interval);
+        // setTimeout × N (setInterval 금지) — 상품당 2~3초 간격으로 순차 완료
+        let cumulativeDelay = 0;
+        productIds.forEach((_pid, i) => {
+            const completedCount = i + 1;
+            cumulativeDelay += 2000 + Math.floor(Math.random() * 1000);
+            const delay = cumulativeDelay;
+            setTimeout(() => {
                 set((state) => ({
                     registrationBatches: state.registrationBatches.map(b =>
-                        b.id === batchId ? { ...b, status: 'completed', completedAt: new Date().toISOString() } : b
-                    ),
-                    products: state.products.map((p) =>
-                        productIds.includes(p.id) ? { ...p, editStatus: 'completed' } : p
-                    ),
+                        b.id === batchId ? { ...b, currentCount: completedCount } : b
+                    )
                 }));
-            }
-        }, 2000 + Math.random() * 1000);
+                if (completedCount >= productIds.length) {
+                    set((state) => ({
+                        registrationBatches: state.registrationBatches.map(b =>
+                            b.id === batchId ? { ...b, status: 'completed', isRead: false } : b
+                        ),
+                        products: state.products.map((p) =>
+                            productIds.includes(p.id) ? { ...p, editStatus: 'completed' } : p
+                        ),
+                    }));
+                }
+            }, delay);
+        });
     },
     markProductsRead: (exceptJobId) => set((state) => ({
         products: state.products.map(p => {

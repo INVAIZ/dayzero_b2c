@@ -130,6 +130,91 @@
       ]
     }
   },
-  "hotPaths": [],
+  "hotPaths": [
+    {
+      "path": "dayzero-app/src/pages/editing/EditingListPage.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1773229887808,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/editing/components/ProductListItem.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1773229874739,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/store/useEditingStore.ts",
+      "accessCount": 3,
+      "lastAccessed": 1773223801989,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app",
+      "accessCount": 2,
+      "lastAccessed": 1773223646719,
+      "type": "directory"
+    },
+    {
+      "path": "docs/06_편집파트_개발_Plan.md",
+      "accessCount": 2,
+      "lastAccessed": 1773229109174,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/editing/components/TranslationModal.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773229114619,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/editing/components/BulkActionBar.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773229114938,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/editing",
+      "accessCount": 2,
+      "lastAccessed": 1773229126861,
+      "type": "directory"
+    },
+    {
+      "path": "dayzero-app/src/components/common/NotificationPanel.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773223682355,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/components/common/Checkbox.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773223749551,
+      "type": "file"
+    },
+    {
+      "path": "docs/04_화면별 기능 명세서.md",
+      "accessCount": 1,
+      "lastAccessed": 1773229108293,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/editing/components/CollectionProgressBanner.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773229115413,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/design/tokens.ts",
+      "accessCount": 1,
+      "lastAccessed": 1773229312846,
+      "type": "file"
+    },
+    {
+      "path": "reviews/2026-03-11-ED-01-review.md",
+      "accessCount": 1,
+      "lastAccessed": 1773229445090,
+      "type": "file"
+    }
+  ],
   "userDirectives": []
 }

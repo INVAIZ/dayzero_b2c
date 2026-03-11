@@ -50,6 +50,7 @@ export interface ProductDetail {
     jobId?: string; // 소싱 작업 고유 ID (알림 연동용)
     weightKg: number;
     isWeightEstimated: boolean;
+    isReTranslating?: boolean;
 }
 
 export interface TranslationJob {
@@ -66,10 +67,12 @@ export type EditTabFilter = 'all' | 'needs_translation' | 'translated';
 
 export interface TranslationBatch {
     id: string;
+    productIds: string[];
     totalCount: number;
     currentCount: number;
     status: 'processing' | 'completed' | 'failed';
     createdAt: string;
+    completedAt?: string;
     isRead?: boolean;
 }
 

@@ -149,32 +149,44 @@
   "hotPaths": [
     {
       "path": "src/components/common/NotificationPanel.tsx",
-      "accessCount": 67,
-      "lastAccessed": 1773208391714,
+      "accessCount": 76,
+      "lastAccessed": 1773227390343,
       "type": "file"
     },
     {
       "path": "src/pages/editing/EditingListPage.tsx",
-      "accessCount": 38,
-      "lastAccessed": 1773209095545,
+      "accessCount": 49,
+      "lastAccessed": 1773230121718,
       "type": "file"
     },
     {
       "path": "src/store/useEditingStore.ts",
-      "accessCount": 19,
-      "lastAccessed": 1773208904067,
+      "accessCount": 37,
+      "lastAccessed": 1773230533169,
       "type": "file"
     },
     {
       "path": "src/pages/sourcing/components/UrlSourcingContent.tsx",
-      "accessCount": 16,
-      "lastAccessed": 1773208189663,
+      "accessCount": 21,
+      "lastAccessed": 1773226424660,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/editing/components/ProductListItem.tsx",
+      "accessCount": 18,
+      "lastAccessed": 1773226866269,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/editing/components/BulkActionBar.tsx",
+      "accessCount": 14,
+      "lastAccessed": 1773230363943,
       "type": "file"
     },
     {
       "path": "src/store/useSourcingStore.ts",
-      "accessCount": 11,
-      "lastAccessed": 1773208315008,
+      "accessCount": 12,
+      "lastAccessed": 1773224219468,
       "type": "directory"
     },
     {
@@ -184,16 +196,16 @@
       "type": "file"
     },
     {
-      "path": "src/pages/editing/components/ProductListItem.tsx",
+      "path": "src/mock/editingMock.ts",
       "accessCount": 10,
-      "lastAccessed": 1773208884785,
+      "lastAccessed": 1773224398707,
       "type": "file"
     },
     {
-      "path": "src/pages/editing/components/BulkActionBar.tsx",
-      "accessCount": 8,
-      "lastAccessed": 1773158396109,
-      "type": "file"
+      "path": "src",
+      "accessCount": 7,
+      "lastAccessed": 1773230462547,
+      "type": "directory"
     },
     {
       "path": "src/components/layout/Sidebar.tsx",
@@ -209,9 +221,21 @@
     },
     {
       "path": "src/pages/sourcing/AutoSourcingPage.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1773193440428,
+      "accessCount": 5,
+      "lastAccessed": 1773224761791,
       "type": "file"
+    },
+    {
+      "path": "src/types/editing.ts",
+      "accessCount": 5,
+      "lastAccessed": 1773227066547,
+      "type": "file"
+    },
+    {
+      "path": "src/types/sourcing.ts",
+      "accessCount": 4,
+      "lastAccessed": 1773230275648,
+      "type": "directory"
     },
     {
       "path": "src/components/onboarding/OnboardingContext.tsx",
@@ -226,22 +250,10 @@
       "type": "directory"
     },
     {
-      "path": "src/mock/editingMock.ts",
+      "path": "src/pages/editing/components/TranslationModal.tsx",
       "accessCount": 3,
-      "lastAccessed": 1773207835354,
+      "lastAccessed": 1773224854608,
       "type": "file"
-    },
-    {
-      "path": "src",
-      "accessCount": 3,
-      "lastAccessed": 1773207865879,
-      "type": "directory"
-    },
-    {
-      "path": "src/types/sourcing.ts",
-      "accessCount": 3,
-      "lastAccessed": 1773208827063,
-      "type": "directory"
     },
     {
       "path": "src/mock/authMock.ts",
@@ -262,15 +274,15 @@
       "type": "file"
     },
     {
-      "path": "src/types/editing.ts",
-      "accessCount": 2,
-      "lastAccessed": 1773190019131,
-      "type": "file"
-    },
-    {
       "path": "src/mock/categoryMap.ts",
       "accessCount": 2,
       "lastAccessed": 1773210066861,
+      "type": "file"
+    },
+    {
+      "path": "src/App.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773224206983,
       "type": "file"
     },
     {
@@ -290,12 +302,6 @@
       "accessCount": 1,
       "lastAccessed": 1773193449499,
       "type": "directory"
-    },
-    {
-      "path": "src/App.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773207890712,
-      "type": "file"
     },
     {
       "path": "src/components/common/Checkbox.tsx",

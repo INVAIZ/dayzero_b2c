@@ -6,7 +6,8 @@
       "Bash(npm run:*)",
       "Bash(npx tsc:*)",
       "Bash(grep -roh \"#[0-9A-Fa-f]\\\\{3,6\\\\}\" /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src --include=\"*.tsx\" | sort | uniq -c | sort -rn | head -30)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(grep -rn \"#[0-9A-Fa-f]\\\\{3,6\\\\}\\\\|rgba\\(\" /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/pages/editing/ --include=\"*.tsx\" | grep -v \"node_modules\")"
     ]
   }
 }

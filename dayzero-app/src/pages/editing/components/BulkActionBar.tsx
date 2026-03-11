@@ -93,13 +93,14 @@ export const BulkActionBar: React.FC<Props> = ({
                     alignItems: 'center',
                     gap: spacing['2'],
                     padding: `${spacing['2']} ${spacing['4']}`,
-                    background: registerCount > 0 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)',
+                    background: registerCount > 0 ? colors.primary : 'rgba(255,255,255,0.1)',
                     color: registerCount > 0 ? '#FFFFFF' : 'rgba(255,255,255,0.3)',
-                    border: `1px solid ${registerCount > 0 ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)'}`,
+                    border: 'none',
                     borderRadius: radius.md,
                     fontSize: font.size.md,
                     fontWeight: 600,
                     cursor: registerCount > 0 ? 'pointer' : 'default',
+                    opacity: registerCount > 0 ? 1 : 0.5,
                 }}
             >
                 <Upload size={16} />

@@ -322,6 +322,45 @@ const daysAgo = (d: number) => new Date(Date.now() - d * 86_400_000).toISOString
 // n-2: 쿠팡 URL 수집 완료 8건, n-3: 다이소 자동 수집 완료 (다이소 pending 전체)
 const COUPANG_NEW_IDS = new Set(['prod-14','prod-15','prod-16','prod-17','prod-18','prod-19','prod-20','prod-21']);
 
+// pending 상품들의 번역 완료 시 사용할 일본어 제목 맵
+export const PENDING_JA_TITLES: Record<string, string> = {
+    'prod-14': '[Coupang] クロックス クラシック クロッグ ユニセックス',
+    'prod-15': '[Coupang] オトゥギ ごまラーメン 5個入りマルチパック',
+    'prod-16': '[Coupang] ナムヤン おいしい豆乳GT 900ml 24本入り',
+    'prod-17': '[Coupang] bibigo 王餃子 冷凍餃子 1.05kg',
+    'prod-18': '[Coupang] 辛ラーメン ブラック 5個入り',
+    'prod-19': '[Coupang] 東遠 ライトスタンダードツナ缶 100g×10缶',
+    'prod-20': '[Coupang] CJ SPAM クラシック 340g×6缶',
+    'prod-21': '[Coupang] ヘクプルダック炒め麺 5個入り',
+    'prod-22': '[Coupang] T-fal インジニオ フライパン 28cm',
+    'prod-23': '[Coupang] CUCKOO 6合炊き電気炊飯器 CRP-P0660FW',
+    'prod-24': '[Coupang] Dyson エアラップ コンプリート ロング',
+    'prod-25': '[Coupang] Philips 電動歯ブラシ ソニッケアー HX3671',
+    'prod-26': '[Coupang] Hutech マッサージチェア HCP-600D',
+    'prod-27': "[Coupang] Nike エアフォース1 '07 ホワイト",
+    'prod-28': '[Coupang] New Balance 993 グレー MR993GL',
+    'prod-29': '[Coupang] Apple iPhone 15 Pro シリコーンケース',
+    'prod-30': '[Coupang] Samsung Galaxy Buds2 Pro ホワイト',
+    'prod-31': '[Coupang] Logicool MX Keys S ワイヤレスキーボード',
+    'prod-32': '[Coupang] Head & Shoulders クールメントール シャンプー 900ml',
+    'prod-33': '[Coupang] Downy 柔軟剤 パープル 3.2L',
+    'prod-34': '[Daiso] スチームアイロン 小型 携帯用',
+    'prod-35': '[Daiso] マルチケーブル整理ボックス デスクオーガナイザー',
+    'prod-36': '[Daiso] ワンタッチ水筒 500ml トライタン',
+    'prod-37': '[Daiso] ミニ卓上扇風機 USB式',
+    'prod-38': '[Daiso] アクリルコスメ収納ケース 3段',
+    'prod-39': '[Daiso] 折りたたみ物干しラック 小型',
+    'prod-40': '[Daiso] クリップ式書見台 デスクスタンド',
+    'prod-41': '[Daiso] シリコンストローセット 6本入り ケース付き',
+    'prod-42': '[Daiso] マグネットメモボード A4 ホワイト',
+    'prod-43': '[Daiso] 折りたたみキャンプチェア ミニ軽量',
+    'prod-44': '[Daiso] 防水収納袋 ジッパー大型 5枚入り',
+    'prod-45': '[Daiso] 浴室用ノンスリップバスマット 40×60cm',
+    'prod-46': '[Daiso] キッチン洗剤泡ディスペンサー 500ml',
+    'prod-47': '[Daiso] 自動開閉ゴミ箱 10L スマートセンサー付き',
+    'prod-48': '[Daiso] モーションセンサーLEDライト 室内用',
+};
+
 // 번역 완료(13건): 7~19일 전 수집 / 번역 필요(35건): 1~6일 전 수집
 export const MOCK_PRODUCTS: ProductDetail[] = [
     ...translatedProducts.map((p, i) => ({ ...p, createdAt: daysAgo(7 + i) })),

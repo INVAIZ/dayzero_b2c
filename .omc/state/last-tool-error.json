@@ -1,7 +1,7 @@
 {
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"ls /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/pages/sourcing && ls /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/components/sourcing\",\"description\":\"List sou...",
-  "error": "Exit code 1\nAutoSourcingPage.tsx\nUrlSourcingPage.tsx\ncomponents\nls: /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/components/sourcing: No such file or directory",
-  "timestamp": "2026-03-10T10:05:05.942Z",
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"/Users/invaiz/Documents/develop/dayzero_B2C/docs/04_화면별 기능 명세서.md\"}",
+  "error": "File content (50957 tokens) exceeds maximum allowed tokens (25000). Use offset and limit parameters to read specific portions of the file, or search for specific content instead of reading the whole file.",
+  "timestamp": "2026-03-11T10:07:22.316Z",
   "retry_count": 1
 }
