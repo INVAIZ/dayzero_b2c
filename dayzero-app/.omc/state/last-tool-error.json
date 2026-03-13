@@ -1,7 +1,7 @@
 {
   "tool_name": "Read",
-  "tool_input_preview": "{\"file_path\":\"/Users/invaiz/Documents/develop/dayzero_B2C/docs/04_화면별 기능 명세서.md\"}",
-  "error": "File content (50957 tokens) exceeds maximum allowed tokens (25000). Use offset and limit parameters to read specific portions of the file, or search for specific content instead of reading the whole file.",
-  "timestamp": "2026-03-12T12:43:36.797Z",
+  "tool_input_preview": "{\"file_path\":\"/Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/pages/registration/RegistrationListPage.tsx\",\"limit\":50}",
+  "error": "File does not exist. Note: your current working directory is /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app.",
+  "timestamp": "2026-03-13T14:52:01.121Z",
   "retry_count": 1
 }

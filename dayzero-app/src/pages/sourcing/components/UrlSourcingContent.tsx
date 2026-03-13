@@ -4,7 +4,7 @@ import { SOURCING_PROVIDERS, MOCK_URL_TO_PROVIDER } from '../../../types/sourcin
 import type { SourcingProvider, SourcedProduct } from '../../../types/sourcing';
 import { useSourcingStore } from '../../../store/useSourcingStore';
 import { useEditingStore } from '../../../store/useEditingStore';
-import { useToastStore } from '../../../store/useToastStore';
+
 import { Link2, AlertCircle, Loader2, CheckCircle2, XCircle, ArrowRight, X } from 'lucide-react';
 import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
 import { colors } from '../../../design/tokens';
@@ -21,7 +21,6 @@ interface ParsedUrl {
 export const UrlSourcingContent = () => {
     const navigate = useNavigate();
     const { addJob, addProduct, addNotification, updateNotification, urlSourcing, setUrlSourcing } = useSourcingStore();
-    const { addToast } = useToastStore();
     const { state: onboardingState } = useOnboarding();
 
     const { urls, parsedUrls, isCollecting, collectionStarted } = urlSourcing;
@@ -289,19 +288,6 @@ export const UrlSourcingContent = () => {
                 completedAt: new Date().toISOString(),
             });
 
-            const failedCount = urlsSnapshot.filter(p => !p.error).length - successProcessed;
-
-            if (failedCount > 0) {
-                addToast(
-                    '요청하신 상품의 수집이 완료되었어요!',
-                    `URL 수집 ${urlsSnapshot.filter(p => !p.error).length}건 중 ${successProcessed}건 성공, ${failedCount}건 실패했어요.`
-                );
-            } else {
-                addToast(
-                    '요청하신 상품의 수집이 완료되었어요!',
-                    `URL 수집 ${successProcessed}건 모두 성공적으로 수집했어요.`
-                );
-            }
         }
     };
 

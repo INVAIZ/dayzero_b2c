@@ -98,10 +98,55 @@
       "status": "completed",
       "completed_at": "2026-03-12T13:48:57.542Z",
       "duration_ms": 38694
+    },
+    {
+      "agent_id": "abefcef6fc37c18d7",
+      "agent_type": "feature-dev:code-explorer",
+      "started_at": "2026-03-13T00:48:28.940Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-13T00:50:24.884Z",
+      "duration_ms": 115944
+    },
+    {
+      "agent_id": "af02b40a85ed444fe",
+      "agent_type": "general-purpose",
+      "started_at": "2026-03-13T06:26:40.199Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-13T06:29:31.516Z",
+      "duration_ms": 171317
+    },
+    {
+      "agent_id": "a9e3832719fe18269",
+      "agent_type": "Explore",
+      "started_at": "2026-03-13T14:47:23.452Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-13T14:48:54.554Z",
+      "duration_ms": 91102
+    },
+    {
+      "agent_id": "a341afb6f35e62f08",
+      "agent_type": "oh-my-claudecode:executor",
+      "started_at": "2026-03-13T14:51:42.310Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-13T14:53:51.546Z",
+      "duration_ms": 129236
+    },
+    {
+      "agent_id": "a14408741dadc204f",
+      "agent_type": "Explore",
+      "started_at": "2026-03-13T15:19:20.856Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-13T15:20:03.521Z",
+      "duration_ms": 42665
     }
   ],
-  "total_spawned": 11,
-  "total_completed": 11,
+  "total_spawned": 16,
+  "total_completed": 16,
   "total_failed": 0,
-  "last_updated": "2026-03-12T15:28:42.548Z"
+  "last_updated": "2026-03-13T15:20:03.625Z"
 }

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Edit3, PackageOpen, ChevronRight } from 'lucide-react';
 import { useSourcingStore } from '../../store/useSourcingStore';
 
-type NavItem = '상품 수집하기' | '수집된 상품 등록' | '등록된 상품 보기';
+type NavItem = '수집하기' | '편집하기' | '판매 중인 상품';
 
 export const Sidebar: React.FC = () => {
     const navigate = useNavigate();
@@ -16,6 +16,7 @@ export const Sidebar: React.FC = () => {
 
     const isSourcingActive = location.pathname.startsWith('/sourcing');
     const isEditingActive = location.pathname.startsWith('/editing');
+    const isRegistrationActive = location.pathname.startsWith('/registration');
 
     useEffect(() => {
         if (unprocessedProductCount > prevCountRef.current) {
@@ -27,13 +28,12 @@ export const Sidebar: React.FC = () => {
     }, [unprocessedProductCount]);
 
     const handleNav = (item: NavItem) => {
-        if (item === '상품 수집하기') {
+        if (item === '수집하기') {
             navigate('/sourcing');
-        } else if (item === '수집된 상품 등록') {
+        } else if (item === '편집하기') {
             navigate('/editing');
-        } else {
-            setShowToast(true);
-            setTimeout(() => setShowToast(false), 2000);
+        } else if (item === '판매 중인 상품') {
+            navigate('/registration');
         }
     };
 
@@ -62,7 +62,7 @@ export const Sidebar: React.FC = () => {
                 <div style={{ fontSize: '13px', fontWeight: 600, color: '#8B95A1', padding: '0 12px', marginBottom: '8px', marginTop: '16px' }}>PRODUCTS</div>
 
                 <button
-                    onClick={() => handleNav('상품 수집하기')}
+                    onClick={() => handleNav('수집하기')}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -87,12 +87,12 @@ export const Sidebar: React.FC = () => {
                     }}
                 >
                     <Search size={20} color={isSourcingActive ? '#191F28' : '#8B95A1'} />
-                    상품 수집하기
+                    수집하기
                     {isSourcingActive && <ChevronRight size={16} color="#B0B8C1" style={{ marginLeft: 'auto' }} />}
                 </button>
 
                 <button
-                    onClick={() => handleNav('수집된 상품 등록')}
+                    onClick={() => handleNav('편집하기')}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -113,7 +113,7 @@ export const Sidebar: React.FC = () => {
                     onMouseOut={(e) => { if (!isEditingActive) e.currentTarget.style.background = 'transparent'; }}
                 >
                     <Edit3 size={20} color={isEditingActive ? '#191F28' : '#8B95A1'} />
-                    수집된 상품 등록
+                    편집하기
                     {isEditingActive && <ChevronRight size={16} color="#B0B8C1" style={{ marginLeft: 'auto' }} />}
                     {!isEditingActive && unprocessedProductCount > 0 && (
                         <div
@@ -139,27 +139,29 @@ export const Sidebar: React.FC = () => {
                 </button>
 
                 <button
-                    onClick={() => handleNav('등록된 상품 보기')}
+                    onClick={() => handleNav('판매 중인 상품')}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '12px',
                         width: '100%',
                         padding: '12px 12px',
-                        background: 'transparent',
+                        background: isRegistrationActive ? '#FFFFFF' : 'transparent',
                         border: 'none',
                         borderRadius: '12px',
                         cursor: 'pointer',
-                        color: '#6B7684',
-                        fontWeight: 500,
+                        color: isRegistrationActive ? '#191F28' : '#6B7684',
+                        fontWeight: isRegistrationActive ? 700 : 500,
                         fontSize: '15px',
                         transition: 'all 0.2s',
+                        boxShadow: isRegistrationActive ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
                     }}
-                    onMouseOver={(e) => (e.currentTarget.style.background = '#F2F4F6')}
-                    onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
+                    onMouseOver={(e) => { if (!isRegistrationActive) e.currentTarget.style.background = '#F2F4F6'; }}
+                    onMouseOut={(e) => { if (!isRegistrationActive) e.currentTarget.style.background = 'transparent'; }}
                 >
-                    <PackageOpen size={20} color="#8B95A1" />
-                    등록된 상품 보기
+                    <PackageOpen size={20} color={isRegistrationActive ? '#191F28' : '#8B95A1'} />
+                    판매 중인 상품
+                    {isRegistrationActive && <ChevronRight size={16} color="#B0B8C1" style={{ marginLeft: 'auto' }} />}
                 </button>
             </nav>
 

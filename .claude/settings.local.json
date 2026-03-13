@@ -37,7 +37,10 @@
       "WebFetch(domain:post.malltail.com)",
       "WebFetch(domain:www.sedaily.com)",
       "WebFetch(domain:poomgo.com)",
-      "WebFetch(domain:article-university.qoo10.jp)"
+      "WebFetch(domain:article-university.qoo10.jp)",
+      "Bash(cp -r /Users/invaiz/Documents/develop/dayzero_B2C/.claude/worktrees/gifted-pike/dayzero-app/src/pages/registration /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/pages/registration)",
+      "Bash(lsof -ti :5173,:5174,:5175,:5176,:5177,:5178,:5179,:5180,:5181,:5182 2>/dev/null | xargs kill -9 2>/dev/null; echo \"done\")",
+      "Bash(pkill -f \"vite\" 2>/dev/null; sleep 1; lsof -ti :5173 2>/dev/null | xargs kill -9 2>/dev/null; echo \"cleaned\")"
     ]
   }
 }

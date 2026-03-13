@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Sidebar } from '../../components/layout/Sidebar';
-import { NotificationPanel } from '../../components/common/NotificationPanel';
+
 import { ToastContainer } from '../../components/common/ToastContainer';
 import { useEditingStore } from '../../store/useEditingStore';
+import { useRegistrationStore } from '../../store/useRegistrationStore';
 import { useToastStore } from '../../store/useToastStore';
 import { EditingHeader } from './components/EditingHeader';
 import { EditingTabBar, type DetailTab } from './components/EditingTabBar';
@@ -17,7 +18,7 @@ export default function EditingDetailPage() {
     const { productId } = useParams<{ productId: string }>();
     const navigate = useNavigate();
 
-    const { products, setCurrentEditProduct, startRegistrationBatch } = useEditingStore();
+    const { products, setCurrentEditProduct } = useEditingStore();
     const addToast = useToastStore((s) => s.addToast);
 
     const [activeTab, setActiveTab] = useState<DetailTab>('basic');
@@ -66,8 +67,9 @@ export default function EditingDetailPage() {
     };
 
     const handleRegister = () => {
-        startRegistrationBatch([product.id]);
+        useRegistrationStore.getState().startJob([product.id], [product]);
         addToast('Qoo10 등록을 시작했습니다', product.titleJa ?? product.titleKo);
+        navigate('/registration');
     };
 
     return (
@@ -78,7 +80,7 @@ export default function EditingDetailPage() {
             fontFamily: "'Pretendard', -apple-system, sans-serif",
         }}>
             <Sidebar />
-            <NotificationPanel />
+
             <ToastContainer />
 
             <main style={{

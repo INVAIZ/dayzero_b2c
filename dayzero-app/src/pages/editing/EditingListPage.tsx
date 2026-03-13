@@ -1,8 +1,9 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, Check, ChevronUp, ChevronDown } from 'lucide-react';
+import { Search, Check, ChevronUp, ChevronDown, ClockIcon } from 'lucide-react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { useEditingStore } from '../../store/useEditingStore';
+import { useRegistrationStore } from '../../store/useRegistrationStore';
 import { useSourcingStore } from '../../store/useSourcingStore';
 import { useOnboarding } from '../../components/onboarding/OnboardingContext';
 import { SOURCING_PROVIDERS } from '../../types/sourcing';
@@ -12,6 +13,7 @@ import { BulkActionBar } from './components/BulkActionBar';
 import { TranslationModal } from './components/TranslationModal';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { Checkbox } from '../../components/common/Checkbox';
+import { SourcingHistoryModal } from './components/SourcingHistoryModal';
 import { colors, font, radius, spacing } from '../../design/tokens';
 import { calculateIntlShippingKrw } from '../../utils/shipping';
 import { isFullyTranslated } from '../../utils/editing';
@@ -19,7 +21,7 @@ import { isFullyTranslated } from '../../utils/editing';
 const TAB_LABELS: { key: EditTabFilter; label: string }[] = [
     { key: 'all', label: '전체' },
     { key: 'needs_translation', label: '편집 필요' },
-    { key: 'translated', label: '작성 완료' },
+    { key: 'translated', label: '편집 완료' },
 ];
 
 type SortKey = 'createdAt' | 'salePriceJpy' | 'title';
@@ -69,7 +71,7 @@ export default function EditingListPage() {
         setActiveTab, setProviderFilter, setSearchKeyword,
         toggleSelectProduct, selectAll, clearSelection,
         openTranslationModal, closeTranslationModal, isTranslationModalOpen, deleteProducts, updateProduct,
-        startTranslationJobs, startRegistrationBatch, markProductsRead, selectByJobId
+        startTranslationJobs, markProductsRead, selectByJobId
     } = useEditingStore();
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -81,7 +83,8 @@ export default function EditingListPage() {
     }, [markProductsRead]);
 
     const { state: onboardingState } = useOnboarding();
-    const { clearUnprocessedCount } = useSourcingStore();
+    const { clearUnprocessedCount, notifications: sourcingNotifications, products: sourcingProducts } = useSourcingStore();
+    const [isSourcingHistoryOpen, setIsSourcingHistoryOpen] = useState(false);
 
     useEffect(() => {
         clearUnprocessedCount();
@@ -132,19 +135,25 @@ export default function EditingListPage() {
         }
     }, [products.length, onboardingState, updateProduct]);
 
+    // 등록 완료/진행 중 상품은 편집 목록에서 제외
+    const editableProducts = useMemo(
+        () => products.filter(p => p.editStatus !== 'completed' && p.editStatus !== 'processing'),
+        [products]
+    );
+
     // 탭별 건수 (providerFilter 무관하게 계산) — 상품명·옵션·상세설명 모두 완료 기준
     const counts = useMemo(() => ({
-        all: products.length,
-        needs_translation: products.filter((p) => !isFullyTranslated(p)).length,
-        translated: products.filter((p) => isFullyTranslated(p)).length,
-    }), [products]);
+        all: editableProducts.length,
+        needs_translation: editableProducts.filter((p) => !isFullyTranslated(p)).length,
+        translated: editableProducts.filter((p) => isFullyTranslated(p)).length,
+    }), [editableProducts]);
 
     // 탭 기준 필터링 (소싱처 필터 전) — 완전 번역 완료 여부 기준
-    const tabFiltered = useMemo(() => products.filter((p) => {
+    const tabFiltered = useMemo(() => editableProducts.filter((p) => {
         if (activeTab === 'needs_translation') return !isFullyTranslated(p);
         if (activeTab === 'translated') return isFullyTranslated(p);
         return true;
-    }), [products, activeTab]);
+    }), [editableProducts, activeTab]);
 
     // 현재 탭에 존재하는 소싱처만 추출
     const availableProviders = useMemo(() => {
@@ -204,15 +213,27 @@ export default function EditingListPage() {
 
             {/* 페이지 헤더 */}
             <div style={{ marginBottom: spacing['6'], animation: 'fadeInUp 0.6s ease' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'], marginBottom: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
                     <h1 style={{ fontSize: font.size['2xl'], fontWeight: 700, color: colors.text.primary }}>수집된 상품</h1>
-                    <span style={{
-                        padding: '4px 10px', borderRadius: radius.full,
-                        background: colors.bg.subtle, fontSize: font.size.sm,
-                        fontWeight: 700, color: colors.text.secondary,
-                    }}>
-                        {products.length}건
-                    </span>
+                    <button
+                        onClick={() => setIsSourcingHistoryOpen(true)}
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: spacing['2'],
+                            padding: `${spacing['2']} ${spacing['3']}`,
+                            background: colors.bg.surface,
+                            border: `1px solid ${colors.border.default}`,
+                            borderRadius: radius.md,
+                            fontSize: font.size.sm, fontWeight: 500,
+                            color: colors.text.secondary,
+                            cursor: 'pointer',
+                            transition: 'all 0.15s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = colors.bg.surface; }}
+                    >
+                        <ClockIcon size={14} />
+                        소싱 기록
+                    </button>
                 </div>
                 <p style={{ fontSize: font.size.md, color: colors.text.tertiary }}>
                     번역 후 Qoo10에 등록할 상품을 편집하고 등록하세요.
@@ -370,8 +391,10 @@ export default function EditingListPage() {
                 onTranslate={openTranslationModal}
                 onRegister={() => {
                     if (selectedTranslatedIds.length > 0) {
-                        startRegistrationBatch(selectedTranslatedIds);
+                        const productsToRegister = products.filter(p => selectedTranslatedIds.includes(p.id));
+                        useRegistrationStore.getState().startJob(selectedTranslatedIds, productsToRegister);
                         clearSelection();
+                        navigate('/registration');
                     }
                 }}
                 onDelete={() => setIsDeleteModalOpen(true)}
@@ -400,6 +423,19 @@ export default function EditingListPage() {
                     startTranslationJobs(selectedProductIds, targets);
                     closeTranslationModal();
                     clearSelection();
+                }}
+            />
+
+            <SourcingHistoryModal
+                isOpen={isSourcingHistoryOpen}
+                onClose={() => setIsSourcingHistoryOpen(false)}
+                notifications={sourcingNotifications}
+                sourcingProducts={sourcingProducts}
+                editingProducts={products}
+                onSelectJob={(notifId) => {
+                    setActiveTab('all');
+                    setProviderFilter('전체');
+                    selectByJobId(notifId);
                 }}
             />
         </MainLayout>

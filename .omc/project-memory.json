@@ -183,6 +183,30 @@
       "type": "file"
     },
     {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/pages/registration/components/AllProductsTable.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773369405326,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/pages/registration/components/SuccessProductTable.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773369423846,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/pages/registration/components/FailedProductTable.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773369455825,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/pages/registration/components/BatchHistoryModal.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773369497236,
+      "type": "file"
+    },
+    {
       "path": "dayzero-app/src/components/onboarding/OnboardingLayout.tsx",
       "accessCount": 1,
       "lastAccessed": 1773325546838,
@@ -216,6 +240,72 @@
       "path": "dayzero-app/src/components/common/SourceTag.tsx",
       "accessCount": 1,
       "lastAccessed": 1773330644013,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/pages/registration/RegistrationResultPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773369286264,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/pages/registration/components/ResultSummaryCards.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773369287174,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/pages/registration/components/BatchHistoryList.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773369287692,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/pages/registration/components/SuccessSummaryCard.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773369295865,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/pages/registration/components/RegistrationTabBar.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773369297721,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/types",
+      "accessCount": 1,
+      "lastAccessed": 1773369305794,
+      "type": "directory"
+    },
+    {
+      "path": "dayzero-app/src/components/common/NotificationPanel.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773369306662,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/types/registration.ts",
+      "accessCount": 1,
+      "lastAccessed": 1773369314268,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/pages/registration/components/ErrorDetailPanel.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773369314987,
+      "type": "file"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/store",
+      "accessCount": 1,
+      "lastAccessed": 1773369348813,
+      "type": "directory"
+    },
+    {
+      "path": ".claude/worktrees/gifted-pike/dayzero-app/src/store/useRegistrationStore.ts",
+      "accessCount": 1,
+      "lastAccessed": 1773369354350,
       "type": "file"
     }
   ],
