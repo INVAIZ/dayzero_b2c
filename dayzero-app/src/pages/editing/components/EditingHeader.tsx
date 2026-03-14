@@ -66,6 +66,7 @@ export const EditingHeader: React.FC<Props> = ({
                     <img
                         src={product.thumbnailUrl}
                         alt=""
+                        onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
                         style={{
                             width: '40px', height: '40px',
                             borderRadius: radius.md,
@@ -180,7 +181,7 @@ export const EditingHeader: React.FC<Props> = ({
                                 transition: 'background 0.2s',
                             }}
                         >
-                            Qoo10 등록
+                            Qoo10에 등록하기
                         </button>
 
                         {showRegTooltip && (

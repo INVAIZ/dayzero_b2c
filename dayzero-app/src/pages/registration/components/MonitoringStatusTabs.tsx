@@ -1,6 +1,6 @@
 import { colors, font, spacing, radius } from '../../../design/tokens';
 
-export type MonitoringTabFilter = '판매 중' | '변동 확인 중' | '판매 중지';
+export type MonitoringTabFilter = '판매 중' | '변동 알림 중' | '판매 중지';
 
 interface Props {
     activeTab: MonitoringTabFilter;
@@ -37,23 +37,23 @@ export const MonitoringStatusTabs: React.FC<Props> = ({ activeTab, onChange, cou
                 )}
             </TabButton>
 
-            {/* 변동 확인 중 */}
+            {/* 변동 알림 중 */}
             <TabButton
-                label="변동 확인 중"
-                isActive={activeTab === '변동 확인 중'}
-                onClick={() => onChange('변동 확인 중')}
+                label="변동 알림 중"
+                isActive={activeTab === '변동 알림 중'}
+                onClick={() => onChange('변동 알림 중')}
             >
                 {counts.monitoring > 0 && (
                     <CountBadge
                         count={counts.monitoring}
-                        isActive={activeTab === '변동 확인 중'}
+                        isActive={activeTab === '변동 알림 중'}
                         variant="blue"
                     />
                 )}
                 {counts.issues > 0 && (
                     <CountBadge
                         count={counts.issues}
-                        isActive={activeTab === '변동 확인 중'}
+                        isActive={activeTab === '변동 알림 중'}
                         variant="red"
                     />
                 )}

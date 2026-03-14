@@ -158,14 +158,14 @@
   "hotPaths": [
     {
       "path": "src/pages/registration/RegistrationResultPage.tsx",
-      "accessCount": 59,
-      "lastAccessed": 1773475075098,
+      "accessCount": 76,
+      "lastAccessed": 1773487677676,
       "type": "file"
     },
     {
       "path": "src/pages/registration/ProductDetailPage.tsx",
-      "accessCount": 24,
-      "lastAccessed": 1773476611328,
+      "accessCount": 44,
+      "lastAccessed": 1773489512409,
       "type": "file"
     },
     {
@@ -175,27 +175,111 @@
       "type": "file"
     },
     {
+      "path": "src/pages/editing/EditingListPage.tsx",
+      "accessCount": 13,
+      "lastAccessed": 1773487381863,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/SourcingPage.tsx",
+      "accessCount": 12,
+      "lastAccessed": 1773487663864,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/sourcing/components/UrlSourcingContent.tsx",
+      "accessCount": 10,
+      "lastAccessed": 1773486551884,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/registration/components/AllProductsTable.tsx",
+      "accessCount": 10,
+      "lastAccessed": 1773489375830,
+      "type": "file"
+    },
+    {
       "path": "src/pages/registration/components/FailedBulkActionBar.tsx",
       "accessCount": 9,
       "lastAccessed": 1773473898875,
       "type": "file"
     },
     {
-      "path": "src/pages/sourcing/components/UrlSourcingContent.tsx",
-      "accessCount": 7,
-      "lastAccessed": 1773471873982,
+      "path": "src/store/useRegistrationStore.ts",
+      "accessCount": 9,
+      "lastAccessed": 1773486530076,
       "type": "file"
     },
     {
-      "path": "src/pages/registration/components/AllProductsTable.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1773473176808,
+      "path": "src/pages/editing/components/EditingHeader.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1773489380811,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/sourcing/UrlSourcingPage.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1773486353387,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/editing/tabs/PriceEditTab.tsx",
+      "accessCount": 8,
+      "lastAccessed": 1773486389564,
       "type": "file"
     },
     {
       "path": "src/pages/registration/components/MonitoringStatusTabs.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1773486288643,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/editing/components/BulkActionBar.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1773486302884,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/sourcing/AutoSourcingPage.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1773486320545,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/onboarding/BasicMarginPage.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1773486538376,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 6,
+      "lastAccessed": 1773487702182,
+      "type": "directory"
+    },
+    {
+      "path": "src/pages/editing/components/ProductListItem.tsx",
+      "accessCount": 6,
+      "lastAccessed": 1773489359819,
+      "type": "file"
+    },
+    {
+      "path": "src",
+      "accessCount": 6,
+      "lastAccessed": 1773489392708,
+      "type": "directory"
+    },
+    {
+      "path": "src/components/common/GlobalNavigationBar.tsx",
       "accessCount": 5,
-      "lastAccessed": 1773474332685,
+      "lastAccessed": 1773486283277,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/editing/tabs/BasicEditTab.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1773489525102,
       "type": "file"
     },
     {
@@ -205,15 +289,15 @@
       "type": "directory"
     },
     {
-      "path": "src/pages/editing/components/EditingHeader.tsx",
+      "path": "src/components/common/ConfirmModal.tsx",
       "accessCount": 4,
-      "lastAccessed": 1773476540356,
+      "lastAccessed": 1773485860125,
       "type": "file"
     },
     {
-      "path": "src/pages/onboarding/BasicMarginPage.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1773471818211,
+      "path": "index.html",
+      "accessCount": 4,
+      "lastAccessed": 1773487967022,
       "type": "file"
     },
     {
@@ -223,34 +307,22 @@
       "type": "file"
     },
     {
-      "path": "src/store/useRegistrationStore.ts",
+      "path": "src/pages/editing/EditingDetailPage.tsx",
       "accessCount": 3,
-      "lastAccessed": 1773473127630,
-      "type": "file"
-    },
-    {
-      "path": "src/components/common/ConfirmModal.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1773475184826,
+      "lastAccessed": 1773485849897,
       "type": "file"
     },
     {
       "path": "src/components/layout/Sidebar.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1773471809969,
+      "accessCount": 3,
+      "lastAccessed": 1773485860467,
       "type": "file"
     },
     {
-      "path": "src/pages/editing/components/ProductListItem.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1773471811051,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/editing/tabs/BasicEditTab.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1773471814664,
-      "type": "file"
+      "path": "src/pages/registration/components/SuccessProductTable.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1773489400787,
+      "type": "directory"
     },
     {
       "path": "src/pages/registration/components/BatchHistoryModal.tsx",
@@ -259,9 +331,21 @@
       "type": "file"
     },
     {
-      "path": "src/pages/editing/EditingDetailPage.tsx",
+      "path": "src/pages/registration/components/MonitoringHistoryModal.tsx",
       "accessCount": 2,
-      "lastAccessed": 1773476546367,
+      "lastAccessed": 1773486503707,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/MainLayout.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773487400723,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/registration/components/FailedProductTable.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773489518516,
       "type": "file"
     },
     {
@@ -275,6 +359,24 @@
       "accessCount": 1,
       "lastAccessed": 1773475132978,
       "type": "directory"
+    },
+    {
+      "path": "src/pages/editing/components/EditingTabBar.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773485850550,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/editing/components/TranslationModal.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773485854156,
+      "type": "file"
+    },
+    {
+      "path": "src/components/common/StatusComponents.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773485860372,
+      "type": "file"
     }
   ],
   "userDirectives": []

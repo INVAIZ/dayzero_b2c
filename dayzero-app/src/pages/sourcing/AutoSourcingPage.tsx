@@ -199,7 +199,7 @@ export default function AutoSourcingPage() {
                 {/* 1. Provider Selection */}
                 <div style={{ marginBottom: '40px' }}>
                     <h2 style={{ fontSize: '16px', fontWeight: 700, color: colors.text.primary, marginBottom: '16px' }}>
-                        1. 소싱처 선택 <span style={{ color: colors.primary }}>*</span>
+                        1. 쇼핑몰 선택 <span style={{ color: colors.primary }}>*</span>
                     </h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
                         {SOURCING_PROVIDERS.map((provider) => {
@@ -241,13 +241,13 @@ export default function AutoSourcingPage() {
                 {/* 2. Category Settings per Selected Provider */}
                 <div style={{ marginBottom: '40px', opacity: providerSettings.length === 0 ? 0.4 : 1, pointerEvents: providerSettings.length === 0 ? 'none' : 'auto', transition: 'opacity 0.2s' }}>
                     <h2 style={{ fontSize: '16px', fontWeight: 700, color: colors.text.primary, marginBottom: '16px' }}>
-                        2. 소싱처별 수집 기준 설정
+                        2. 쇼핑몰별 수집 기준 설정
                     </h2>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {providerSettings.length === 0 ? (
                             <div style={{ background: colors.bg.page, border: `1px solid ${colors.border.default}`, borderRadius: '16px', padding: '32px', textAlign: 'center', color: colors.text.muted, fontSize: '14px' }}>
-                                위에서 소싱처를 하나 이상 선택해주세요.
+                                위에서 쇼핑몰을 하나 이상 선택해주세요.
                             </div>
                         ) : (
                             providerSettings.map(setting => {
@@ -354,7 +354,7 @@ export default function AutoSourcingPage() {
                             disabled={!isFormValid}
                             style={{ width: '160px', background: isFormValid ? colors.primary : colors.border.default, color: isFormValid ? colors.bg.surface : colors.text.muted }}
                         >
-                            {editId ? '수정 완료' : '완료'}
+                            {editId ? '수정 저장하기' : '설정 저장하기'}
                         </button>
                     </div>
                 </div>

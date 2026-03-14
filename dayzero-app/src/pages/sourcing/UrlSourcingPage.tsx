@@ -42,7 +42,7 @@ export default function UrlSourcingPage() {
                 provider,
                 status: 'idle',
                 error: !url.startsWith('http') ? '올바른 URL을 입력해주세요'
-                    : !provider ? '현재 지원하지 않는 소싱처예요'
+                    : !provider ? '지원하지 않는 쇼핑몰이에요. 올리브영·쿠팡·다이소 URL을 사용해주세요.'
                         : undefined
             };
         });
@@ -114,7 +114,7 @@ export default function UrlSourcingPage() {
                 successProcessed++;
             } else {
                 setParsedUrls(prev => prev.map(p =>
-                    p.id === current.id ? { ...p, status: 'failed', error: '소싱처 접속이 일시적으로 불안정해요. 잠시 후 재시도해보세요' } : p
+                    p.id === current.id ? { ...p, status: 'failed', error: '쇼핑몰 접속이 일시적으로 불안정해요. 잠시 후 재시도해보세요' } : p
                 ));
             }
 
@@ -184,7 +184,7 @@ export default function UrlSourcingPage() {
                     onClick={() => navigate('/sourcing')}
                     style={{ background: 'none', border: 'none', color: '#8B95A1', fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', marginBottom: '24px', padding: 0 }}
                 >
-                    ← 소싱 홈으로
+                    ← 수집 홈으로
                 </button>
 
                 <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#191F28', marginBottom: '8px' }}>
@@ -202,7 +202,7 @@ export default function UrlSourcingPage() {
                                 <textarea
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
-                                    placeholder={'소싱처 상품 URL을 입력하세요 (줄바꿈으로 여러 개 입력 가능)\n예) https://www.oliveyoung.co.kr/store/...'}
+                                    placeholder={'쇼핑몰 상품 URL을 입력하세요 (줄바꿈으로 여러 개 입력 가능)\n예) https://www.oliveyoung.co.kr/store/...'}
                                     style={{
                                         width: '100%',
                                         minHeight: '160px',
@@ -254,7 +254,7 @@ export default function UrlSourcingPage() {
                                 onClick={() => setShowProviders(!showProviders)}
                                 style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: '#4E5968', cursor: 'pointer', padding: 0 }}
                             >
-                                지원 소싱처 보기 {showProviders ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                지원 쇼핑몰 보기 {showProviders ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                             </button>
 
                             {showProviders && (
@@ -360,7 +360,7 @@ export default function UrlSourcingPage() {
                         {isAllCompleted && (
                             <div style={{ display: 'flex', gap: '12px', animation: 'fadeInUp 0.4s ease' }}>
                                 <button className="btn-google" onClick={() => navigate('/sourcing')} style={{ flex: 1, background: '#F2F4F6', border: 'none' }}>
-                                    소싱 메인으로
+                                    수집 홈으로
                                 </button>
                                 {successCount > 0 && (
                                     <button className="btn-primary" onClick={handleEditClick} style={{ flex: 2, background: '#191F28', color: 'white' }}>

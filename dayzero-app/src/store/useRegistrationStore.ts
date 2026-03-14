@@ -35,7 +35,7 @@ function generateSimulatedCheckResult(originalPrice: number, salePriceJpy: numbe
         return {
             result: 'price_changed',
             currentPrice: newPrice,
-            issueDescription: `소싱처 원가가 ₩${originalPrice.toLocaleString()} → ₩${newPrice.toLocaleString()}로 변동됐어요. 현재 마진율은 유지되고 있어요.`,
+            issueDescription: `쇼핑몰 구매가가 ₩${originalPrice.toLocaleString()} → ₩${newPrice.toLocaleString()}로 변동됐어요. 현재 마진율은 유지되고 있어요.`,
         };
     } else if (rand < 0.85) {
         const increase = Math.round(originalPrice * (0.4 + Math.random() * 0.3));
@@ -46,13 +46,13 @@ function generateSimulatedCheckResult(originalPrice: number, salePriceJpy: numbe
         return {
             result: 'negative_margin',
             currentPrice: newPrice,
-            issueDescription: `소싱처 원가가 ₩${originalPrice.toLocaleString()} → ₩${newPrice.toLocaleString()}로 상승하여 현재 판매가(¥${salePriceJpy.toLocaleString()}) 기준 마진율이 ${marginPct}%예요. 판매가를 ¥${recommendedJpy.toLocaleString()} 이상으로 조정하거나, 다른 소싱처를 검토해주세요.`,
+            issueDescription: `쇼핑몰 구매가가 ₩${originalPrice.toLocaleString()} → ₩${newPrice.toLocaleString()}로 올라 현재 판매가(¥${salePriceJpy.toLocaleString()}) 기준 마진율이 ${marginPct}%예요. 판매가를 ¥${recommendedJpy.toLocaleString()} 이상으로 조정하거나, 다른 쇼핑몰을 검토해주세요.`,
         };
     } else {
         return {
             result: 'out_of_stock',
             currentPrice: originalPrice,
-            issueDescription: `소싱처에서 해당 상품이 품절 처리됐어요. Qoo10 판매를 일시 중지하거나, 다른 소싱처를 찾아주세요.`,
+            issueDescription: `쇼핑몰에서 해당 상품이 품절됐어요. Qoo10 판매를 일시 중지하거나, 다른 쇼핑몰을 찾아주세요.`,
         };
     }
 }
@@ -345,7 +345,7 @@ export const useRegistrationStore = create<RegistrationState>()(
                                     ? {
                                         result: 'out_of_stock' as const,
                                         currentPrice: r.product.originalPriceKrw,
-                                        issueDescription: `소싱처에서 해당 상품이 품절 처리됐어요. Qoo10 판매를 일시 중지하거나, 다른 소싱처를 찾아주세요.`,
+                                        issueDescription: `쇼핑몰에서 해당 상품이 품절됐어요. Qoo10 판매를 일시 중지하거나, 다른 쇼핑몰을 찾아주세요.`,
                                     }
                                     : (() => {
                                         const increase = Math.round(r.product.originalPriceKrw * (0.5 + Math.random() * 0.2));
@@ -356,7 +356,7 @@ export const useRegistrationStore = create<RegistrationState>()(
                                         return {
                                             result: 'negative_margin' as const,
                                             currentPrice: newPrice,
-                                            issueDescription: `소싱처 원가가 ₩${r.product.originalPriceKrw.toLocaleString()} → ₩${newPrice.toLocaleString()}로 상승하여 현재 판매가(¥${r.product.salePriceJpy.toLocaleString()}) 기준 마진율이 ${marginPct}%예요. 판매가를 ¥${recommendedJpy.toLocaleString()} 이상으로 조정하거나, 다른 소싱처를 검토해주세요.`,
+                                            issueDescription: `쇼핑몰 구매가가 ₩${r.product.originalPriceKrw.toLocaleString()} → ₩${newPrice.toLocaleString()}로 올라 현재 판매가(¥${r.product.salePriceJpy.toLocaleString()}) 기준 마진율이 ${marginPct}%예요. 판매가를 ¥${recommendedJpy.toLocaleString()} 이상으로 조정하거나, 다른 쇼핑몰을 검토해주세요.`,
                                         };
                                     })();
 

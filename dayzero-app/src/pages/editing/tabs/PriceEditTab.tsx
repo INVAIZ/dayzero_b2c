@@ -415,20 +415,20 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
     // ── 확인 모달 내용 ───────────────────────────────────────────────────
     const confirmConfig: Partial<Record<NonNullable<EditingField>, { title: string; description: string }>> = {
         originalPrice: {
-            title: '소싱 원가를 수정할까요?',
+            title: '구매 원가를 수정할까요?',
             description: product.priceSource === 'ai'
                 ? `AI가 예측한 가격이에요 (₩${originalPrice.toLocaleString()}).\n실제 가격과 다를 수 있으니 확인 후 수정하세요.`
                 : `실제 상품 사이트에서 수집한 가격이에요 (₩${originalPrice.toLocaleString()}).\n정말 수정하시겠어요?`,
         },
         domestic: {
             title: '국내 배송비를 수정할까요?',
-            description: `소싱처에서 수집한 배송비에요 (₩${domesticShipping.toLocaleString()}).\n정말 수정하시겠어요?`,
+            description: `쇼핑몰에서 수집한 배송비에요 (₩${domesticShipping.toLocaleString()}).\n정말 수정하시겠어요?`,
         },
         weight: {
             title: '무게를 수정할까요?',
             description: product.weightSource === 'ai'
                 ? `AI가 예측한 무게예요 (${weight}kg).\n실제 무게와 다를 수 있으니 확인 후 수정하세요.\n수정하면 해외 배송비가 자동 재계산됩니다.`
-                : `소싱처에서 수집한 실제 무게예요 (${weight}kg).\n정말 수정하시겠어요? 수정하면 해외 배송비가 재계산됩니다.`,
+                : `쇼핑몰에서 수집한 실제 무게예요 (${weight}kg).\n정말 수정하시겠어요? 수정하면 해외 배송비가 재계산됩니다.`,
         },
     };
 
@@ -464,10 +464,10 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
 
             <div style={{ border: `1px solid ${colors.border.default}`, borderRadius: radius.lg, overflow: 'hidden' }}>
                 <div style={{ padding: `0 ${spacing['4']}` }}>
-                    {/* 소싱 원가 */}
+                    {/* 구매 원가 */}
                     {editingField === 'originalPrice' ? (
                         <CostEditRow
-                            label="소싱 원가"
+                            label="구매 원가"
                             value={editInput}
                             prefix="₩"
                             onChange={setEditInput}
@@ -476,7 +476,7 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
                         />
                     ) : (
                         <CostRow
-                            label="소싱 원가"
+                            label="구매 원가"
                             value={originalPrice}
                             prefix="₩"
                             source={product.priceSource}
@@ -501,7 +501,7 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
                     ) : (
                         <CostRow
                             label="국내 배송비"
-                            sub="소싱처→집하센터"
+                            sub="쇼핑몰→집하센터"
                             value={domesticShipping}
                             prefix="₩"
                             source="crawled"

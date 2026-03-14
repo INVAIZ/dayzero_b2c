@@ -654,7 +654,7 @@ export default function BasicMarginPage() {
                             기본 설정이 완료됐어요
                         </h2>
                         <p style={{ fontSize: '15px', color: '#6B7684', margin: '0 0 40px', lineHeight: 1.6, animation: 'riseUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both' }}>
-                            이제 첫 상품을 소싱해볼까요?
+                            이제 첫 상품을 수집해볼까요?
                         </p>
 
                         {/* 완료 항목 요약 */}
@@ -700,7 +700,7 @@ export default function BasicMarginPage() {
                             onMouseDown={e => e.currentTarget.style.transform = 'scale(0.98)'}
                             onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
                         >
-                            소싱 시작하기
+                            수집 시작하기
                             <ArrowRight size={18} />
                         </button>
                     </div>

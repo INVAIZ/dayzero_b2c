@@ -2,25 +2,25 @@ import React, { useState } from 'react';
 import { Bell, User } from 'lucide-react';
 import { useSourcingStore } from '../../store/useSourcingStore';
 
-type NavItem = '소싱' | '편집' | '등록' | '내 상품' | '설정';
+type NavItem = '수집' | '편집' | '등록' | '내 상품' | '설정';
 
-const NAV_ITEMS: NavItem[] = ['소싱', '편집', '등록', '내 상품', '설정'];
+const NAV_ITEMS: NavItem[] = ['수집', '편집', '등록', '내 상품', '설정'];
 
 export const GlobalNavigationBar: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<NavItem>('소싱');
+    const [activeTab, setActiveTab] = useState<NavItem>('수집');
     const [showToast, setShowToast] = useState(false);
 
     // Mock counts
     const unprocessedCount = useSourcingStore(state => state.unprocessedProductCount);
     const mockCounts: Record<string, number> = {
-        '소싱': unprocessedCount,
+        '수집': unprocessedCount,
         '편집': 0,
         '등록': 0,
         '내 상품': 0,
     };
 
     const handleTabClick = (item: NavItem) => {
-        if (item === '소싱') {
+        if (item === '수집') {
             setActiveTab(item);
         } else {
             // Show prepare toast

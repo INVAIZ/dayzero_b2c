@@ -5,7 +5,7 @@ import { MainLayout } from '../components/layout/MainLayout';
 import { getProviderLogo } from '../types/sourcing';
 import { Link2, Zap, Clock, LayoutGrid, Package, Check, Trash2, GripVertical } from 'lucide-react';
 import { UrlSourcingContent } from './sourcing/components/UrlSourcingContent';
-import { colors } from '../design/tokens';
+import { colors, font } from '../design/tokens';
 import { ConfirmModal } from '../components/common/ConfirmModal';
 
 const formatLastRun = (dateString?: string) => {
@@ -223,7 +223,7 @@ export default function SourcingPage() {
                     </div>
                 ) : filteredSchedules.length === 0 ? (
                     <div style={{ padding: '40px', textAlign: 'center', color: colors.text.tertiary, fontSize: '15px', background: colors.bg.surface, borderRadius: '16px', border: `1px solid ${colors.border.default}`, animation: 'fadeIn 0.2s ease' }}>
-                        해당 소싱처의 자동 수집이 없어요.
+                        해당 쇼핑몰의 자동 수집이 없어요.
                     </div>
                 ) : (
                     <div key={selectedFilter} style={{ display: 'flex', flexDirection: 'column', gap: '12px', animation: 'fadeInUp 0.3s ease' }}>
@@ -318,13 +318,19 @@ export default function SourcingPage() {
 
     return (
         <MainLayout>
-            <div style={{ maxWidth: '800px', width: '100%', margin: '0 auto', paddingBottom: '100px' }}>
-                <h1 style={{ fontSize: '28px', fontWeight: 700, color: colors.text.primary, marginBottom: '8px' }}>
-                    상품 소싱
+            <style>{`
+                @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            `}</style>
+            <div style={{ paddingBottom: '100px' }}>
+                <div style={{ animation: 'fadeInUp 0.6s ease' }}>
+                <h1 style={{ fontSize: font.size['2xl'], fontWeight: 700, color: colors.text.primary, marginBottom: '8px' }}>
+                    상품 수집
                 </h1>
-                <p style={{ fontSize: '15px', color: colors.text.tertiary, marginBottom: '32px' }}>
-                    소싱 방식을 선택하고 인기 상품을 빠르게 수집해보세요.
+                <p style={{ fontSize: font.size.base, color: colors.text.tertiary, marginBottom: '32px' }}>
+                    수집 방식을 선택하고 인기 상품을 빠르게 수집해보세요.
                 </p>
+                </div>
 
                 {renderTabs()}
 

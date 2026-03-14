@@ -145,7 +145,7 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                             color: colors.text.muted,
                             fontSize: font.size.base,
                         }}>
-                            변동 확인이 등록된 상품이 없어요
+                            변동 알림이 등록된 상품이 없어요
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>

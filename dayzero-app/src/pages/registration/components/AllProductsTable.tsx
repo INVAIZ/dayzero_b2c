@@ -132,7 +132,7 @@ export const AllProductsTable: React.FC<Props> = ({
                 <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>상품번호</div>
                 <div style={{ width: '80px', flexShrink: 0, ...colHeader }}>등록일시</div>
                 {showMonitoring && (
-                    <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>변동 확인</div>
+                    <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>변동 알림</div>
                 )}
                 <div style={{ width: '40px', flexShrink: 0, ...colHeader, textAlign: 'center' }}>링크</div>
             </div>
@@ -188,6 +188,7 @@ export const AllProductsTable: React.FC<Props> = ({
                             <img
                                 src={r.product.thumbnailUrl}
                                 alt=""
+                                onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
                                 style={{
                                     width: '48px', height: '48px', flexShrink: 0,
                                     borderRadius: radius.img ?? radius.md,
@@ -277,7 +278,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                 {formatDate(r.registeredAt)}
                             </div>
 
-                            {/* 변동 확인 상태 */}
+                            {/* 변동 알림 상태 */}
                             {showMonitoring && (
                                 <div style={{ width: '100px', flexShrink: 0 }}>
                                     {isMonitored && monitoringResult ? (

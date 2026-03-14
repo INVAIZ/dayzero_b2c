@@ -454,7 +454,7 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                     }
                                 }
                             }}
-                            placeholder={urls.length === 0 ? "지원 소싱처의 상품 URL을 입력하고 엔터 및 스페이스 바를 누르세요" : ""}
+                            placeholder={urls.length === 0 ? "쇼핑몰 상품 URL을 입력하고 엔터 및 스페이스 바를 누르세요" : ""}
                             style={{
                                 flex: 1,
                                 minWidth: '200px',
@@ -473,7 +473,7 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                     <div style={{ marginTop: '24px', borderTop: `1px solid ${colors.border.default}`, paddingTop: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                             <div style={{ fontSize: '13px', fontWeight: 600, color: colors.text.muted }}>
-                                지원 소싱처에서 찾아보세요
+                                지원 쇼핑몰에서 찾아보세요
                             </div>
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>

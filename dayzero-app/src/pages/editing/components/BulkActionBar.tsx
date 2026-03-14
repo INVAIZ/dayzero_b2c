@@ -87,7 +87,7 @@ export const BulkActionBar: React.FC<Props> = ({
                     }}
                 >
                     <Languages size={16} />
-                    AI 편집 ({translateCount})
+                    AI로 편집하기 ({translateCount})
                 </button>
                 {translateCount === 0 && selectedCount > 0 && (
                     <div data-bulk-tip="" style={{
@@ -104,7 +104,7 @@ export const BulkActionBar: React.FC<Props> = ({
                             borderRadius: radius.md, whiteSpace: 'nowrap',
                             animation: 'tooltipFadeIn 0.15s ease',
                         }}>
-                            선택한 상품은 이미 작성이 완료되었습니다
+                            선택한 상품은 이미 편집이 완료됐어요
                             <div style={{
                                 position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)',
                                 border: '5px solid transparent', borderTopColor: colors.text.primary,
@@ -133,7 +133,7 @@ export const BulkActionBar: React.FC<Props> = ({
                 }}
             >
                 <Upload size={16} />
-                Qoo10 등록 ({registerCount})
+                Qoo10에 등록하기 ({registerCount})
             </button>
 
             <button
@@ -153,7 +153,7 @@ export const BulkActionBar: React.FC<Props> = ({
                 }}
             >
                 <Trash2 size={16} />
-                삭제
+                삭제하기
             </button>
         </div>
         </div>

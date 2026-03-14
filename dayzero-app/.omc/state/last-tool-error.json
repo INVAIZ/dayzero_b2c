@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"npm run build 2>&1\",\"timeout\":120000,\"description\":\"빌드 실행\"}",
-  "error": "Exit code 2\n\n> dayzero-app@0.0.0 build\n> tsc -b && vite build\n\nsrc/pages/registration/RegistrationResultPage.tsx(23,46): error TS6133: 'resumeSales' is declared but its value is never read.",
-  "timestamp": "2026-03-14T07:27:39.210Z",
+  "tool_input_preview": "{\"command\":\"npx tsc -b --noEmit 2>&1\",\"description\":\"TypeScript 빌드 검증\"}",
+  "error": "Exit code 2\nsrc/pages/registration/ProductDetailPage.tsx(13,35): error TS6196: 'MonitoringCheckResult' is declared but never used.\nsrc/pages/registration/ProductDetailPage.tsx(670,18): error TS6133: 'salePriceJpy' is declared but its value is never read.\nsrc/pages/registration/ProductDetailPage.tsx(684,41): error TS18048: 'history' is possibly 'undefined'.\nsrc/pages/registration/ProductDetailPage.tsx(685,31): error TS18048: 'history' is possibly 'undefined'.\nsrc/pages/registration/ProductDetailP...",
+  "timestamp": "2026-03-14T11:09:31.076Z",
   "retry_count": 1
 }

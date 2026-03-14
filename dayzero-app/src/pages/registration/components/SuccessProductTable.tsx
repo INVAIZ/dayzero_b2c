@@ -66,6 +66,7 @@ export const SuccessProductTable: React.FC<Props> = ({ results }) => {
                             <img
                                 src={r.product.thumbnailUrl}
                                 alt=""
+                                onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
                                 style={{
                                     width: '36px', height: '36px',
                                     borderRadius: radius.md,

@@ -91,7 +91,7 @@ export const RegistrationResultPage: React.FC = () => {
         switch (monitoringTab) {
             case '판매 중지':
                 return allSuccessResults.filter(r => r.salesStatus === 'paused');
-            case '변동 확인 중': {
+            case '변동 알림 중': {
                 const results = allSuccessResults.filter(r => r.salesStatus !== 'paused' && r.monitoring?.status === 'active');
                 return [...results].sort((a, b) => issueOrder(a.monitoring?.lastCheckResult) - issueOrder(b.monitoring?.lastCheckResult));
             }
@@ -247,7 +247,7 @@ export const RegistrationResultPage: React.FC = () => {
         <MainLayout>
             <div>
                 {/* 헤더 */}
-                <div style={{ marginBottom: spacing['6'], display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                <div style={{ marginBottom: spacing['6'], display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', animation: 'fadeInUp 0.6s ease' }}>
                     <div>
                         <h1 style={{
                             fontSize: font.size['2xl'],
@@ -276,7 +276,7 @@ export const RegistrationResultPage: React.FC = () => {
                             </span>
                         </h1>
                         <p style={{ fontSize: font.size.md, color: colors.text.tertiary, margin: 0 }}>
-                            Qoo10 JP에 등록된 상품을 관리하고, 소싱처 가격·재고 변동을 확인하세요.
+                            Qoo10 JP에 등록된 상품을 관리하고, 쇼핑몰 가격·재고 변동을 확인하세요.
                         </p>
                     </div>
 
@@ -366,7 +366,7 @@ export const RegistrationResultPage: React.FC = () => {
                     onRowClick={handleRowClick}
                     showMonitoring
                     emptyMessage={
-                        monitoringTab === '변동 확인 중' ? '변동 확인 중인 상품이 없어요' :
+                        monitoringTab === '변동 알림 중' ? '변동 알림 중인 상품이 없어요' :
                         monitoringTab === '판매 중지' ? '판매 중지된 상품이 없어요' :
                         '판매 중인 상품이 없어요'
                     }
@@ -441,7 +441,7 @@ export const RegistrationResultPage: React.FC = () => {
                 onClose={() => setIsEnableMonitoringModalOpen(false)}
                 onConfirm={handleEnableMonitoring}
                 title={`${selectedMonitoringInfo.unmonitoredCount}건에 변동 알림을 등록할까요?`}
-                description={`매일 오전 7시에 소싱처의 가격과 재고를 자동으로 확인해서, 역마진이나 품절이 생기면 알려드려요.\n\n현재 등록: ${monitoringCounts.monitoring}건 / 최대 ${FREE_PLAN_LIMIT}건`}
+                description={`매일 오전 7시에 쇼핑몰의 가격과 재고를 자동으로 확인해서, 역마진이나 품절이 생기면 알려드려요.\n\n현재 등록: ${monitoringCounts.monitoring}건 / 최대 ${FREE_PLAN_LIMIT}건`}
                 confirmText="변동 알림 받기"
                 cancelText="취소"
                 type="info"
@@ -453,7 +453,7 @@ export const RegistrationResultPage: React.FC = () => {
                 onClose={() => setIsDisableMonitoringModalOpen(false)}
                 onConfirm={handleDisableMonitoring}
                 title={`${selectedMonitoringInfo.monitoredCount}건의 변동 알림을 해제할까요?`}
-                description="해제하면 소싱처 가격·재고 변동이 더 이상 확인되지 않아요."
+                description="해제하면 쇼핑몰 가격·재고 변동이 더 이상 확인되지 않아요."
                 confirmText="알림 해제"
                 cancelText="취소"
             />
@@ -549,7 +549,7 @@ const MonitoringInfoCallout: React.FC<{
                     color: colors.text.tertiary,
                     marginBottom: '4px',
                 }}>
-                    변동 확인 중
+                    변동 알림 중
                 </div>
 
                 {/* 카운트 + 태그 */}
@@ -593,13 +593,17 @@ const MonitoringInfoCallout: React.FC<{
                     gap: '4px',
                 }}>
                     <Clock size={12} color={colors.text.muted} style={{ flexShrink: 0, marginTop: '2px' }} />
-                    변동 확인을 등록하면 매일 오전 7시에 소싱처 가격·재고를 자동으로 확인하고, 역마진이나 품절이 생기면 바로 알려드려요.
+                    변동 알림을 등록하면 매일 오전 7시에 쇼핑몰 가격·재고를 자동으로 확인하고, 역마진이나 품절이 생기면 바로 알려드려요.
                 </div>
             </div>
 
             <style>{`
                 @keyframes calloutIn {
                     from { opacity: 0; transform: translateY(-8px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(8px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
             `}</style>

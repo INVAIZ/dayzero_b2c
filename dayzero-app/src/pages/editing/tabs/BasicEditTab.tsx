@@ -290,11 +290,13 @@ const OptionRow: React.FC<{
             marginBottom: spacing['3'],
             borderBottom: `1px solid ${colors.border.default}`,
         }}>
-            <img src={imageUrl} alt="" style={{
-                width: '44px', height: '44px',
-                borderRadius: radius.md, objectFit: 'cover',
-                border: `1px solid ${colors.border.default}`, flexShrink: 0,
-            }} />
+            <img src={imageUrl} alt=""
+                onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
+                style={{
+                    width: '44px', height: '44px',
+                    borderRadius: radius.md, objectFit: 'cover',
+                    border: `1px solid ${colors.border.default}`, flexShrink: 0,
+                }} />
 
             {/* 옵션명 입력 (hover → 한국어 원문 툴팁) */}
             <div

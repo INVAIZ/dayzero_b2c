@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, ExternalLink, Shield, AlertTriangle, PackageX,
     TrendingDown, TrendingUp, ChevronLeft, ChevronRight,
-    Pause, Play, Trash2,
 } from 'lucide-react';
 import { colors, font, spacing, radius, shadow } from '../../design/tokens';
 import { MainLayout } from '../../components/layout/MainLayout';
@@ -11,18 +10,16 @@ import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { getProviderLogo } from '../../types/sourcing';
 import { stripPrefix } from '../../utils/editing';
 import { useRegistrationStore } from '../../store/useRegistrationStore';
-import type { PriceHistoryEntry } from '../../types/registration';
+import type { RegistrationResult } from '../../types/registration';
 
 export const ProductDetailPage: React.FC = () => {
     const { resultId } = useParams<{ resultId: string }>();
     const navigate = useNavigate();
-    const { jobs, enableMonitoring, disableMonitoring, pauseSales, resumeSales, deleteResults } = useRegistrationStore();
+    const { jobs, enableMonitoring, disableMonitoring } = useRegistrationStore();
+
 
     const [isEnableModalOpen, setIsEnableModalOpen] = useState(false);
     const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
-    const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
-    const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     // 모든 성공 결과 통합 + 현재 상품 찾기
     const allResults = useMemo(
@@ -42,7 +39,7 @@ export const ProductDetailPage: React.FC = () => {
                         style={{
                             padding: `${spacing['2']} ${spacing['4']}`,
                             background: colors.primary,
-                            color: colors.bg.surface,
+                            color: '#fff',
                             border: 'none',
                             borderRadius: radius.md,
                             fontSize: font.size.base,
@@ -63,7 +60,6 @@ export const ProductDetailPage: React.FC = () => {
     const isNegativeMargin = checkResult === 'negative_margin';
     const isOutOfStock = checkResult === 'out_of_stock';
     const hasIssue = isNegativeMargin || isOutOfStock;
-    const isPaused = result.salesStatus === 'paused';
 
     const displayTitle = product.titleJa
         ? stripPrefix(product.titleJa)
@@ -98,23 +94,7 @@ export const ProductDetailPage: React.FC = () => {
     const handleDisable = () => {
         disableMonitoring([result.id]);
         setIsDisableModalOpen(false);
-    };
-
-    const handlePause = () => {
-        pauseSales([result.id]);
-        setIsPauseModalOpen(false);
-    };
-
-    const confirmResume = () => {
-        resumeSales([result.id]);
-        setIsResumeModalOpen(false);
-    };
-
-    const handleDelete = () => {
-        const job = jobs.find(j => j.results.some(r => r.id === result.id));
-        if (job) deleteResults(job.id, [result.id]);
-        setIsDeleteModalOpen(false);
-        navigate('/registration');
+        // toast removed
     };
 
     return (
@@ -139,7 +119,7 @@ export const ProductDetailPage: React.FC = () => {
                         목록으로
                     </button>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                    <div style={{ display: 'flex', gap: spacing['2'] }}>
                         <NavButton
                             icon={<ChevronLeft size={16} />}
                             disabled={!hasPrev}
@@ -159,30 +139,6 @@ export const ProductDetailPage: React.FC = () => {
                             disabled={!hasNext}
                             onClick={() => hasNext && navigate(`/registration/${allResults[currentIndex + 1].id}`)}
                         />
-
-                        <div style={{ width: '1px', height: '20px', background: colors.border.default }} />
-
-                        {isPaused ? (
-                            <ActionButton
-                                icon={<Play size={13} />}
-                                label="판매 재개"
-                                color={colors.success}
-                                onClick={() => setIsResumeModalOpen(true)}
-                            />
-                        ) : (
-                            <ActionButton
-                                icon={<Pause size={13} />}
-                                label="판매 일시 중지"
-                                color={colors.warningIcon}
-                                onClick={() => setIsPauseModalOpen(true)}
-                            />
-                        )}
-                        <ActionButton
-                            icon={<Trash2 size={13} />}
-                            label="판매 종료"
-                            color={colors.danger}
-                            onClick={() => setIsDeleteModalOpen(true)}
-                        />
                     </div>
                 </div>
 
@@ -201,6 +157,7 @@ export const ProductDetailPage: React.FC = () => {
                     <img
                         src={product.thumbnailUrl}
                         alt=""
+                        onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
                         style={{
                             width: '72px', height: '72px',
                             borderRadius: radius.img,
@@ -289,13 +246,20 @@ export const ProductDetailPage: React.FC = () => {
                             {isMonitored ? '변동 알림 ON' : '변동 알림'}
                         </span>
                     </div>
-
                 </div>
 
                 {/* 역마진/품절 경고 카드 */}
-                {isMonitored && hasIssue && (
+                {isMonitored && isNegativeMargin && (
                     <AlertCard
-                        type={checkResult as 'negative_margin' | 'out_of_stock'}
+                        type="negative_margin"
+                        description={monitoring?.issueDescription ?? ''}
+                        sourceUrl={product.sourceUrl}
+                        qoo10Url={result.qoo10ProductUrl}
+                    />
+                )}
+                {isMonitored && isOutOfStock && (
+                    <AlertCard
+                        type="out_of_stock"
                         description={monitoring?.issueDescription ?? ''}
                         sourceUrl={product.sourceUrl}
                         qoo10Url={result.qoo10ProductUrl}
@@ -342,8 +306,8 @@ export const ProductDetailPage: React.FC = () => {
                         )}
                     </InfoCard>
 
-                    {/* 소싱처 원본 정보 */}
-                    <InfoCard title="소싱처 원본 정보">
+                    {/* 원본 쇼핑몰 정보 */}
+                    <InfoCard title="원본 쇼핑몰 정보">
                         <div style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -407,7 +371,7 @@ export const ProductDetailPage: React.FC = () => {
                                     textDecoration: 'none',
                                 }}
                             >
-                                소싱처에서 확인 <ExternalLink size={12} />
+                                쇼핑몰에서 확인 <ExternalLink size={12} />
                             </a>
                         </div>
                     </InfoCard>
@@ -443,14 +407,14 @@ export const ProductDetailPage: React.FC = () => {
                             color: colors.text.tertiary,
                             marginBottom: spacing['4'],
                         }}>
-                            소싱처 가격이 올라 역마진이 생기거나, 품절되면 바로 알려드려요.
+                            쇼핑몰 가격이 올라 역마진이 생기거나, 품절되면 바로 알려드려요.
                         </div>
                         <button
                             onClick={() => setIsEnableModalOpen(true)}
                             style={{
                                 padding: `${spacing['2']} ${spacing['5']}`,
                                 background: colors.primary,
-                                color: colors.bg.surface,
+                                color: '#fff',
                                 border: 'none',
                                 borderRadius: radius.md,
                                 fontSize: font.size.base,
@@ -464,52 +428,13 @@ export const ProductDetailPage: React.FC = () => {
                 )}
             </div>
 
-            {/* 판매 일시 중지 모달 */}
-            <ConfirmModal
-                isOpen={isPauseModalOpen}
-                onClose={() => setIsPauseModalOpen(false)}
-                onConfirm={handlePause}
-                title="판매를 일시 중지할까요?"
-                description="일시 중지해도 Qoo10 등록은 그대로 유지돼요. 언제든지 다시 판매를 재개할 수 있어요."
-                confirmText="판매 일시 중지"
-                cancelText="취소"
-            />
-
-            {/* 판매 재개 모달 */}
-            <ConfirmModal
-                isOpen={isResumeModalOpen}
-                onClose={() => setIsResumeModalOpen(false)}
-                onConfirm={confirmResume}
-                title="판매를 재개할까요?"
-                description={
-                    isOutOfStock
-                        ? '이 상품은 아직 품절 상태예요. 품절 상태에서 판매를 재개하면 주문이 들어왔을 때 배송이 어려울 수 있어요.'
-                        : '판매를 재개하면 Qoo10에서 바로 구매 가능 상태로 전환돼요.'
-                }
-                confirmText="판매 재개"
-                cancelText="취소"
-                type={isOutOfStock ? 'danger' : 'info'}
-            />
-
-            {/* 판매 종료 모달 */}
-            <ConfirmModal
-                isOpen={isDeleteModalOpen}
-                onClose={() => setIsDeleteModalOpen(false)}
-                onConfirm={handleDelete}
-                title="판매를 종료할까요?"
-                description="판매 종료 후에는 복구할 수 없어요. Qoo10에서도 상품이 완전히 제거되고, 편집 목록으로 돌아가지 않아요."
-                confirmText="판매 종료"
-                cancelText="취소"
-                type="danger"
-            />
-
             {/* 모달 */}
             <ConfirmModal
                 isOpen={isEnableModalOpen}
                 onClose={() => setIsEnableModalOpen(false)}
                 onConfirm={handleEnable}
                 title="이 상품에 변동 알림을 등록할까요?"
-                description="매일 소싱처의 가격과 재고를 자동으로 확인해서, 역마진이나 품절이 생기면 알려드려요."
+                description="매일 쇼핑몰의 가격과 재고를 자동으로 확인해서, 역마진이나 품절이 생기면 알려드려요."
                 confirmText="변동 알림 받기"
                 cancelText="취소"
                 type="info"
@@ -519,8 +444,8 @@ export const ProductDetailPage: React.FC = () => {
                 onClose={() => setIsDisableModalOpen(false)}
                 onConfirm={handleDisable}
                 title="변동 알림을 해제할까요?"
-                description="해제하면 소싱처 가격·재고 변동이 더 이상 확인되지 않아요."
-                confirmText="변동 해제"
+                description="해제하면 쇼핑몰 가격·재고 변동이 더 이상 확인되지 않아요."
+                confirmText="변동 알림 해제"
                 cancelText="취소"
             />
 
@@ -556,36 +481,6 @@ const NavButton: React.FC<{
         }}
     >
         {icon}
-    </button>
-);
-
-const ActionButton: React.FC<{
-    icon: React.ReactNode;
-    label: string;
-    color: string;
-    onClick: () => void;
-}> = ({ icon, label, color, onClick }) => (
-    <button
-        onClick={onClick}
-        style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            background: 'none',
-            border: `1px solid ${colors.border.default}`,
-            borderRadius: radius.md,
-            padding: `5px ${spacing['3']}`,
-            fontSize: font.size.xs,
-            fontWeight: 600,
-            color,
-            cursor: 'pointer',
-            transition: 'border-color 0.15s, background 0.15s',
-            whiteSpace: 'nowrap',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = color; e.currentTarget.style.background = colors.bg.subtle; }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = colors.border.default; e.currentTarget.style.background = 'none'; }}
-    >
-        {icon}{label}
     </button>
 );
 
@@ -716,7 +611,7 @@ const AlertCard: React.FC<{
                     fontWeight: 700,
                     color: colors.text.primary,
                 }}>
-                    {isMargin ? '역마진이 발생했어요' : '소싱처에서 품절됐어요'}
+                    {isMargin ? '역마진이 발생했어요' : '쇼핑몰에서 품절됐어요'}
                 </span>
             </div>
             <p style={{
@@ -761,7 +656,7 @@ const AlertCard: React.FC<{
                         textDecoration: 'none',
                     }}
                 >
-                    소싱처에서 확인 <ExternalLink size={12} />
+                    쇼핑몰에서 확인 <ExternalLink size={12} />
                 </a>
             </div>
         </div>
@@ -770,13 +665,13 @@ const AlertCard: React.FC<{
 
 /** 가격 변동 이력 섹션 — Google Analytics 스타일 인터랙티브 차트 */
 const PriceHistorySection: React.FC<{
-    history: PriceHistoryEntry[];
+    history: NonNullable<RegistrationResult['monitoring']>['priceHistory'];
 }> = ({ history }) => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
-    if (history.length === 0) return null;
-
-    const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+        if (!history) return;
         const svg = e.currentTarget;
         const rect = svg.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -790,53 +685,60 @@ const PriceHistorySection: React.FC<{
         if (idx >= 0 && idx < history.length) {
             setHoveredIndex(idx);
         }
-    };
-
-    const chart = useMemo(() => {
-        const prices = history.map(h => h.sourcePriceKrw);
-        const dataMin = Math.min(...prices);
-        const dataMax = Math.max(...prices);
-
-        // Y축 범위: 데이터 범위에 여유를 두고 깔끔한 숫자로 맞춤
-        const rawRange = dataMax - dataMin || 1000;
-        const raw = rawRange / 4;
-        const mag = Math.pow(10, Math.floor(Math.log10(raw)));
-        const step = Math.ceil(raw / mag) * mag;
-        const yMin = Math.floor(dataMin / step) * step;
-        const yMax = yMin + step * 5;
-        const yRange = yMax - yMin;
-
-        // 차트 레이아웃
-        const svgW = 620;
-        const svgH = 200;
-        const padL = 52;
-        const padR = 20;
-        const padTop = 16;
-        const padBot = 28;
-        const plotW = svgW - padL - padR;
-        const plotH = svgH - padTop - padBot;
-
-        const toX = (i: number) => padL + (i / (history.length - 1)) * plotW;
-        const toY = (price: number) => padTop + plotH - ((price - yMin) / yRange) * plotH;
-
-        const points = history.map((h, i) => ({ x: toX(i), y: toY(h.sourcePriceKrw) }));
-        const lineD = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
-        const areaD = `${lineD} L${points[points.length - 1].x},${padTop + plotH} L${points[0].x},${padTop + plotH} Z`;
-        const yTicks = Array.from({ length: 6 }, (_, i) => yMin + step * i).filter(v => v <= yMax);
-        const xLabelCount = Math.min(5, history.length);
-        const xLabels = Array.from({ length: xLabelCount }, (_, i) => {
-            const idx = Math.round((i / (xLabelCount - 1)) * (history.length - 1));
-            return { x: toX(idx), label: formatShortDate(history[idx].date) };
-        });
-
-        return { svgW, svgH, padL, padR, padTop, plotH, toY, points, lineD, areaD, yTicks, xLabels, bandW: plotW / history.length };
     }, [history]);
 
-    const { svgW, svgH, padL, padR, padTop, plotH, toY, points, lineD, areaD, yTicks, xLabels, bandW } = chart;
+    if (!history || history.length === 0) return null;
+
+    const prices = history.map(h => h.sourcePriceKrw);
+    const dataMin = Math.min(...prices);
+    const dataMax = Math.max(...prices);
+
+    // Y축 범위: 데이터 범위에 여유를 두고 깔끔한 숫자로 맞춤
+    const rawRange = dataMax - dataMin || 1000;
+    const step = (() => {
+        const raw = rawRange / 4;
+        const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+        return Math.ceil(raw / mag) * mag;
+    })();
+    const yMin = Math.floor(dataMin / step) * step;
+    const yMax = yMin + step * 5;
+    const yRange = yMax - yMin;
+
+    // 차트 레이아웃
+    const svgW = 620;
+    const svgH = 200;
+    const padL = 52;   // Y축 라벨 공간
+    const padR = 20;
+    const padTop = 16;
+    const padBot = 28;  // X축 라벨 공간
+    const plotW = svgW - padL - padR;
+    const plotH = svgH - padTop - padBot;
+
+    const toX = (i: number) => padL + (i / (history.length - 1)) * plotW;
+    const toY = (price: number) => padTop + plotH - ((price - yMin) / yRange) * plotH;
+
+    const points = history.map((h, i) => ({ x: toX(i), y: toY(h.sourcePriceKrw) }));
+
+    // 직선 path
+    const lineD = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+    const areaD = `${lineD} L${points[points.length - 1].x},${padTop + plotH} L${points[0].x},${padTop + plotH} Z`;
+
+    // Y축 그리드 + 라벨 (5단계)
+    const yTicks = Array.from({ length: 6 }, (_, i) => yMin + step * i).filter(v => v <= yMax);
+
+    // X축 라벨 (4~5개 균등)
+    const xLabelCount = Math.min(5, history.length);
+    const xLabels = Array.from({ length: xLabelCount }, (_, i) => {
+        const idx = Math.round((i / (xLabelCount - 1)) * (history.length - 1));
+        return { x: toX(idx), label: formatShortDate(history[idx].date) };
+    });
 
     // 호버 데이터
     const hEntry = hoveredIndex !== null ? history[hoveredIndex] : null;
     const hPoint = hoveredIndex !== null ? points[hoveredIndex] : null;
+
+    // 호버 밴드 폭
+    const bandW = plotW / history.length;
 
     // Y축 라벨 포맷
     const fmtY = (v: number) => {
@@ -846,7 +748,7 @@ const PriceHistorySection: React.FC<{
     };
 
     return (
-        <div style={{
+        <div ref={containerRef} style={{
             background: colors.bg.surface,
             border: `1px solid ${colors.border.default}`,
             borderRadius: radius.lg,
@@ -930,12 +832,14 @@ const PriceHistorySection: React.FC<{
 
                     {/* 호버 포인트 */}
                     {hPoint && hEntry && (
-                        <circle cx={hPoint.x} cy={hPoint.y} r="6"
-                            fill={colors.bg.surface}
-                            stroke={hEntry.marginPercent < 0 || hEntry.stockStatus === 'out_of_stock'
-                                ? colors.danger : colors.primary}
-                            strokeWidth="2.5"
-                        />
+                        <>
+                            <circle cx={hPoint.x} cy={hPoint.y} r="6"
+                                fill={colors.bg.surface}
+                                stroke={hEntry.marginPercent < 0 || hEntry.stockStatus === 'out_of_stock'
+                                    ? colors.danger : colors.primary}
+                                strokeWidth="2.5"
+                            />
+                        </>
                     )}
 
                     {/* X축 라벨 */}

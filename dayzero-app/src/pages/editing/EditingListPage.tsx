@@ -75,6 +75,7 @@ export default function EditingListPage() {
     } = useEditingStore();
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
     useEffect(() => {
         return () => {
@@ -232,7 +233,7 @@ export default function EditingListPage() {
                         onMouseLeave={e => { e.currentTarget.style.background = colors.bg.surface; }}
                     >
                         <ClockIcon size={14} />
-                        소싱 기록
+                        수집 기록
                     </button>
                 </div>
                 <p style={{ fontSize: font.size.md, color: colors.text.tertiary }}>
@@ -390,15 +391,26 @@ export default function EditingListPage() {
                 registerCount={selectedRegisterCount}
                 onTranslate={openTranslationModal}
                 onRegister={() => {
-                    if (selectedTranslatedIds.length > 0) {
-                        const productsToRegister = products.filter(p => selectedTranslatedIds.includes(p.id));
-                        useRegistrationStore.getState().startJob(selectedTranslatedIds, productsToRegister);
-                        clearSelection();
-                        navigate('/registration');
-                    }
+                    if (selectedTranslatedIds.length > 0) setIsRegisterModalOpen(true);
                 }}
                 onDelete={() => setIsDeleteModalOpen(true)}
                 onClear={clearSelection}
+            />
+
+            <ConfirmModal
+                isOpen={isRegisterModalOpen}
+                onClose={() => setIsRegisterModalOpen(false)}
+                onConfirm={() => {
+                    const productsToRegister = products.filter(p => selectedTranslatedIds.includes(p.id));
+                    useRegistrationStore.getState().startJob(selectedTranslatedIds, productsToRegister);
+                    clearSelection();
+                    navigate('/registration');
+                }}
+                title={`${selectedRegisterCount}개 상품을 Qoo10에 등록할까요?`}
+                description="등록하면 Qoo10에서 바로 구매 가능 상태로 전환돼요."
+                confirmText="등록하기"
+                cancelText="취소"
+                type="info"
             />
 
             <ConfirmModal
