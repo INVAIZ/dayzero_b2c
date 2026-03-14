@@ -3,12 +3,14 @@ import { ArrowLeft, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react
 import { colors, font, radius, spacing, shadow, zIndex } from '../../../design/tokens';
 import { getProviderLogo, SOURCING_PROVIDERS } from '../../../types/sourcing';
 import type { ProductDetail } from '../../../types/editing';
-import { stripPrefix } from '../../../utils/editing';
+import { stripPrefix, isFullyTranslated } from '../../../utils/editing';
 
 interface Props {
     product: ProductDetail;
     hasPrev: boolean;
     hasNext: boolean;
+    currentIndex: number;
+    totalCount: number;
     onBack: () => void;
     onPrev: () => void;
     onNext: () => void;
@@ -17,15 +19,11 @@ interface Props {
 
 
 export const EditingHeader: React.FC<Props> = ({
-    product, hasPrev, hasNext, onBack, onPrev, onNext, onRegister,
+    product, hasPrev, hasNext, currentIndex, totalCount, onBack, onPrev, onNext, onRegister,
 }) => {
     const [showRegTooltip, setShowRegTooltip] = useState(false);
 
-    const isTranslated =
-        product.translationStatus === 'completed' &&
-        !!product.titleJa &&
-        !!product.descriptionJa &&
-        product.options.length > 0 && product.options.every(o => !!o.nameJa);
+    const isTranslated = isFullyTranslated(product);
     const providerUrl = product.sourceUrl || SOURCING_PROVIDERS.find(p => p.name === product.provider)?.url || 'https://www.coupang.com';
 
     return (
@@ -116,36 +114,47 @@ export const EditingHeader: React.FC<Props> = ({
                         onClick={onPrev}
                         disabled={!hasPrev}
                         style={{
-                            display: 'flex', alignItems: 'center', gap: '2px',
-                            background: hasPrev ? colors.bg.subtle : colors.bg.faint,
+                            width: '32px', height: '32px',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: colors.bg.surface,
                             border: `1px solid ${colors.border.default}`,
                             borderRadius: radius.md,
-                            padding: `${spacing['2']} ${spacing['3']}`,
-                            fontSize: font.size.sm,
-                            color: hasPrev ? colors.text.secondary : colors.text.disabled,
-                            cursor: hasPrev ? 'pointer' : 'not-allowed',
+                            cursor: hasPrev ? 'pointer' : 'default',
+                            opacity: hasPrev ? 1 : 0.4,
+                            transition: 'border-color 0.15s',
                         }}
+                        onMouseEnter={e => { if (hasPrev) e.currentTarget.style.borderColor = colors.text.muted; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = colors.border.default; }}
                     >
-                        <ChevronLeft size={14} />
-                        이전
+                        <ChevronLeft size={16} color={colors.text.secondary} />
                     </button>
+
+                    <span style={{
+                        fontSize: font.size.sm,
+                        color: colors.text.muted,
+                        padding: `0 ${spacing['1']}`,
+                        whiteSpace: 'nowrap',
+                    }}>
+                        {currentIndex + 1} / {totalCount}
+                    </span>
 
                     <button
                         onClick={onNext}
                         disabled={!hasNext}
                         style={{
-                            display: 'flex', alignItems: 'center', gap: '2px',
-                            background: hasNext ? colors.bg.subtle : colors.bg.faint,
+                            width: '32px', height: '32px',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: colors.bg.surface,
                             border: `1px solid ${colors.border.default}`,
                             borderRadius: radius.md,
-                            padding: `${spacing['2']} ${spacing['3']}`,
-                            fontSize: font.size.sm,
-                            color: hasNext ? colors.text.secondary : colors.text.disabled,
-                            cursor: hasNext ? 'pointer' : 'not-allowed',
+                            cursor: hasNext ? 'pointer' : 'default',
+                            opacity: hasNext ? 1 : 0.4,
+                            transition: 'border-color 0.15s',
                         }}
+                        onMouseEnter={e => { if (hasNext) e.currentTarget.style.borderColor = colors.text.muted; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = colors.border.default; }}
                     >
-                        다음
-                        <ChevronRight size={14} />
+                        <ChevronRight size={16} color={colors.text.secondary} />
                     </button>
 
                     {/* 세로 구분선 */}
@@ -166,7 +175,7 @@ export const EditingHeader: React.FC<Props> = ({
                                 borderRadius: radius.md,
                                 padding: `${spacing['2']} ${spacing['4']}`,
                                 fontSize: font.size.sm, fontWeight: 600,
-                                color: isTranslated ? '#fff' : colors.text.disabled,
+                                color: isTranslated ? colors.bg.surface : colors.text.disabled,
                                 cursor: isTranslated ? 'pointer' : 'not-allowed',
                                 transition: 'background 0.2s',
                             }}

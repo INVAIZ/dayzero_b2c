@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1773382916875,
+  "lastScanned": 1773471435132,
   "projectRoot": "/Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app",
   "techStack": {
     "languages": [
@@ -77,7 +77,7 @@
       "path": "dist",
       "purpose": "Distribution/build output",
       "fileCount": 5,
-      "lastAccessed": 1773382916855,
+      "lastAccessed": 1773471435114,
       "keyFiles": [
         "DayZero Logo.png",
         "Qoo10.png",
@@ -90,7 +90,7 @@
       "path": "public",
       "purpose": "Public files",
       "fileCount": 4,
-      "lastAccessed": 1773382916855,
+      "lastAccessed": 1773471435114,
       "keyFiles": [
         "DayZero Logo.png",
         "Qoo10.png",
@@ -102,7 +102,7 @@
       "path": "reviews",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1773382916855,
+      "lastAccessed": 1773471435114,
       "keyFiles": [
         "2026-03-12-ED-editing-review.md"
       ]
@@ -111,7 +111,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 4,
-      "lastAccessed": 1773382916856,
+      "lastAccessed": 1773471435115,
       "keyFiles": [
         "App.css",
         "App.tsx",
@@ -123,17 +123,17 @@
       "path": "dist/assets",
       "purpose": "Static assets",
       "fileCount": 2,
-      "lastAccessed": 1773382916856,
+      "lastAccessed": 1773471435115,
       "keyFiles": [
         "index-Bjxh_95e.css",
-        "index-DOi2d8mQ.js"
+        "index-DC-k3k2t.js"
       ]
     },
     "src/assets": {
       "path": "src/assets",
       "purpose": "Static assets",
       "fileCount": 1,
-      "lastAccessed": 1773382916857,
+      "lastAccessed": 1773471435115,
       "keyFiles": [
         "react.svg"
       ]
@@ -142,14 +142,14 @@
       "path": "src/components",
       "purpose": "UI components",
       "fileCount": 0,
-      "lastAccessed": 1773382916857,
+      "lastAccessed": 1773471435116,
       "keyFiles": []
     },
     "src/pages": {
       "path": "src/pages",
       "purpose": "Page components",
       "fileCount": 1,
-      "lastAccessed": 1773382916857,
+      "lastAccessed": 1773471435116,
       "keyFiles": [
         "SourcingPage.tsx"
       ]
@@ -158,231 +158,123 @@
   "hotPaths": [
     {
       "path": "src/pages/registration/RegistrationResultPage.tsx",
-      "accessCount": 29,
-      "lastAccessed": 1773415183118,
+      "accessCount": 59,
+      "lastAccessed": 1773475075098,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/registration/ProductDetailPage.tsx",
+      "accessCount": 24,
+      "lastAccessed": 1773476611328,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/registration/components/SuccessSummaryCard.tsx",
+      "accessCount": 20,
+      "lastAccessed": 1773475128856,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/registration/components/FailedBulkActionBar.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1773473898875,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/sourcing/components/UrlSourcingContent.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1773471873982,
       "type": "file"
     },
     {
       "path": "src/pages/registration/components/AllProductsTable.tsx",
-      "accessCount": 22,
-      "lastAccessed": 1773412011158,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/editing/EditingListPage.tsx",
-      "accessCount": 22,
-      "lastAccessed": 1773414795318,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/editing/components/SourcingHistoryModal.tsx",
-      "accessCount": 20,
-      "lastAccessed": 1773415168010,
-      "type": "file"
-    },
-    {
-      "path": "src",
-      "accessCount": 19,
-      "lastAccessed": 1773415255174,
-      "type": "directory"
-    },
-    {
-      "path": "src/pages/registration/components/SuccessSummaryCard.tsx",
-      "accessCount": 13,
-      "lastAccessed": 1773412757136,
-      "type": "file"
-    },
-    {
-      "path": "src/components/layout/Sidebar.tsx",
-      "accessCount": 12,
-      "lastAccessed": 1773415168831,
-      "type": "directory"
-    },
-    {
-      "path": "src/pages/registration/components/RegistrationProgressSection.tsx",
-      "accessCount": 11,
-      "lastAccessed": 1773412862000,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/editing/components/ProductListItem.tsx",
-      "accessCount": 11,
-      "lastAccessed": 1773413286711,
-      "type": "directory"
-    },
-    {
-      "path": "src/pages/sourcing/components/UrlSourcingContent.tsx",
-      "accessCount": 11,
-      "lastAccessed": 1773415067239,
-      "type": "directory"
-    },
-    {
-      "path": "src/store/useRegistrationStore.ts",
-      "accessCount": 9,
-      "lastAccessed": 1773413293738,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/registration/components/BatchHistoryModal.tsx",
-      "accessCount": 8,
-      "lastAccessed": 1773413871266,
-      "type": "file"
-    },
-    {
-      "path": "src/store/useSourcingStore.ts",
-      "accessCount": 6,
-      "lastAccessed": 1773415167962,
-      "type": "file"
-    },
-    {
-      "path": "src/types/sourcing.ts",
-      "accessCount": 6,
-      "lastAccessed": 1773415183747,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/editing/EditingDetailPage.tsx",
-      "accessCount": 6,
-      "lastAccessed": 1773415239132,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/sourcing",
       "accessCount": 5,
-      "lastAccessed": 1773415213976,
-      "type": "directory"
-    },
-    {
-      "path": "src/pages/registration/components/RegistrationTabBar.tsx",
-      "accessCount": 4,
-      "lastAccessed": 1773385562291,
+      "lastAccessed": 1773473176808,
       "type": "file"
     },
     {
-      "path": "src/components/layout/MainLayout.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1773413616661,
-      "type": "file"
-    },
-    {
-      "path": "src/components/common/NotificationPanel.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1773415167902,
+      "path": "src/pages/registration/components/MonitoringStatusTabs.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1773474332685,
       "type": "file"
     },
     {
       "path": "src/types/registration.ts",
-      "accessCount": 2,
-      "lastAccessed": 1773383642756,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/editing",
-      "accessCount": 2,
-      "lastAccessed": 1773411844170,
+      "accessCount": 4,
+      "lastAccessed": 1773473118425,
       "type": "directory"
     },
     {
-      "path": "src/types/editing.ts",
-      "accessCount": 2,
-      "lastAccessed": 1773413255304,
+      "path": "src/pages/editing/components/EditingHeader.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1773476540356,
       "type": "file"
     },
     {
-      "path": "src/components/common/StatusComponents.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1773413286934,
+      "path": "src/pages/onboarding/BasicMarginPage.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1773471818211,
       "type": "file"
     },
     {
-      "path": "src/store/useEditingStore.ts",
-      "accessCount": 2,
-      "lastAccessed": 1773414516550,
+      "path": "src/mock/editingMock.ts",
+      "accessCount": 3,
+      "lastAccessed": 1773471830173,
       "type": "file"
     },
     {
-      "path": "src/store",
-      "accessCount": 2,
-      "lastAccessed": 1773414712937,
-      "type": "directory"
+      "path": "src/store/useRegistrationStore.ts",
+      "accessCount": 3,
+      "lastAccessed": 1773473127630,
+      "type": "file"
     },
     {
-      "path": "src/pages/registration/components/FailedBulkActionBar.tsx",
+      "path": "src/components/common/ConfirmModal.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1773475184826,
+      "type": "file"
+    },
+    {
+      "path": "src/components/layout/Sidebar.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773471809969,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/editing/components/ProductListItem.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773471811051,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/editing/tabs/BasicEditTab.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773471814664,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/registration/components/BatchHistoryModal.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773471819654,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/editing/EditingDetailPage.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773476546367,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/registration/components/RegistrationTabBar.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773383731687,
-      "type": "file"
-    },
-    {
-      "path": "src/App.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773388930018,
-      "type": "directory"
-    },
-    {
-      "path": "src/utils/editing.ts",
-      "accessCount": 1,
-      "lastAccessed": 1773389423750,
+      "lastAccessed": 1773471601810,
       "type": "directory"
     },
     {
       "path": "src/design/tokens.ts",
       "accessCount": 1,
-      "lastAccessed": 1773393321787,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/editing/components/CollectionProgressBanner.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773413267200,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/editing/components/EditingHeader.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773413278298,
-      "type": "file"
-    },
-    {
-      "path": "src/mock/editingMock.ts",
-      "accessCount": 1,
-      "lastAccessed": 1773413294127,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/SourcingPage.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773413301440,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/sourcing/AutoSourcingPage.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773413301702,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/sourcing/UrlSourcingPage.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773413301914,
-      "type": "file"
-    },
-    {
-      "path": "src/types",
-      "accessCount": 1,
-      "lastAccessed": 1773414699851,
+      "lastAccessed": 1773475132978,
       "type": "directory"
-    },
-    {
-      "path": "src/components/common/GlobalNavigationBar.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773415168976,
-      "type": "file"
-    },
-    {
-      "path": "src/pages/auth/LoginPage.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773415183065,
-      "type": "file"
     }
   ],
   "userDirectives": []

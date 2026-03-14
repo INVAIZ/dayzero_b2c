@@ -1,12 +1,11 @@
 import { Fragment, useMemo, useState, useRef, useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ChevronDown, ChevronRight, Calculator, Package, Truck, Globe, RefreshCw, Weight } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronRight, Calculator, Package, Truck, Globe, RefreshCw } from 'lucide-react';
 import OnboardingLayout from '../../components/onboarding/OnboardingLayout';
 import { useOnboarding, type ForwarderValue } from '../../components/onboarding/OnboardingContext';
 
 const PLATFORM_FEE_RATE = 0.12;
 const DAILY_EXCHANGE_RATE = 9.2;
-const RATE_BASE_TIME = '09:00';
 
 /* ── 배송대행사별 요율표 (무게 kg → 배송비 ¥) ── */
 interface RateRow { maxKg: number; fee: number }

@@ -1,4 +1,4 @@
-import { X, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { X, CheckCircle2, XCircle, Loader2, History } from 'lucide-react';
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
 import { ProgressBar } from '../../../components/common/StatusComponents';
 import type { RegistrationJob } from '../../../types/registration';
@@ -56,146 +56,140 @@ export const BatchHistoryModal: React.FC<Props> = ({ isOpen, onClose, jobs, acti
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-    return (
-        <div style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: zIndex.modal,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px',
-            animation: 'fadeIn 0.2s ease',
-        }}>
-            <div
-                onClick={onClose}
-                style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    backdropFilter: 'blur(4px)',
-                }}
-            />
+    const totalRegistered = jobs.reduce((sum, j) => sum + j.successCount, 0);
 
-            {/* 패널 — 고정 높이, 테이블 형태 */}
-            <div style={{
-                position: 'relative',
-                width: '100%',
-                maxWidth: '580px',
-                height: '520px',
-                background: colors.bg.surface,
-                borderRadius: radius.xl,
-                boxShadow: shadow.lg,
+    return (
+        <div
+            onClick={onClose}
+            style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.4)',
+                backdropFilter: 'blur(4px)',
                 display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
-                animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-            }}>
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: zIndex.modal,
+                animation: 'batchOverlayIn 0.2s ease',
+            }}
+        >
+            <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                    background: colors.bg.surface,
+                    borderRadius: radius.xl,
+                    width: '580px',
+                    maxHeight: '80vh',
+                    overflow: 'hidden',
+                    boxShadow: shadow.lg,
+                    animation: 'batchModalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
+            >
                 {/* 헤더 */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: `${spacing['4']} ${spacing['5']}`,
+                    padding: `${spacing['5']} ${spacing['6']}`,
                     borderBottom: `1px solid ${colors.border.default}`,
-                    flexShrink: 0,
                 }}>
-                    <h3 style={{
-                        fontSize: font.size.lg,
-                        fontWeight: 700,
-                        color: colors.text.primary,
-                        margin: 0,
-                    }}>
-                        등록 기록
-                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                        <History size={18} color={colors.primary} />
+                        <span style={{
+                            fontSize: font.size.lg,
+                            fontWeight: 700,
+                            color: colors.text.primary,
+                        }}>
+                            등록 기록
+                        </span>
+                    </div>
                     <button
                         onClick={onClose}
                         style={{
-                            background: 'none',
-                            border: 'none',
-                            color: colors.text.muted,
-                            cursor: 'pointer',
-                            padding: '4px',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            transition: 'background 0.2s',
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            padding: spacing['1'],
+                            borderRadius: radius.md,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}
                         onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle; }}
                         onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
                     >
-                        <X size={20} />
+                        <X size={20} color={colors.text.muted} />
                     </button>
                 </div>
 
-                {/* 테이블 헤더 */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: `${spacing['2']} ${spacing['5']}`,
-                    background: colors.bg.faint,
-                    borderBottom: `1px solid ${colors.border.default}`,
-                    gap: spacing['3'],
-                    flexShrink: 0,
-                }}>
-                    <span style={{ ...colHeader, flex: 1, minWidth: 0 }}>상품</span>
-                    <span style={{ ...colHeader, flex: '0 0 80px', textAlign: 'center' }}>결과</span>
-                    <span style={{ ...colHeader, flex: '0 0 100px', textAlign: 'right' }}>등록일시</span>
-                </div>
+                {/* 요약 */}
+                {sortedJobs.length > 0 && (
+                    <div style={{
+                        padding: `${spacing['4']} ${spacing['6']}`,
+                        background: colors.bg.faint,
+                        borderBottom: `1px solid ${colors.border.default}`,
+                        display: 'flex',
+                        gap: spacing['4'],
+                    }}>
+                        <SummaryBadge label="총 등록 횟수" value={`${sortedJobs.length}회`} />
+                        <SummaryBadge label="등록된 상품" value={`${totalRegistered}건`} color={colors.success} />
+                    </div>
+                )}
 
-                {/* 테이블 바디 — 스크롤 */}
+                {/* 등록 목록 */}
                 <div style={{
                     flex: 1,
-                    overflowY: 'auto',
+                    overflow: 'auto',
+                    padding: `${spacing['4']} ${spacing['6']}`,
                 }}>
                     {sortedJobs.length === 0 ? (
                         <div style={{
-                            padding: spacing['10'],
                             textAlign: 'center',
+                            padding: `${spacing['8']} 0`,
                             color: colors.text.muted,
-                            fontSize: font.size.sm,
+                            fontSize: font.size.base,
                         }}>
-                            아직 등록 이력이 없습니다
+                            아직 등록 기록이 없어요
                         </div>
                     ) : (
-                        sortedJobs.map((job, i) => {
-                            const isActive = job.id === activeJobId;
-                            const isProcessing = job.status === 'processing';
-                            const isLast = i === sortedJobs.length - 1;
-                            const label = getJobLabel(job);
-                            const thumbnail = job.results.length > 0
-                                ? job.results[0].product.thumbnailUrl
-                                : null;
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>
+                            {sortedJobs.map((job) => {
+                                const isActive = job.id === activeJobId;
+                                const isProcessing = job.status === 'processing';
+                                const label = getJobLabel(job);
+                                const thumbnail = job.results.length > 0
+                                    ? job.results[0].product.thumbnailUrl
+                                    : null;
 
-                            return (
-                                <div
-                                    key={job.id}
-                                    onClick={() => { onSelectJob(job.id); onClose(); }}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        padding: `${spacing['3']} ${spacing['5']}`,
-                                        borderBottom: isLast ? 'none' : `1px solid ${colors.border.default}`,
-                                        background: isActive ? '#F8FAFF' : 'transparent',
-                                        cursor: 'pointer',
-                                        transition: 'background 0.1s',
-                                        gap: spacing['3'],
-                                    }}
-                                    onMouseEnter={e => {
-                                        if (!isActive) e.currentTarget.style.background = colors.bg.faint;
-                                    }}
-                                    onMouseLeave={e => {
-                                        e.currentTarget.style.background = isActive ? '#F8FAFF' : 'transparent';
-                                    }}
-                                >
-                                    {/* 상품 (썸네일 + 라벨) */}
-                                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: spacing['3'], minWidth: 0 }}>
+                                return (
+                                    <div
+                                        key={job.id}
+                                        onClick={() => { onSelectJob(job.id); onClose(); }}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'flex-start',
+                                            gap: spacing['3'],
+                                            padding: spacing['3'],
+                                            background: isActive ? colors.bg.info : 'transparent',
+                                            borderRadius: radius.md,
+                                            border: isActive
+                                                ? `1px solid ${colors.primaryLightBorder}`
+                                                : '1px solid transparent',
+                                            cursor: 'pointer',
+                                            transition: 'background 0.15s',
+                                        }}
+                                        onMouseEnter={e => {
+                                            if (!isActive) e.currentTarget.style.background = colors.bg.faint;
+                                        }}
+                                        onMouseLeave={e => {
+                                            e.currentTarget.style.background = isActive ? colors.bg.info : 'transparent';
+                                        }}
+                                    >
+                                        {/* 썸네일 */}
                                         {thumbnail ? (
                                             <img
                                                 src={thumbnail}
                                                 alt=""
                                                 style={{
-                                                    width: '32px',
-                                                    height: '32px',
+                                                    width: '36px', height: '36px',
                                                     borderRadius: radius.md,
                                                     objectFit: 'cover',
                                                     border: `1px solid ${colors.border.default}`,
@@ -204,8 +198,7 @@ export const BatchHistoryModal: React.FC<Props> = ({ isOpen, onClose, jobs, acti
                                             />
                                         ) : (
                                             <div style={{
-                                                width: '32px',
-                                                height: '32px',
+                                                width: '36px', height: '36px',
                                                 borderRadius: radius.md,
                                                 background: colors.bg.info,
                                                 display: 'flex',
@@ -213,97 +206,139 @@ export const BatchHistoryModal: React.FC<Props> = ({ isOpen, onClose, jobs, acti
                                                 justifyContent: 'center',
                                                 flexShrink: 0,
                                             }}>
-                                                <Loader2 size={14} color={colors.primary} className="spin" />
+                                                <Loader2 size={14} color={colors.primary} />
                                             </div>
                                         )}
-                                        <span style={{
-                                            fontSize: font.size.sm,
-                                            fontWeight: 500,
-                                            color: colors.text.primary,
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap',
-                                            minWidth: 0,
-                                        }}>
-                                            {label.name}
-                                        </span>
-                                        {label.suffix && (
-                                            <span style={{
+
+                                        {/* 상품명 */}
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{
                                                 fontSize: font.size.sm,
-                                                fontWeight: 500,
-                                                color: colors.text.muted,
-                                                flexShrink: 0,
+                                                fontWeight: 600,
+                                                color: colors.text.primary,
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
                                                 whiteSpace: 'nowrap',
                                             }}>
-                                                {label.suffix}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* 결과 */}
-                                    <div style={{ flex: '0 0 80px', textAlign: 'center' }}>
-                                        {isProcessing ? (
-                                            <div>
-                                                <div style={{
-                                                    fontSize: font.size.xs,
-                                                    color: colors.primary,
-                                                    fontWeight: 600,
-                                                    marginBottom: '3px',
-                                                }}>
-                                                    {job.currentCount}/{job.totalCount}
-                                                </div>
-                                                <ProgressBar value={job.currentCount} max={job.totalCount} />
+                                                {label.name}
+                                                {label.suffix && (
+                                                    <span style={{
+                                                        fontWeight: 500,
+                                                        color: colors.text.muted,
+                                                        marginLeft: spacing['1'],
+                                                    }}>
+                                                        {label.suffix}
+                                                    </span>
+                                                )}
                                             </div>
-                                        ) : (
                                             <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: spacing['2'],
                                                 fontSize: font.size.xs,
-                                                fontWeight: 600,
+                                                color: colors.text.muted,
+                                                marginTop: '1px',
                                             }}>
-                                                {job.successCount > 0 && (
-                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '2px', color: colors.success }}>
-                                                        <CheckCircle2 size={12} />{job.successCount}
-                                                    </span>
-                                                )}
-                                                {job.failedCount > 0 && (
-                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '2px', color: colors.danger }}>
-                                                        <XCircle size={12} />{job.failedCount}
-                                                    </span>
-                                                )}
+                                                {formatDate(job.createdAt)}
                                             </div>
-                                        )}
-                                    </div>
+                                        </div>
 
-                                    {/* 등록일시 */}
-                                    <div style={{
-                                        flex: '0 0 100px',
-                                        fontSize: font.size.xs,
-                                        color: colors.text.muted,
-                                        textAlign: 'right',
-                                    }}>
-                                        {formatDate(job.createdAt)}
+                                        {/* 결과 */}
+                                        <div style={{ flexShrink: 0, paddingTop: '1px' }}>
+                                            {isProcessing ? (
+                                                <div style={{ width: '64px' }}>
+                                                    <div style={{
+                                                        fontSize: font.size.xs,
+                                                        color: colors.primary,
+                                                        fontWeight: 600,
+                                                        marginBottom: '3px',
+                                                        textAlign: 'center',
+                                                    }}>
+                                                        {job.currentCount}/{job.totalCount}
+                                                    </div>
+                                                    <ProgressBar value={job.currentCount} max={job.totalCount} />
+                                                </div>
+                                            ) : (
+                                                <div style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: spacing['2'],
+                                                    fontSize: font.size.xs,
+                                                    fontWeight: 600,
+                                                }}>
+                                                    {job.successCount > 0 && (
+                                                        <span style={{
+                                                            display: 'flex', alignItems: 'center', gap: '3px',
+                                                            color: colors.success,
+                                                        }}>
+                                                            <CheckCircle2 size={13} />{job.successCount}건
+                                                        </span>
+                                                    )}
+                                                    {job.failedCount > 0 && (
+                                                        <span style={{
+                                                            display: 'flex', alignItems: 'center', gap: '3px',
+                                                            color: colors.danger,
+                                                        }}>
+                                                            <XCircle size={13} />{job.failedCount}건
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })
+                                );
+                            })}
+                        </div>
                     )}
+                </div>
+
+                {/* 하단 */}
+                <div style={{
+                    padding: `${spacing['4']} ${spacing['6']}`,
+                    borderTop: `1px solid ${colors.border.default}`,
+                }}>
+                    <span style={{
+                        fontSize: font.size.xs,
+                        color: colors.text.muted,
+                    }}>
+                        등록 기록을 클릭하면 해당 상품이 선택돼요
+                    </span>
                 </div>
             </div>
 
             <style>{`
-                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-                @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+                @keyframes batchOverlayIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes batchModalSlideUp {
+                    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+                    to { opacity: 1; transform: translateY(0) scale(1); }
+                }
             `}</style>
         </div>
     );
 };
 
-const colHeader: React.CSSProperties = {
-    fontSize: font.size.xs,
-    fontWeight: 600,
-    color: colors.text.muted,
-    whiteSpace: 'nowrap',
-};
+// ── 하위 컴포넌트 ─────────────────────────────────────────────────────────
+
+const SummaryBadge: React.FC<{
+    label: string;
+    value: string;
+    color?: string;
+}> = ({ label, value, color }) => (
+    <div>
+        <div style={{
+            fontSize: font.size.xs,
+            fontWeight: 500,
+            color: colors.text.muted,
+            marginBottom: '2px',
+        }}>
+            {label}
+        </div>
+        <div style={{
+            fontSize: font.size.base,
+            fontWeight: 700,
+            color: color ?? colors.text.primary,
+        }}>
+            {value}
+        </div>
+    </div>
+);

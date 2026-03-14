@@ -1,0 +1,44 @@
+{
+  "agents": [
+    {
+      "agent_id": "a05908c0da75070f5",
+      "agent_type": "Explore",
+      "started_at": "2026-03-14T05:14:18.791Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-14T05:14:50.517Z",
+      "duration_ms": 31726
+    },
+    {
+      "agent_id": "a7333ff914bfe38f8",
+      "agent_type": "feature-dev:code-reviewer",
+      "started_at": "2026-03-14T10:00:49.694Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-14T10:03:21.195Z",
+      "duration_ms": 151501
+    },
+    {
+      "agent_id": "a6921fa304ea559dd",
+      "agent_type": "feature-dev:code-reviewer",
+      "started_at": "2026-03-14T10:00:55.469Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-14T10:02:50.124Z",
+      "duration_ms": 114655
+    },
+    {
+      "agent_id": "a62346e230616fb07",
+      "agent_type": "feature-dev:code-reviewer",
+      "started_at": "2026-03-14T10:01:02.373Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-14T10:02:54.912Z",
+      "duration_ms": 112539
+    }
+  ],
+  "total_spawned": 4,
+  "total_completed": 4,
+  "total_failed": 0,
+  "last_updated": "2026-03-14T10:08:25.450Z"
+}

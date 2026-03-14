@@ -9,6 +9,7 @@ import AutoSourcingPage from './pages/sourcing/AutoSourcingPage';
 import EditingListPage from './pages/editing/EditingListPage';
 import EditingDetailPage from './pages/editing/EditingDetailPage';
 import { RegistrationResultPage } from './pages/registration/RegistrationResultPage';
+import { ProductDetailPage } from './pages/registration/ProductDetailPage';
 import { OnboardingProvider } from './components/onboarding/OnboardingContext';
 
 export default function App() {
@@ -30,8 +31,9 @@ export default function App() {
           <Route path="/editing" element={<EditingListPage />} />
           <Route path="/editing/:productId" element={<EditingDetailPage />} />
 
-          {/* Registration Section */}
+          {/* Registration Section (= 판매 중인 상품 + 변동 확인) */}
           <Route path="/registration" element={<RegistrationResultPage />} />
+          <Route path="/registration/:resultId" element={<ProductDetailPage />} />
 
           {/* Default redirect to splash */}
           <Route path="*" element={<Navigate to="/" replace />} />

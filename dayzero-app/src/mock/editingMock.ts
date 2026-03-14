@@ -1,16 +1,6 @@
 import type { ProductDetail } from '../types/editing';
 import { DETAIL_KO_SVGS } from './detailImageSvgs';
 
-const TRANSLATED_DESCRIPTIONS: Record<string, { ko: string; ja: string }> = {
-    beauty: {
-        ko: '피부 타입에 맞는 순한 성분으로 만들어진 스킨케어 제품입니다. 자극 없이 촉촉하게 피부를 가꿔줍니다.',
-        ja: '肌タイプに合わせた優しい成分で作られたスキンケア製品です。刺激なくしっとりと肌を整えます。',
-    },
-    daily: {
-        ko: '일상생활에 꼭 필요한 생활용품입니다. 실용적이고 사용하기 편리하게 설계되었습니다.',
-        ja: '日常生活に欠かせない生活用品です。実用的で使いやすく設計されています。',
-    },
-};
 
 const PENDING_DESC = '피부 타입에 맞는 순한 성분으로 만들어진 스킨케어 제품입니다. 자극 없이 촉촉하게 피부를 가꿔줍니다.';
 

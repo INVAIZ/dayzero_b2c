@@ -1,15 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
-import { ExternalLink, Check } from 'lucide-react';
+import { ExternalLink, Check, Shield, AlertTriangle, PackageX, TrendingDown, Minus } from 'lucide-react';
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
 import { getProviderLogo } from '../../../types/sourcing';
 import { stripPrefix } from '../../../utils/editing';
-import type { RegistrationResult } from '../../../types/registration';
+import type { RegistrationResult, MonitoringCheckResult } from '../../../types/registration';
 
 interface Props {
     results: RegistrationResult[];
     selectedIds?: string[];
     onToggleSelect?: (id: string) => void;
     onSelectAll?: () => void;
+    onRowClick?: (resultId: string) => void;
+    showMonitoring?: boolean;
+    emptyMessage?: string;
 }
 
 // --- 툴팁 (편집 목록과 동일) ---
@@ -83,11 +86,21 @@ function calcMargin(product: { originalPriceKrw: number; salePriceJpy: number })
     return ((sale - cost) / sale) * 100;
 }
 
+const MONITORING_LABELS: Record<MonitoringCheckResult, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
+    normal: { label: '정상', color: colors.success, bg: colors.successLight, icon: <Shield size={12} /> },
+    price_changed: { label: '가격 변동', color: colors.warningIcon, bg: colors.warningLight, icon: <TrendingDown size={12} /> },
+    negative_margin: { label: '역마진', color: colors.danger, bg: colors.dangerLight, icon: <AlertTriangle size={12} /> },
+    out_of_stock: { label: '품절', color: colors.text.primary, bg: colors.bg.subtle, icon: <PackageX size={12} /> },
+};
+
 export const AllProductsTable: React.FC<Props> = ({
     results,
     selectedIds = [],
     onToggleSelect,
     onSelectAll,
+    onRowClick,
+    showMonitoring = false,
+    emptyMessage = '등록된 상품이 없어요',
 }) => {
     const [tooltip, setTooltip] = useState<TooltipData | null>(null);
     const hasSelection = !!onToggleSelect;
@@ -96,7 +109,7 @@ export const AllProductsTable: React.FC<Props> = ({
     if (results.length === 0) {
         return (
             <div style={{ textAlign: 'center', padding: `${spacing['12']} 0`, color: colors.text.muted, fontSize: font.size.base }}>
-                등록된 상품이 없습니다
+                {emptyMessage}
             </div>
         );
     }
@@ -118,6 +131,9 @@ export const AllProductsTable: React.FC<Props> = ({
                 <div style={{ width: '56px', flexShrink: 0, ...colHeader }}>마진율</div>
                 <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>상품번호</div>
                 <div style={{ width: '80px', flexShrink: 0, ...colHeader }}>등록일시</div>
+                {showMonitoring && (
+                    <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>변동 확인</div>
+                )}
                 <div style={{ width: '40px', flexShrink: 0, ...colHeader, textAlign: 'center' }}>링크</div>
             </div>
 
@@ -133,14 +149,20 @@ export const AllProductsTable: React.FC<Props> = ({
                     const displayTitle = r.product.titleJa
                         ? stripPrefix(r.product.titleJa)
                         : stripPrefix(r.product.titleKo);
+                    const monitoringResult = r.monitoring?.lastCheckResult;
+                    const isMonitored = r.monitoring?.status === 'active';
+                    const isIssueRow = isMonitored && (monitoringResult === 'negative_margin' || monitoringResult === 'out_of_stock');
 
                     return (
                         <div
                             key={r.id}
+                            onClick={() => onRowClick?.(r.id)}
                             style={{
                                 display: 'flex', alignItems: 'center', gap: spacing['5'],
                                 padding: `14px ${spacing['5']}`,
-                                background: isSelected ? colors.primaryLight : colors.bg.surface,
+                                background: isSelected
+                                    ? colors.primaryLight
+                                    : isIssueRow ? colors.dangerBg : colors.bg.surface,
                                 borderRadius: radius.lg,
                                 borderBottom: `1px solid ${colors.border.default}`,
                                 cursor: 'pointer',
@@ -148,10 +170,10 @@ export const AllProductsTable: React.FC<Props> = ({
                                 animation: `rowSlideIn 0.3s ease ${Math.min(i * 0.04, 0.4)}s both`,
                             }}
                             onMouseEnter={e => {
-                                if (!isSelected) e.currentTarget.style.background = colors.bg.faint;
+                                if (!isSelected) e.currentTarget.style.background = isIssueRow ? '#FDE8EA' : colors.bg.faint;
                             }}
                             onMouseLeave={e => {
-                                if (!isSelected) e.currentTarget.style.background = colors.bg.surface;
+                                if (!isSelected) e.currentTarget.style.background = isIssueRow ? colors.dangerBg : colors.bg.surface;
                             }}
                         >
                             {/* 체크박스 */}
@@ -254,6 +276,40 @@ export const AllProductsTable: React.FC<Props> = ({
                             <div style={{ width: '80px', flexShrink: 0, fontSize: font.size.sm, color: colors.text.muted }}>
                                 {formatDate(r.registeredAt)}
                             </div>
+
+                            {/* 변동 확인 상태 */}
+                            {showMonitoring && (
+                                <div style={{ width: '100px', flexShrink: 0 }}>
+                                    {isMonitored && monitoringResult ? (
+                                        <span style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            padding: '3px 10px',
+                                            borderRadius: radius.full,
+                                            fontSize: font.size.xs,
+                                            fontWeight: 600,
+                                            color: MONITORING_LABELS[monitoringResult].color,
+                                            background: MONITORING_LABELS[monitoringResult].bg,
+                                        }}>
+                                            {MONITORING_LABELS[monitoringResult].icon}
+                                            {MONITORING_LABELS[monitoringResult].label}
+                                        </span>
+                                    ) : (
+                                        <span style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            fontSize: font.size.xs,
+                                            fontWeight: 500,
+                                            color: colors.text.muted,
+                                        }}>
+                                            <Minus size={12} />
+                                            미등록
+                                        </span>
+                                    )}
+                                </div>
+                            )}
 
                             {/* 링크 */}
                             <div style={{ width: '40px', flexShrink: 0, textAlign: 'center' }}>

@@ -47,7 +47,6 @@ const KoTooltip: React.FC<{ pos: { x: number; y: number }; text: string }> = ({ 
         if (!ref.current) return;
         const { width, height } = ref.current.getBoundingClientRect();
         const vw = window.innerWidth;
-        const vh = window.innerHeight;
         let x = pos.x + 12;
         let y = pos.y - height - 10;
         if (x + width > vw - 16) x = vw - width - 16;

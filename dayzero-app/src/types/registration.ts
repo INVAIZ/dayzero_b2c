@@ -40,6 +40,12 @@ export interface RegistrationResult {
 
     // 실패 시
     error?: RegistrationError;
+
+    // 판매 중지 여부 (없으면 active로 간주)
+    salesStatus?: 'active' | 'paused';
+
+    // 변동 확인
+    monitoring?: MonitoringInfo;
 }
 
 // 등록 Job (배치 단위)
@@ -59,3 +65,34 @@ export interface RegistrationJob {
 
 // 판매처 필터
 export type MarketplaceFilter = 'all' | Marketplace;
+
+// ── 변동 확인 (모니터링) ──────────────────────────────────────────────────
+
+/** 변동 확인 등록 상태 */
+export type MonitoringStatus = 'inactive' | 'active';
+
+/** 변동 확인 결과 */
+export type MonitoringCheckResult =
+    | 'normal'            // 🟢 정상
+    | 'price_changed'     // 🟡 가격 변동 (마진 유지)
+    | 'negative_margin'   // 🔴 역마진
+    | 'out_of_stock';     // ⚫ 품절
+
+/** 가격/재고 변동 이력 항목 */
+export interface PriceHistoryEntry {
+    date: string;              // ISO date
+    sourcePriceKrw: number;    // 소싱처 원가
+    stockStatus: 'in_stock' | 'out_of_stock';
+    marginPercent: number;     // 판매가 대비 마진율
+}
+
+/** 변동 확인 상세 정보 (RegistrationResult에 추가) */
+export interface MonitoringInfo {
+    status: MonitoringStatus;
+    lastCheckResult?: MonitoringCheckResult;
+    lastCheckAt?: string;                    // ISO
+    nextCheckAt?: string;                    // ISO
+    currentSourcePriceKrw?: number;          // 최근 확인 원가
+    priceHistory?: PriceHistoryEntry[];      // 최근 30일 이력
+    issueDescription?: string;               // 문제 상세 설명
+}

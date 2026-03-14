@@ -125,14 +125,6 @@ export const UrlSourcingContent = () => {
                     '에스파 (aespa) - 3rd Mini Album [MY WORLD] (Poster ver.)',
                     '르세라핌 (LE SSERAFIM) - 3rd Mini Album [EASY] (Weverse Albums ver.)'
                 ];
-                const kpopTitlesJa = [
-                    '【予約販売】NewJeans - 2nd EP [Get Up] (Bunny Beach Bag ver.)',
-                    'SEVENTEEN - 10th ミニアルバム [FML] (通常版)',
-                    'LE SSERAFIM - 1st スタジオアルバム [UNFORGIVEN] (Weverse Albums ver.)',
-                    'Stray Kids - 5-STAR (Limited Edition)',
-                    'aespa - 3rd ミニアルバム [MY WORLD] (ポスター版)',
-                    'LE SSERAFIM - 3rd ミニアルバム [EASY] (Weverse Albums ver.)',
-                ];
                 const generalTitles = [
                     '[단독기획] 닥터지 레드 블레미쉬 클리어 수딩 크림 70ml+30ml 세트',
                     '일리윤 세라마이드 아토 집중 크림 200ml 탑퍼 기획',
@@ -140,19 +132,10 @@ export const UrlSourcingContent = () => {
                     '코스알엑스 패드 3종 비교 기획세트 (오리지널/모이스쳐/포어리스)',
                     '클리오 킬커버 더뉴 파운웨어 쿠션 (본품+리필+퍼프2매)',
                 ];
-                const generalTitlesJa = [
-                    '【独占企画】Dr.G レッドブレミッシュ クリア スージングクリーム 70ml+30ml セット',
-                    'illiyoon セラミドアト 集中クリーム 200ml トッパー企画セット',
-                    '【NEW/2026年まで】LANEIGE ネオクッション マット 15g 本品+リフィル',
-                    'COSRX パッド 3種 比較企画セット (オリジナル/モイスチャー/ポアレス)',
-                    'CLIO キルカバー ザニュー ファウンウェアクッション (本品+リフィル+パフ2枚)',
-                ];
 
                 const realisticTitles = isKpop ? kpopTitles : generalTitles;
-                const realisticTitlesJa = isKpop ? kpopTitlesJa : generalTitlesJa;
                 const realTitle = realisticTitles[i % realisticTitles.length];
-                const realTitleJa = realisticTitlesJa[i % realisticTitlesJa.length];
-                const orgPrice = Math.floor(Math.random() * 20000) + 15000;
+const orgPrice = Math.floor(Math.random() * 20000) + 15000;
 
                 const mockProduct: SourcedProduct = {
                     id: `prod-${Date.now()}-${i}`,

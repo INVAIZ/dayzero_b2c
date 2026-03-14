@@ -1,4 +1,4 @@
-import { X, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { X, CheckCircle2, Loader2, Package } from 'lucide-react';
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
 import type { CollectionNotification } from '../../../store/useSourcingStore';
 import type { SourcedProduct } from '../../../types/sourcing';
@@ -44,7 +44,6 @@ function getNotifLabel(
     sourcingProducts: SourcedProduct[],
     editingProducts: ProductDetail[],
 ): { name: string; suffix: string | null } {
-    // notif.id === product.jobId 이므로 매칭 가능
     const fromSourcing = sourcingProducts.filter(p => p.jobId === notif.id);
     const firstName = fromSourcing.length > 0
         ? fromSourcing[0].title
@@ -55,163 +54,155 @@ function getNotifLabel(
     return { name: firstName, suffix: `외 ${notif.totalCount - 1}건` };
 }
 
-export const SourcingHistoryModal: React.FC<Props> = ({ isOpen, onClose, notifications, sourcingProducts, editingProducts, onSelectJob }) => {
+export const SourcingHistoryModal: React.FC<Props> = ({
+    isOpen, onClose, notifications, sourcingProducts, editingProducts, onSelectJob,
+}) => {
     if (!isOpen) return null;
 
     const filtered = notifications.filter(n => n.status === 'completed' || n.status === 'running');
-
     const sorted = [...filtered].sort((a, b) => {
         if (a.status === 'running' && b.status !== 'running') return -1;
         if (a.status !== 'running' && b.status === 'running') return 1;
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-    return (
-        <div style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: zIndex.modal,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px',
-            animation: 'fadeIn 0.2s ease',
-        }}>
-            <div
-                onClick={onClose}
-                style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    backdropFilter: 'blur(4px)',
-                }}
-            />
+    const totalCollected = filtered.reduce((sum, n) => sum + n.currentCount, 0);
 
-            {/* 패널 */}
-            <div style={{
-                position: 'relative',
-                width: '100%',
-                maxWidth: '580px',
-                height: '520px',
-                background: colors.bg.surface,
-                borderRadius: radius.xl,
-                boxShadow: shadow.lg,
+    return (
+        <div
+            onClick={onClose}
+            style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.4)',
+                backdropFilter: 'blur(4px)',
                 display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
-                animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-            }}>
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: zIndex.modal,
+                animation: 'sourcingOverlayIn 0.2s ease',
+            }}
+        >
+            <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                    background: colors.bg.surface,
+                    borderRadius: radius.xl,
+                    width: '580px',
+                    maxHeight: '80vh',
+                    overflow: 'hidden',
+                    boxShadow: shadow.lg,
+                    animation: 'sourcingModalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
+            >
                 {/* 헤더 */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: `${spacing['4']} ${spacing['5']}`,
+                    padding: `${spacing['5']} ${spacing['6']}`,
                     borderBottom: `1px solid ${colors.border.default}`,
-                    flexShrink: 0,
                 }}>
-                    <h3 style={{
-                        fontSize: font.size.lg,
-                        fontWeight: 700,
-                        color: colors.text.primary,
-                        margin: 0,
-                    }}>
-                        소싱 기록
-                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                        <Package size={18} color={colors.primary} />
+                        <span style={{
+                            fontSize: font.size.lg,
+                            fontWeight: 700,
+                            color: colors.text.primary,
+                        }}>
+                            수집 기록
+                        </span>
+                    </div>
                     <button
                         onClick={onClose}
                         style={{
-                            background: 'none',
-                            border: 'none',
-                            color: colors.text.muted,
-                            cursor: 'pointer',
-                            padding: '4px',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            transition: 'background 0.2s',
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            padding: spacing['1'],
+                            borderRadius: radius.md,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}
                         onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle; }}
                         onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
                     >
-                        <X size={20} />
+                        <X size={20} color={colors.text.muted} />
                     </button>
                 </div>
 
-                {/* 테이블 헤더 */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 60px 60px 100px',
-                    alignItems: 'center',
-                    padding: `${spacing['2']} ${spacing['5']}`,
-                    background: colors.bg.faint,
-                    borderBottom: `1px solid ${colors.border.default}`,
-                    gap: spacing['3'],
-                    flexShrink: 0,
-                }}>
-                    <span style={colHeader}>상품</span>
-                    <span style={{ ...colHeader, textAlign: 'center' }}>유형</span>
-                    <span style={{ ...colHeader, textAlign: 'center' }}>결과</span>
-                    <span style={colHeader}>소싱일시</span>
-                </div>
+                {/* 요약 */}
+                {sorted.length > 0 && (
+                    <div style={{
+                        padding: `${spacing['4']} ${spacing['6']}`,
+                        background: colors.bg.faint,
+                        borderBottom: `1px solid ${colors.border.default}`,
+                        display: 'flex',
+                        gap: spacing['4'],
+                    }}>
+                        <SummaryBadge label="총 수집 횟수" value={`${sorted.length}회`} />
+                        <SummaryBadge label="수집된 상품" value={`${totalCollected}건`} color={colors.success} />
+                    </div>
+                )}
 
-                {/* 테이블 바디 */}
+                {/* 목록 */}
                 <div style={{
                     flex: 1,
-                    overflowY: 'auto',
+                    overflow: 'auto',
+                    padding: `${spacing['4']} ${spacing['6']}`,
                 }}>
                     {sorted.length === 0 ? (
                         <div style={{
-                            padding: spacing['10'],
                             textAlign: 'center',
+                            padding: `${spacing['8']} 0`,
                             color: colors.text.muted,
-                            fontSize: font.size.sm,
+                            fontSize: font.size.base,
                         }}>
-                            아직 소싱 이력이 없습니다
+                            아직 수집 기록이 없어요
                         </div>
                     ) : (
-                        sorted.map((notif, i) => {
-                            const isRunning = notif.status === 'running';
-                            const isLast = i === sorted.length - 1;
-                            const label = getNotifLabel(notif, sourcingProducts, editingProducts);
-                            const matchedSourcing = sourcingProducts.filter(p => p.jobId === notif.id);
-                            const matchedEditing = editingProducts.filter(p => p.jobId === notif.id);
-                            const thumbnail = matchedSourcing.length > 0
-                                ? matchedSourcing[0].thumbnailUrl
-                                : matchedEditing.length > 0
-                                    ? matchedEditing[0].thumbnailUrl
-                                    : null;
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>
+                            {sorted.map((notif) => {
+                                const isRunning = notif.status === 'running';
+                                const label = getNotifLabel(notif, sourcingProducts, editingProducts);
+                                const matchedSourcing = sourcingProducts.filter(p => p.jobId === notif.id);
+                                const matchedEditing = editingProducts.filter(p => p.jobId === notif.id);
+                                const thumbnail = matchedSourcing.length > 0
+                                    ? matchedSourcing[0].thumbnailUrl
+                                    : matchedEditing.length > 0
+                                        ? matchedEditing[0].thumbnailUrl
+                                        : null;
 
-                            return (
-                                <div
-                                    key={notif.id}
-                                    onClick={() => { onSelectJob(notif.id); onClose(); }}
-                                    style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: '1fr 60px 60px 100px',
-                                        alignItems: 'center',
-                                        padding: `${spacing['3']} ${spacing['5']}`,
-                                        borderBottom: isLast ? 'none' : `1px solid ${colors.border.default}`,
-                                        background: 'transparent',
-                                        cursor: 'pointer',
-                                        transition: 'background 0.1s',
-                                        gap: spacing['3'],
-                                    }}
-                                    onMouseEnter={e => {
-                                        e.currentTarget.style.background = colors.bg.faint;
-                                    }}
-                                    onMouseLeave={e => {
-                                        e.currentTarget.style.background = 'transparent';
-                                    }}
-                                >
-                                    {/* 상품 (썸네일 + 라벨) */}
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'], minWidth: 0 }}>
+                                return (
+                                    <div
+                                        key={notif.id}
+                                        onClick={() => { onSelectJob(notif.id); onClose(); }}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'flex-start',
+                                            gap: spacing['3'],
+                                            padding: spacing['3'],
+                                            background: isRunning ? colors.bg.info : 'transparent',
+                                            borderRadius: radius.md,
+                                            border: isRunning
+                                                ? `1px solid ${colors.primaryLightBorder}`
+                                                : '1px solid transparent',
+                                            cursor: 'pointer',
+                                            transition: 'background 0.15s',
+                                        }}
+                                        onMouseEnter={e => {
+                                            if (!isRunning) e.currentTarget.style.background = colors.bg.faint;
+                                        }}
+                                        onMouseLeave={e => {
+                                            e.currentTarget.style.background = isRunning ? colors.bg.info : 'transparent';
+                                        }}
+                                    >
+                                        {/* 썸네일 */}
                                         {thumbnail ? (
                                             <img
                                                 src={thumbnail}
                                                 alt=""
                                                 style={{
-                                                    width: '32px',
-                                                    height: '32px',
+                                                    width: '36px', height: '36px',
                                                     borderRadius: radius.md,
                                                     objectFit: 'cover',
                                                     border: `1px solid ${colors.border.default}`,
@@ -220,114 +211,149 @@ export const SourcingHistoryModal: React.FC<Props> = ({ isOpen, onClose, notific
                                             />
                                         ) : (
                                             <div style={{
-                                                width: '32px',
-                                                height: '32px',
+                                                width: '36px', height: '36px',
                                                 borderRadius: radius.md,
-                                                background: isRunning ? colors.bg.info : colors.bg.subtle,
+                                                background: isRunning ? colors.primaryLight : colors.bg.subtle,
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 flexShrink: 0,
                                             }}>
                                                 {isRunning
-                                                    ? <Loader2 size={14} color={colors.primary} className="spin" />
+                                                    ? <Loader2 size={14} color={colors.primary} />
                                                     : <CheckCircle2 size={14} color={colors.success} />
                                                 }
                                             </div>
                                         )}
-                                        <span style={{
-                                            fontSize: font.size.sm,
-                                            fontWeight: 500,
-                                            color: colors.text.primary,
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap',
-                                            minWidth: 0,
-                                        }}>
-                                            {label.name}
-                                        </span>
-                                        {label.suffix && (
-                                            <span style={{
+
+                                        {/* 상품명 + 날짜 */}
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{
                                                 fontSize: font.size.sm,
-                                                fontWeight: 500,
-                                                color: colors.text.muted,
-                                                flexShrink: 0,
+                                                fontWeight: 600,
+                                                color: colors.text.primary,
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
                                                 whiteSpace: 'nowrap',
                                             }}>
-                                                {label.suffix}
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    {/* 유형 태그 */}
-                                    <div style={{ textAlign: 'center' }}>
-                                        <span style={{
-                                            display: 'inline-block',
-                                            fontSize: font.size.xs,
-                                            fontWeight: 600,
-                                            padding: '2px 8px',
-                                            borderRadius: radius.full,
-                                            background: notif.type === 'url' ? colors.primaryLight : colors.warningLight,
-                                            color: notif.type === 'url' ? colors.primary : colors.warningIcon,
-                                            whiteSpace: 'nowrap',
-                                        }}>
-                                            {notif.type === 'url' ? 'URL' : '자동'}
-                                        </span>
-                                    </div>
-
-                                    {/* 결과 */}
-                                    <div style={{ textAlign: 'center' }}>
-                                        {isRunning ? (
-                                            <div style={{
-                                                fontSize: font.size.xs,
-                                                color: colors.primary,
-                                                fontWeight: 600,
-                                            }}>
-                                                {notif.currentCount}/{notif.totalCount}
-                                            </div>
-                                        ) : (
-                                            <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: spacing['2'],
-                                                fontSize: font.size.xs,
-                                                fontWeight: 600,
-                                            }}>
-                                                {notif.currentCount > 0 && (
-                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '2px', color: colors.success }}>
-                                                        <CheckCircle2 size={12} />{notif.currentCount}
+                                                {label.name}
+                                                {label.suffix && (
+                                                    <span style={{
+                                                        fontWeight: 500,
+                                                        color: colors.text.muted,
+                                                        marginLeft: spacing['1'],
+                                                    }}>
+                                                        {label.suffix}
                                                     </span>
                                                 )}
                                             </div>
-                                        )}
-                                    </div>
+                                            <div style={{
+                                                fontSize: font.size.xs,
+                                                color: colors.text.muted,
+                                                marginTop: '1px',
+                                            }}>
+                                                {formatDate(notif.createdAt)}
+                                            </div>
+                                        </div>
 
-                                    {/* 소싱일시 */}
-                                    <div style={{
-                                        fontSize: font.size.xs,
-                                        color: colors.text.muted,
-                                    }}>
-                                        {formatDate(notif.createdAt)}
+                                        {/* 유형 태그 + 결과 */}
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: spacing['2'],
+                                            flexShrink: 0,
+                                            paddingTop: '1px',
+                                        }}>
+                                            <span style={{
+                                                fontSize: font.size.xs,
+                                                fontWeight: 600,
+                                                padding: '2px 8px',
+                                                borderRadius: radius.full,
+                                                background: notif.type === 'url' ? colors.primaryLight : colors.warningLight,
+                                                color: notif.type === 'url' ? colors.primary : colors.warningIcon,
+                                                whiteSpace: 'nowrap',
+                                            }}>
+                                                {notif.type === 'url' ? 'URL' : '자동'}
+                                            </span>
+
+                                            {isRunning ? (
+                                                <span style={{
+                                                    fontSize: font.size.xs,
+                                                    fontWeight: 600,
+                                                    color: colors.primary,
+                                                }}>
+                                                    {notif.currentCount}/{notif.totalCount}
+                                                </span>
+                                            ) : (
+                                                <span style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '3px',
+                                                    fontSize: font.size.xs,
+                                                    fontWeight: 600,
+                                                    color: colors.success,
+                                                }}>
+                                                    <CheckCircle2 size={13} />{notif.currentCount}건
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })
+                                );
+                            })}
+                        </div>
                     )}
+                </div>
+
+                {/* 하단 */}
+                <div style={{
+                    padding: `${spacing['4']} ${spacing['6']}`,
+                    borderTop: `1px solid ${colors.border.default}`,
+                }}>
+                    <span style={{
+                        fontSize: font.size.xs,
+                        color: colors.text.muted,
+                    }}>
+                        수집 기록을 클릭하면 해당 상품이 선택돼요
+                    </span>
                 </div>
             </div>
 
             <style>{`
-                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-                @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+                @keyframes sourcingOverlayIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes sourcingModalSlideUp {
+                    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+                    to { opacity: 1; transform: translateY(0) scale(1); }
+                }
             `}</style>
         </div>
     );
 };
 
-const colHeader: React.CSSProperties = {
-    fontSize: font.size.xs,
-    fontWeight: 600,
-    color: colors.text.muted,
-    whiteSpace: 'nowrap',
-};
+// ── 하위 컴포넌트 ─────────────────────────────────────────────────────────
+
+const SummaryBadge: React.FC<{
+    label: string;
+    value: string;
+    color?: string;
+}> = ({ label, value, color }) => (
+    <div>
+        <div style={{
+            fontSize: font.size.xs,
+            fontWeight: 500,
+            color: colors.text.muted,
+            marginBottom: '2px',
+        }}>
+            {label}
+        </div>
+        <div style={{
+            fontSize: font.size.base,
+            fontWeight: 700,
+            color: color ?? colors.text.primary,
+        }}>
+            {value}
+        </div>
+    </div>
+);

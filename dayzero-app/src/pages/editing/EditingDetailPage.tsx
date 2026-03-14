@@ -94,6 +94,8 @@ export default function EditingDetailPage() {
                     product={product}
                     hasPrev={hasPrev}
                     hasNext={hasNext}
+                    currentIndex={productIndex}
+                    totalCount={products.length}
                     onBack={() => navigate('/editing')}
                     onPrev={handlePrev}
                     onNext={handleNext}

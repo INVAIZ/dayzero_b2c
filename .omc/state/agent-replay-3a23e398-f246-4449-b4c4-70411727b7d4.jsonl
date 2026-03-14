@@ -1,0 +1,9 @@
+{"t":0,"agent":"a05908c","agent_type":"Explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a05908c","agent_type":"Explore","event":"agent_stop","success":true,"duration_ms":31726}
+{"t":0,"agent":"a7333ff","agent_type":"feature-dev:code-reviewer","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a6921fa","agent_type":"feature-dev:code-reviewer","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a62346e","agent_type":"feature-dev:code-reviewer","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a6921fa","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":114655}
+{"t":0,"agent":"a62346e","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":112539}
+{"t":0,"agent":"a7333ff","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":151501}
+{"t":0,"agent":"a0c3be1","agent_type":"unknown","event":"agent_stop","success":true}

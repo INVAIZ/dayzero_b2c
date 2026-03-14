@@ -1,7 +1,7 @@
 {
-  "tool_name": "Read",
-  "tool_input_preview": "{\"file_path\":\"/tmp/dayzero-diff.txt\"}",
-  "error": "File content (50755 tokens) exceeds maximum allowed tokens (25000). Use offset and limit parameters to read specific portions of the file, or search for specific content instead of reading the whole file.",
-  "timestamp": "2026-03-12T15:48:44.684Z",
-  "retry_count": 3
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app && npx tsc -b --noEmit 2>&1\",\"description\":\"TypeScript 빌드 검증\"}",
+  "error": "Exit code 2\nsrc/pages/registration/ProductDetailPage.tsx(883,35): error TS2304: Cannot find name 'toY'.",
+  "timestamp": "2026-03-14T10:30:53.136Z",
+  "retry_count": 2
 }

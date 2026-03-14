@@ -8,7 +8,7 @@ type NavItem = '수집하기' | '편집하기' | '판매 중인 상품';
 export const Sidebar: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [showToast, setShowToast] = useState(false);
+    const [showToast] = useState(false);
     const [badgeAnimating, setBadgeAnimating] = useState(false);
 
     const { unprocessedProductCount } = useSourcingStore();

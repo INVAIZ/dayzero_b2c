@@ -1,0 +1,11 @@
+{"t":0,"agent":"abda558","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"af2e21b","agent_type":"Explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"af2e21b","agent_type":"Explore","event":"agent_stop","success":true,"duration_ms":13000}
+{"t":0,"agent":"ac6f037","agent_type":"Explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"ac6f037","agent_type":"Explore","event":"agent_stop","success":true,"duration_ms":21038}
+{"t":0,"agent":"a257581","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a8ba58e","agent_type":"general-purpose","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a8ba58e","agent_type":"general-purpose","event":"agent_stop","success":true,"duration_ms":184359}
+{"t":0,"agent":"a5c1daf","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"feature-review"}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"simplify"}

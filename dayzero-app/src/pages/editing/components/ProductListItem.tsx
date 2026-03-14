@@ -299,8 +299,7 @@ export const ProductListItem: React.FC<Props> = ({
                     const titleDone = !!product.titleJa;
                     const optionsDone = product.options.length > 0 && product.options.every(o => !!o.nameJa);
                     const descDone = !!product.descriptionJa;
-                    const _allDone = titleDone && optionsDone && descDone;
-                    const tags: { label: string; done: boolean }[] = [
+const tags: { label: string; done: boolean }[] = [
                         { label: '상품명', done: titleDone },
                         { label: '옵션', done: optionsDone },
                         { label: '상세설명', done: descDone },
