@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, ExternalLink, Shield, AlertTriangle, PackageX,
@@ -9,6 +9,7 @@ import { MainLayout } from '../../components/layout/MainLayout';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { getProviderLogo } from '../../types/sourcing';
 import { stripPrefix } from '../../utils/editing';
+import { handleImgError } from '../../utils/image';
 import { useRegistrationStore } from '../../store/useRegistrationStore';
 import type { RegistrationResult } from '../../types/registration';
 
@@ -39,7 +40,7 @@ export const ProductDetailPage: React.FC = () => {
                         style={{
                             padding: `${spacing['2']} ${spacing['4']}`,
                             background: colors.primary,
-                            color: '#fff',
+                            color: colors.bg.surface,
                             border: 'none',
                             borderRadius: radius.md,
                             fontSize: font.size.base,
@@ -157,7 +158,7 @@ export const ProductDetailPage: React.FC = () => {
                     <img
                         src={product.thumbnailUrl}
                         alt=""
-                        onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
+                        onError={handleImgError}
                         style={{
                             width: '72px', height: '72px',
                             borderRadius: radius.img,
@@ -414,7 +415,7 @@ export const ProductDetailPage: React.FC = () => {
                             style={{
                                 padding: `${spacing['2']} ${spacing['5']}`,
                                 background: colors.primary,
-                                color: '#fff',
+                                color: colors.bg.surface,
                                 border: 'none',
                                 borderRadius: radius.md,
                                 fontSize: font.size.base,
@@ -668,8 +669,6 @@ const PriceHistorySection: React.FC<{
     history: NonNullable<RegistrationResult['monitoring']>['priceHistory'];
 }> = ({ history }) => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-
     const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
         if (!history) return;
         const svg = e.currentTarget;
@@ -748,7 +747,7 @@ const PriceHistorySection: React.FC<{
     };
 
     return (
-        <div ref={containerRef} style={{
+        <div style={{
             background: colors.bg.surface,
             border: `1px solid ${colors.border.default}`,
             borderRadius: radius.lg,

@@ -3,6 +3,7 @@ import { ChevronDown, Check } from 'lucide-react';
 import { colors, font, spacing, radius } from '../../../design/tokens';
 import { EmptyState } from '../../../components/common/StatusComponents';
 import { ErrorDetailPanel, ERROR_TYPE_LABELS } from './ErrorDetailPanel';
+import { handleImgError } from '../../../utils/image';
 import type { RegistrationResult, RegistrationErrorType } from '../../../types/registration';
 
 interface Props {
@@ -119,7 +120,7 @@ export const FailedProductTable: React.FC<Props> = ({ results, selectedIds, onTo
                                 <img
                                     src={r.product.thumbnailUrl}
                                     alt=""
-                                    onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
+                                    onError={handleImgError}
                                     style={{
                                         width: '36px', height: '36px',
                                         borderRadius: radius.md,

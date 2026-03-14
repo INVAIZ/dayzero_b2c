@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"npx tsc -b --noEmit 2>&1\",\"description\":\"TypeScript 빌드 검증\"}",
-  "error": "Exit code 2\nsrc/pages/registration/ProductDetailPage.tsx(13,35): error TS6196: 'MonitoringCheckResult' is declared but never used.\nsrc/pages/registration/ProductDetailPage.tsx(670,18): error TS6133: 'salePriceJpy' is declared but its value is never read.\nsrc/pages/registration/ProductDetailPage.tsx(684,41): error TS18048: 'history' is possibly 'undefined'.\nsrc/pages/registration/ProductDetailPage.tsx(685,31): error TS18048: 'history' is possibly 'undefined'.\nsrc/pages/registration/ProductDetailP...",
-  "timestamp": "2026-03-14T11:09:31.076Z",
+  "tool_input_preview": "{\"command\":\"npx tsc -b --noEmit 2>&1\",\"description\":\"TypeScript 전체 빌드 검사\"}",
+  "error": "Exit code 2\nsrc/pages/SourcingPage.tsx(8,24): error TS6133: 'spacing' is declared but its value is never read.\nsrc/pages/SourcingPage.tsx(8,33): error TS6133: 'radius' is declared but its value is never read.",
+  "timestamp": "2026-03-14T12:09:08.113Z",
   "retry_count": 1
 }

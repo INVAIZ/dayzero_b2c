@@ -3,6 +3,7 @@ import { ExternalLink, Check, Shield, AlertTriangle, PackageX, TrendingDown, Min
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
 import { getProviderLogo } from '../../../types/sourcing';
 import { stripPrefix } from '../../../utils/editing';
+import { handleImgError } from '../../../utils/image';
 import type { RegistrationResult, MonitoringCheckResult } from '../../../types/registration';
 
 interface Props {
@@ -188,7 +189,7 @@ export const AllProductsTable: React.FC<Props> = ({
                             <img
                                 src={r.product.thumbnailUrl}
                                 alt=""
-                                onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
+                                onError={handleImgError}
                                 style={{
                                     width: '48px', height: '48px', flexShrink: 0,
                                     borderRadius: radius.img ?? radius.md,

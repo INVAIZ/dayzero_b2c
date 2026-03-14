@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react';
 import { colors, font, spacing, radius } from '../../../design/tokens';
 import { EmptyState } from '../../../components/common/StatusComponents';
 import type { RegistrationResult } from '../../../types/registration';
+import { handleImgError } from '../../../utils/image';
 
 interface Props {
     results: RegistrationResult[];
@@ -66,7 +67,7 @@ export const SuccessProductTable: React.FC<Props> = ({ results }) => {
                             <img
                                 src={r.product.thumbnailUrl}
                                 alt=""
-                                onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
+                                onError={handleImgError}
                                 style={{
                                     width: '36px', height: '36px',
                                     borderRadius: radius.md,

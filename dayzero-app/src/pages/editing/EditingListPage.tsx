@@ -177,7 +177,11 @@ export default function EditingListPage() {
         return sortDir === 'asc' ? cmp : -cmp;
     }), [filtered, sortKey, sortDir]);
 
-    const allFilteredSelected = filtered.length > 0 && filtered.every((p) => selectedProductIds.includes(p.id));
+    const selectedIdSet = useMemo(() => new Set(selectedProductIds), [selectedProductIds]);
+    const allFilteredSelected = useMemo(
+        () => filtered.length > 0 && filtered.every((p) => selectedIdSet.has(p.id)),
+        [filtered, selectedIdSet]
+    );
 
     // 선택된 상품 중 아직 편집 필요한 상품만 카운트 (전부 완료면 번역 버튼 비활성화)
     const selectedTranslateCount = useMemo(() =>
@@ -195,7 +199,6 @@ export default function EditingListPage() {
         ).map(p => p.id),
         [products, selectedProductIds]
     );
-    const selectedAlreadyTranslatedCount = selectedTranslatedIds.length;
     const selectedRegisterCount = selectedTranslatedIds.length;
 
     const handleSelectAll = () => {
@@ -430,7 +433,7 @@ export default function EditingListPage() {
                 isOpen={isTranslationModalOpen}
                 onClose={closeTranslationModal}
                 selectedCount={selectedProductIds.length}
-                alreadyTranslatedCount={selectedAlreadyTranslatedCount}
+                alreadyTranslatedCount={selectedTranslatedIds.length}
                 onStart={(targets) => {
                     startTranslationJobs(selectedProductIds, targets);
                     closeTranslationModal();

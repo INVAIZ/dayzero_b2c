@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react
 import { colors, font, radius, spacing, shadow, zIndex } from '../../../design/tokens';
 import { getProviderLogo, SOURCING_PROVIDERS } from '../../../types/sourcing';
 import type { ProductDetail } from '../../../types/editing';
+import { handleImgError } from '../../../utils/image';
 import { stripPrefix, isFullyTranslated } from '../../../utils/editing';
 
 interface Props {
@@ -66,7 +67,7 @@ export const EditingHeader: React.FC<Props> = ({
                     <img
                         src={product.thumbnailUrl}
                         alt=""
-                        onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
+                        onError={handleImgError}
                         style={{
                             width: '40px', height: '40px',
                             borderRadius: radius.md,

@@ -6,6 +6,7 @@ import { QOO10_CATEGORY_KO, toKoCategory } from '../../../mock/categoryMap';
 import { PENDING_JA_TITLES } from '../../../mock/editingMock';
 import { colors, font, radius, shadow, spacing, zIndex } from '../../../design/tokens';
 import { stripPrefix, toJaTitle, mockTranslateOption as mockTranslateOpt } from '../../../utils/editing';
+import { handleImgError } from '../../../utils/image';
 import { ConfirmModal } from '../../../components/common/ConfirmModal';
 
 interface Props {
@@ -291,7 +292,7 @@ const OptionRow: React.FC<{
             borderBottom: `1px solid ${colors.border.default}`,
         }}>
             <img src={imageUrl} alt=""
-                onError={e => { const t = e.currentTarget; t.style.background = '#F2F4F6'; t.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }}
+                onError={handleImgError}
                 style={{
                     width: '44px', height: '44px',
                     borderRadius: radius.md, objectFit: 'cover',

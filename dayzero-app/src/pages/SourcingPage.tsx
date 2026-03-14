@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSourcingStore } from '../store/useSourcingStore';
 import { MainLayout } from '../components/layout/MainLayout';
@@ -57,7 +57,7 @@ export default function SourcingPage() {
                 onClick={() => setActiveTab('auto')}
                 style={{
                     padding: '10px 24px',
-                    fontSize: '15px',
+                    fontSize: font.size.base,
                     fontWeight: activeTab === 'auto' ? 700 : 500,
                     color: activeTab === 'auto' ? colors.text.primary : colors.text.muted,
                     background: activeTab === 'auto' ? colors.bg.surface : 'transparent',
@@ -78,7 +78,7 @@ export default function SourcingPage() {
                 onClick={() => setActiveTab('url')}
                 style={{
                     padding: '10px 24px',
-                    fontSize: '15px',
+                    fontSize: font.size.base,
                     fontWeight: activeTab === 'url' ? 700 : 500,
                     color: activeTab === 'url' ? colors.text.primary : colors.text.muted,
                     background: activeTab === 'url' ? colors.bg.surface : 'transparent',
@@ -98,17 +98,24 @@ export default function SourcingPage() {
         </div>
     );
 
+    const availableProviders = useMemo(
+        () => Array.from(new Set(schedules.map(s => s.provider))),
+        [schedules]
+    );
+    const filteredSchedules = useMemo(
+        () => selectedFilter === '전체' ? schedules : schedules.filter(s => s.provider === selectedFilter),
+        [schedules, selectedFilter]
+    );
+
     const renderSchedules = () => {
-        const availableProviders = Array.from(new Set(schedules.map(s => s.provider)));
         const filters = ['전체', ...availableProviders];
-        const filteredSchedules = selectedFilter === '전체' ? schedules : schedules.filter(s => s.provider === selectedFilter);
 
         return (
             <div style={{ marginBottom: '48px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <h2 style={{ fontSize: '18px', fontWeight: 700, color: colors.text.primary }}>등록된 자동 수집 목록</h2>
+                    <h2 style={{ fontSize: font.size.lg, fontWeight: 700, color: colors.text.primary }}>등록된 자동 수집 목록</h2>
                     {schedules.length > 0 && (
-                        <button onClick={() => navigate('/sourcing/auto')} style={{ background: 'none', color: colors.primary, border: 'none', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <button onClick={() => navigate('/sourcing/auto')} style={{ background: 'none', color: colors.primary, border: 'none', fontSize: font.size.md, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                             + 자동 수집 추가
                         </button>
                     )}
@@ -123,7 +130,7 @@ export default function SourcingPage() {
                                 style={{
                                     padding: filter === '전체' ? '8px 16px' : (selectedFilter === filter ? '8px 16px' : '8px'),
                                     borderRadius: '20px',
-                                    fontSize: '14px',
+                                    fontSize: font.size.md,
                                     fontWeight: selectedFilter === filter ? 600 : 500,
                                     color: selectedFilter === filter ? colors.primary : colors.text.tertiary,
                                     background: selectedFilter === filter ? colors.primaryLight : colors.bg.surface,
@@ -193,10 +200,10 @@ export default function SourcingPage() {
                         }}>
                             <Zap size={32} fill={colors.primary} />
                         </div>
-                        <h3 style={{ fontSize: '18px', fontWeight: 700, color: colors.text.primary, marginBottom: '8px' }}>
+                        <h3 style={{ fontSize: font.size.lg, fontWeight: 700, color: colors.text.primary, marginBottom: '8px' }}>
                             아직 등록된 자동 수집이 없어요
                         </h3>
-                        <p style={{ fontSize: '15px', color: colors.text.tertiary, marginBottom: '32px', lineHeight: '1.5' }}>
+                        <p style={{ fontSize: font.size.base, color: colors.text.tertiary, marginBottom: '32px', lineHeight: '1.5' }}>
                             매일 아침 바쁜 당신을 위해,<br />
                             AI가 알아서 상품을 찾아오는 자동 수집을 시작해보세요.
                         </p>
@@ -208,7 +215,7 @@ export default function SourcingPage() {
                                 height: '52px',
                                 borderRadius: '12px',
                                 background: colors.primary,
-                                color: 'white',
+                                color: colors.bg.surface,
                                 fontSize: '16px',
                                 fontWeight: 700,
                                 border: 'none',
@@ -222,7 +229,7 @@ export default function SourcingPage() {
                         </button>
                     </div>
                 ) : filteredSchedules.length === 0 ? (
-                    <div style={{ padding: '40px', textAlign: 'center', color: colors.text.tertiary, fontSize: '15px', background: colors.bg.surface, borderRadius: '16px', border: `1px solid ${colors.border.default}`, animation: 'fadeIn 0.2s ease' }}>
+                    <div style={{ padding: '40px', textAlign: 'center', color: colors.text.tertiary, fontSize: font.size.base, background: colors.bg.surface, borderRadius: '16px', border: `1px solid ${colors.border.default}`, animation: 'fadeIn 0.2s ease' }}>
                         해당 쇼핑몰의 자동 수집이 없어요.
                     </div>
                 ) : (
@@ -264,7 +271,7 @@ export default function SourcingPage() {
                                     >
                                         <img src={getProviderLogo(schedule.provider)} alt={schedule.provider} style={{ width: '40px', height: '40px', borderRadius: '10px', border: `1px solid ${colors.border.default}`, flexShrink: 0 }} />
                                         <div style={{ minWidth: 0 }}>
-                                            <div style={{ fontSize: '15px', fontWeight: 600, color: colors.text.primary, marginBottom: '8px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                                            <div style={{ fontSize: font.size.base, fontWeight: 600, color: colors.text.primary, marginBottom: '8px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
                                                 {schedule.provider}에서
                                                 <span style={{ padding: '4px 8px', background: colors.primaryLight, color: colors.primary, borderRadius: '6px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                                     <LayoutGrid size={12} />
@@ -340,8 +347,8 @@ export default function SourcingPage() {
                         <div style={{ background: colors.bg.faint, borderRadius: '12px', padding: '16px', marginBottom: '32px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                             <Zap size={16} color={colors.primary} style={{ marginTop: '3px', flexShrink: 0 }} />
                             <div>
-                                <h3 style={{ fontSize: '15px', fontWeight: 600, color: colors.text.primary, marginBottom: '4px' }}>자동 수집이란?</h3>
-                                <p style={{ fontSize: '14px', color: colors.text.secondary, lineHeight: '1.5' }}>
+                                <h3 style={{ fontSize: font.size.base, fontWeight: 600, color: colors.text.primary, marginBottom: '4px' }}>자동 수집이란?</h3>
+                                <p style={{ fontSize: font.size.md, color: colors.text.secondary, lineHeight: '1.5' }}>
                                     원하는 쇼핑몰의 카테고리를 설정해두면 매일 오전 07시에 조건에 맞는 상품을 알아서 찾아옵니다.
                                 </p>
                             </div>
