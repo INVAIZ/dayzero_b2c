@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, LayoutList, PackageOpen, ChevronRight } from 'lucide-react';
 import { useSourcingStore } from '../../store/useSourcingStore';
 
-type NavItem = '수집하기' | '수집 목록' | '판매 중인 상품';
+type NavItem = '수집하기' | '수집된 상품' | '판매 중인 상품';
 
 export const Sidebar: React.FC = () => {
     const navigate = useNavigate();
@@ -30,7 +30,7 @@ export const Sidebar: React.FC = () => {
     const handleNav = (item: NavItem) => {
         if (item === '수집하기') {
             navigate('/sourcing');
-        } else if (item === '수집 목록') {
+        } else if (item === '수집된 상품') {
             navigate('/editing');
         } else if (item === '판매 중인 상품') {
             navigate('/registration');
@@ -92,7 +92,7 @@ export const Sidebar: React.FC = () => {
                 </button>
 
                 <button
-                    onClick={() => handleNav('수집 목록')}
+                    onClick={() => handleNav('수집된 상품')}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -113,7 +113,7 @@ export const Sidebar: React.FC = () => {
                     onMouseOut={(e) => { if (!isEditingActive) e.currentTarget.style.background = 'transparent'; }}
                 >
                     <LayoutList size={20} color={isEditingActive ? '#191F28' : '#8B95A1'} />
-                    수집 목록
+                    수집된 상품
                     {isEditingActive && <ChevronRight size={16} color="#B0B8C1" style={{ marginLeft: 'auto' }} />}
                     {!isEditingActive && unprocessedProductCount > 0 && (
                         <div
