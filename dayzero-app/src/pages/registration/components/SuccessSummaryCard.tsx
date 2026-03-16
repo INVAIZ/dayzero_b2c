@@ -32,7 +32,8 @@ export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
 
     const { count, totalRevenue, avgMargin, negativeMarginCount, outOfStockCount } = stats;
 
-    // 더미: 지난 달 대비 변동 (프로토타입용)
+    // 더미: 지난 달 대비 변동 (프로토타입용, 상품 없을 때는 표시 안 함)
+    const hasDiff = count > 0;
     const prevProductCount = Math.max(1, Math.round(count * 0.75));
     const prevMargin = Math.max(5, avgMargin - 3.2);
     const prevRevenue = Math.round(totalRevenue * 0.8);
@@ -53,14 +54,14 @@ export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
                 label="등록된 상품 수"
                 icon={<Package size={18} color={colors.text.muted} />}
                 value={count.toLocaleString()}
-                diffText={`+${productDiff}건`}
+                diffText={hasDiff ? `+${productDiff}건` : undefined}
                 diffPositive={productDiff >= 0}
             />
             <StatCard
                 label="평균 마진율"
                 icon={<TrendingUp size={18} color={colors.text.muted} />}
                 value={`${avgMargin.toFixed(1)}%`}
-                diffText={`${marginDiff >= 0 ? '+' : ''}${marginDiff.toFixed(1)}%p`}
+                diffText={hasDiff ? `${marginDiff >= 0 ? '+' : ''}${marginDiff.toFixed(1)}%p` : undefined}
                 diffPositive={marginDiff >= 0}
             />
             <StatCard
@@ -68,7 +69,7 @@ export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
                 icon={<Coins size={18} color={colors.text.muted} />}
                 value={`¥${totalRevenue.toLocaleString()}`}
                 subValue={`₩${Math.round(totalRevenue / 0.11).toLocaleString()}`}
-                diffText={`${revenuePct >= 0 ? '+' : ''}${revenuePct}%`}
+                diffText={hasDiff ? `${revenuePct >= 0 ? '+' : ''}${revenuePct}%` : undefined}
                 diffPositive={revenuePct >= 0}
             />
             <IssueStatCard
