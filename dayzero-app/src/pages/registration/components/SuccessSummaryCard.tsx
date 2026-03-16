@@ -75,6 +75,7 @@ export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
             <IssueStatCard
                 negativeMarginCount={negativeMarginCount}
                 outOfStockCount={outOfStockCount}
+                hasProducts={hasDiff}
             />
             <style>{`
                 @keyframes summaryFadeIn {
@@ -181,7 +182,8 @@ const StatCard = ({
 const IssueStatCard: React.FC<{
     negativeMarginCount: number;
     outOfStockCount: number;
-}> = ({ negativeMarginCount, outOfStockCount }) => {
+    hasProducts: boolean;
+}> = ({ negativeMarginCount, outOfStockCount, hasProducts }) => {
     const total = negativeMarginCount + outOfStockCount;
     return (
         <div style={{
@@ -215,7 +217,7 @@ const IssueStatCard: React.FC<{
             </div>
 
             <div style={{ display: 'flex', gap: spacing['2'], flexWrap: 'wrap' }}>
-                {total === 0 ? (
+                {!hasProducts ? null : total === 0 ? (
                     <span style={{ fontSize: font.size.xs, color: colors.success, fontWeight: 600 }}>
                         모든 상품 정상
                     </span>
