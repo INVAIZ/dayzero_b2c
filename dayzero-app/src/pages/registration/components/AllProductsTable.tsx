@@ -137,7 +137,7 @@ export const AllProductsTable: React.FC<Props> = ({
         <>
             {/* 컬럼 헤더 */}
             <div style={{
-                display: 'flex', alignItems: 'center', gap: spacing['5'],
+                display: 'flex', alignItems: 'center', gap: spacing['3'],
                 padding: `0 ${spacing['5']}`, marginBottom: spacing['2'],
             }}>
                 {hasSelection && <Checkbox checked={allSelected} onClick={() => onSelectAll?.()} />}
@@ -146,8 +146,8 @@ export const AllProductsTable: React.FC<Props> = ({
                 <div style={{ flex: 3, minWidth: 0, ...colHeader }}>
                     {hasSelection && selectedIds.length > 0 ? `${selectedIds.length}건 선택` : '상품명'}
                 </div>
-                <div style={{ width: '90px', flexShrink: 0, ...colHeader }}>판매가</div>
-                <div style={{ width: '56px', flexShrink: 0, ...colHeader }}>마진율</div>
+                <div style={{ width: '76px', flexShrink: 0, ...colHeader }}>판매가</div>
+                <div style={{ width: '48px', flexShrink: 0, ...colHeader }}>마진율</div>
                 <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>상품번호</div>
                 <div style={{ width: '80px', flexShrink: 0, ...colHeader }}>등록일시</div>
                 {showMonitoring && (
@@ -177,7 +177,7 @@ export const AllProductsTable: React.FC<Props> = ({
                             key={r.id}
                             onClick={() => onRowClick?.(r.id)}
                             style={{
-                                display: 'flex', alignItems: 'center', gap: spacing['5'],
+                                display: 'flex', alignItems: 'center', gap: spacing['3'],
                                 padding: `14px ${spacing['5']}`,
                                 background: isSelected
                                     ? colors.primaryLight
@@ -266,7 +266,7 @@ export const AllProductsTable: React.FC<Props> = ({
                             </div>
 
                             {/* 판매가 */}
-                            <div style={{ width: '90px', flexShrink: 0 }}>
+                            <div style={{ width: '76px', flexShrink: 0 }}>
                                 <span style={{
                                     fontSize: font.size.base, fontWeight: 700, color: colors.text.primary,
                                 }}>
@@ -276,7 +276,7 @@ export const AllProductsTable: React.FC<Props> = ({
 
                             {/* 마진율 */}
                             <div style={{
-                                width: '56px', flexShrink: 0,
+                                width: '48px', flexShrink: 0,
                                 fontSize: font.size.sm, fontWeight: 600,
                                 color: margin >= 20 ? colors.success : colors.text.secondary,
                             }}>
