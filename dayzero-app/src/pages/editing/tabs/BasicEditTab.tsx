@@ -672,9 +672,9 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                     {toKoCategory(product.qoo10CategoryPath)}
                     <ChevronDown size={15} color={colors.text.muted} style={{ flexShrink: 0 }} />
                 </div>
-                <div style={{ marginTop: spacing['2'], display: 'flex', alignItems: 'center', gap: '4px', fontSize: font.size.xs, color: colors.primary }}>
+                <div style={{ marginTop: spacing['2'], display: 'flex', alignItems: 'center', gap: '4px', fontSize: font.size.xs, color: colors.text.muted }}>
                     <Sparkles size={11} />
-                    AI가 소싱처 카테고리를 기반으로 자동 매칭했어요.
+                    AI가 쇼핑몰 카테고리를 분석해 자동 매칭했어요.
                 </div>
             </div>
 
