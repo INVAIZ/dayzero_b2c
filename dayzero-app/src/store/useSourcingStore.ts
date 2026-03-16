@@ -65,7 +65,7 @@ export const useSourcingStore = create<SourcingState>()(
             unprocessedProductCount: 0,
             products: [],
             notifications: [
-                { id: 'n-2', type: 'url', title: '쿠팡 URL 수집', status: 'completed', currentCount: 8, totalCount: 8, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), isRead: false },
+                { id: 'n-2', type: 'url', title: '쿠팡 직접 수집', status: 'completed', currentCount: 8, totalCount: 8, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), isRead: false },
                 { id: 'n-3', type: 'auto', title: '다이소 자동 수집', status: 'completed', currentCount: 15, totalCount: 15, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), isRead: false },
             ],
             unreadCount: 2,

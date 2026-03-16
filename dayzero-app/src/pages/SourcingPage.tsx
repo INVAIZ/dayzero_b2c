@@ -93,7 +93,7 @@ export default function SourcingPage() {
                 }}
             >
                 <Link2 size={16} />
-                URL 수집
+                직접 수집
             </button>
         </div>
     );

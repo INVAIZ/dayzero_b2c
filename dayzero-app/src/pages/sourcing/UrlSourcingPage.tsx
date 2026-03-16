@@ -69,7 +69,7 @@ export default function UrlSourcingPage() {
         addNotification({
             id: notifId,
             type: 'url',
-            title: `URL 수집 (${validCount}건)`,
+            title: `직접 수집 (${validCount}건)`,
             status: 'running',
             currentCount: 0,
             totalCount: validCount,
@@ -188,7 +188,7 @@ export default function UrlSourcingPage() {
                 </button>
 
                 <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#191F28', marginBottom: '8px' }}>
-                    URL 수집
+                    직접 수집
                 </h1>
                 <p style={{ fontSize: '15px', color: '#6B7684', marginBottom: '32px' }}>
                     수집하려는 상품의 URL을 입력하세요. 줄바꿈으로 최대 20개까지 한 번에 수집할 수 있어요.
