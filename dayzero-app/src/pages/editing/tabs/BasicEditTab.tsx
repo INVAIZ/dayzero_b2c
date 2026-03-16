@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { ChevronDown, Plus, Trash2, Search, Check, X, Loader2, PenLine, Languages, CheckCircle2, Info } from 'lucide-react';
+import { ChevronDown, Plus, Trash2, Search, Check, X, Loader2, PenLine, Languages, CheckCircle2, Info, Sparkles } from 'lucide-react';
 import type { ProductDetail, ProductOption } from '../../../types/editing';
 import { useEditingStore } from '../../../store/useEditingStore';
 import { QOO10_CATEGORY_KO, toKoCategory } from '../../../mock/categoryMap';
@@ -674,6 +674,10 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                 </div>
                 <div style={{ marginTop: '5px', paddingLeft: spacing['1'], fontSize: font.size.xs, color: colors.text.muted }}>
                     {product.qoo10CategoryPath}
+                </div>
+                <div style={{ marginTop: spacing['2'], display: 'flex', alignItems: 'center', gap: '4px', fontSize: font.size.xs, color: colors.primary }}>
+                    <Sparkles size={11} />
+                    AI가 소싱처 카테고리를 기반으로 자동 매칭했어요.
                 </div>
             </div>
 
