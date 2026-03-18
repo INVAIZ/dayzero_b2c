@@ -164,14 +164,10 @@ export default function BasicMarginPage() {
     }, []);
 
     const activeForwarder = shippingMode === 'auto' ? shippingForwarder : '';
-    const activeForwarderLabel = activeForwarder ? FORWARDER_RATES[activeForwarder]?.label ?? '' : '';
 
     const [showComplete, setShowComplete] = useState(false);
-    const [showRateTable, setShowRateTable] = useState(false);
     const [showSimulation, setShowSimulation] = useState(false);
     const [showCalculation, setShowCalculation] = useState(false);
-    const [showFeeTable, setShowFeeTable] = useState(false);
-    const [showMarginTip, setShowMarginTip] = useState(false);
     const [simBaseCost, setSimBaseCost] = useState(15000);
     const [simWeight, setSimWeight] = useState(0.3);
 
@@ -181,7 +177,7 @@ export default function BasicMarginPage() {
         ? lookupShippingFee(activeForwarder as ForwarderValue, simWeight)
         : intlShipping;
 
-    const { marginAmount, totalCostKrw, finalPriceJpy, payoutJpy, payoutKrw, actualProfitKrw } = useMemo(() => {
+    const { marginAmount, totalCostKrw, finalPriceJpy, payoutKrw, actualProfitKrw } = useMemo(() => {
         // 셀러 총 비용 (원가 + 작업비)
         const costKrw = simBaseCost + prepCost;
         // 셀러가 원하는 수익
@@ -201,7 +197,6 @@ export default function BasicMarginPage() {
             marginAmount: desiredProfit,
             totalCostKrw: costKrw,
             finalPriceJpy: finalJpy,
-            payoutJpy: payoutJpyVal,
             payoutKrw: payoutKrwVal,
             actualProfitKrw: profit,
         };
@@ -356,7 +351,6 @@ export default function BasicMarginPage() {
                                                         setShippingForwarder(key);
                                                         setShippingMode('auto');
                                                         setIsShippingDropdownOpen(false);
-                                                        setShowRateTable(true);
                                                     }}
                                                     style={{
                                                         padding: spacing['4'], fontSize: font.size.base, cursor: 'pointer',

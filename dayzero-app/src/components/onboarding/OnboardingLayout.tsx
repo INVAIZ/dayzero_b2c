@@ -34,7 +34,7 @@ function getPrevStep(): number {
 }
 
 export default function OnboardingLayout({ children, currentStep, onStepClick, exiting }: OnboardingLayoutProps) {
-    const prevStepRef = useRef(() => getPrevStep());
+    const prevStepRef = useRef(getPrevStep());
     const [visualStep, setVisualStep] = useState(prevStepRef.current);
     const [contentVisible, setContentVisible] = useState(false);
     const [maxVisited, setMaxVisited] = useState(() => Math.max(getMaxVisitedStep(), currentStep));
