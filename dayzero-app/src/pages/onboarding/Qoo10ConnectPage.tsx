@@ -1,28 +1,46 @@
-import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Fragment, useState, useRef, useEffect } from 'react';
 import { ArrowRight, ExternalLink, Loader2, CheckCircle2, Info, ChevronRight } from 'lucide-react';
 import OnboardingLayout from '../../components/onboarding/OnboardingLayout';
+import { useOnboardingTransition } from '../../components/onboarding/useOnboardingTransition';
 import { mockQoo10Connect } from '../../mock/authMock';
 import { useOnboarding } from '../../components/onboarding/OnboardingContext';
 
 export default function Qoo10ConnectPage() {
-    const navigate = useNavigate();
     const inputRef = useRef<HTMLInputElement>(null);
 
     const { state, setState } = useOnboarding();
     const { apiKey, connected, storeName, sellerId } = state;
 
+    const { exiting, transitionTo } = useOnboardingTransition();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [showQsmPanel, setShowQsmPanel] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
+    const [panelCollapsed, setPanelCollapsed] = useState(false);
 
     // Focus input automatically for better UX
     useEffect(() => {
         if (!loading && !connected) {
-            setTimeout(() => inputRef.current?.focus(), 100);
+            const id = setTimeout(() => inputRef.current?.focus(), 100);
+            return () => clearTimeout(id);
         }
     }, [loading, connected]);
+
+    // 탭 복귀 감지: QSM 패널 열려있을 때 다른 탭 갔다 돌아오면 패널 접기 + 입력란 포커스
+    useEffect(() => {
+        if (!showQsmPanel) {
+            setPanelCollapsed(false);
+            return;
+        }
+        const handleVisibility = () => {
+            if (document.visibilityState === 'visible' && showQsmPanel && !panelCollapsed) {
+                setPanelCollapsed(true);
+                setTimeout(() => inputRef.current?.focus(), 200);
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibility);
+        return () => document.removeEventListener('visibilitychange', handleVisibility);
+    }, [showQsmPanel, panelCollapsed]);
 
     const handleSubmit = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -37,6 +55,7 @@ export default function Qoo10ConnectPage() {
         const res = await mockQoo10Connect(apiKey);
 
         setLoading(false);
+        setShowQsmPanel(false);
         setState(prev => ({
             ...prev,
             connected: true,
@@ -47,7 +66,7 @@ export default function Qoo10ConnectPage() {
 
     return (
         <>
-            <OnboardingLayout currentStep={1}>
+            <OnboardingLayout currentStep={1} exiting={exiting} onStepClick={(stepId) => { if (stepId === 2) transitionTo('/basic-info'); if (stepId === 3) transitionTo('/basic-margin'); }}>
                 {/* Title Area - Large, isolated focus */}
                 {!connected && (
                     <div style={{ marginBottom: '48px', textAlign: 'center' }}>
@@ -323,7 +342,7 @@ export default function Qoo10ConnectPage() {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
                             <button
-                                onClick={() => navigate('/basic-info')}
+                                onClick={() => transitionTo('/basic-info')}
                                 style={{
                                     width: '100%',
                                     height: '52px',
@@ -344,7 +363,6 @@ export default function Qoo10ConnectPage() {
                                 onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             >
                                 다음 단계로 계속
-                                <ArrowRight size={18} />
                             </button>
 
                             <button
@@ -353,13 +371,13 @@ export default function Qoo10ConnectPage() {
                                 }}
                                 style={{
                                     width: '100%',
-                                    height: '52px',
+                                    height: '44px',
                                     background: 'transparent',
                                     color: '#6B7684',
                                     border: 'none',
                                     borderRadius: '12px',
                                     fontSize: '15px',
-                                    fontWeight: 600,
+                                    fontWeight: 500,
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -369,7 +387,7 @@ export default function Qoo10ConnectPage() {
                                 onMouseOver={(e) => e.currentTarget.style.color = '#191F28'}
                                 onMouseOut={(e) => e.currentTarget.style.color = '#6B7684'}
                             >
-                                원하는 스토어가 아닌가요? 이전 화면으로
+                                다른 계정으로 연결하기
                             </button>
                         </div>
                     </div>
@@ -379,17 +397,19 @@ export default function Qoo10ConnectPage() {
             {/* QSM Slide-over Overlay */}
             {showQsmPanel && (
                 <>
-                    {/* Dimmed Backdrop */}
-                    <div
-                        onClick={() => setShowQsmPanel(false)}
-                        style={{
-                            position: 'fixed',
-                            top: 0, left: 0, right: 0, bottom: 0,
-                            background: 'rgba(0, 0, 0, 0.4)',
-                            zIndex: 999,
-                            animation: 'fadeIn 0.2s ease-out forwards'
-                        }}
-                    />
+                    {/* Dimmed Backdrop — 접혔을 때는 숨김 */}
+                    {!panelCollapsed && (
+                        <div
+                            onClick={() => setShowQsmPanel(false)}
+                            style={{
+                                position: 'fixed',
+                                top: 0, left: 0, right: 0, bottom: 0,
+                                background: 'rgba(0, 0, 0, 0.4)',
+                                zIndex: 999,
+                                animation: 'fadeIn 0.2s ease-out forwards'
+                            }}
+                        />
+                    )}
 
                     {/* Slide Panel */}
                     <div style={{
@@ -397,15 +417,16 @@ export default function Qoo10ConnectPage() {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        width: '1100px',
-                        maxWidth: '90vw',
+                        width: panelCollapsed ? '340px' : '1100px',
+                        maxWidth: panelCollapsed ? '35vw' : '90vw',
                         background: '#FFFFFF',
                         boxShadow: '-8px 0 32px rgba(0,0,0,0.12)',
                         zIndex: 1000,
                         display: 'flex',
                         flexDirection: 'column',
-                        animation: 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        borderLeft: '1px solid #E5E8EB'
+                        transition: 'width 0.35s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                        borderLeft: '1px solid #E5E8EB',
+                        overflow: 'hidden',
                     }}>
                         {/* Overlay Header with Visual Guide */}
                         <div style={{
@@ -414,12 +435,14 @@ export default function Qoo10ConnectPage() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            background: '#F9FAFB'
+                            background: '#F9FAFB',
+                            flexShrink: 0,
+                            overflow: 'hidden',
                         }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                                     <button
-                                        onClick={() => setShowQsmPanel(false)}
+                                        onClick={() => setPanelCollapsed(!panelCollapsed)}
                                         style={{
                                             background: '#FFFFFF',
                                             border: '1px solid #E5E8EB',
@@ -431,46 +454,44 @@ export default function Qoo10ConnectPage() {
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             transition: 'all 0.2s',
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                                            flexShrink: 0,
                                         }}
                                         onMouseOver={(e) => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.color = '#191F28'; }}
                                         onMouseOut={(e) => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.color = '#4E5968'; }}
-                                        title="패널 닫기"
+                                        title={panelCollapsed ? '패널 펼치기' : '패널 닫기'}
                                     >
-                                        <ChevronRight size={24} />
+                                        <ChevronRight size={24} style={{ transform: panelCollapsed ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                                     </button>
-                                    <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#191F28', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#191F28', display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
                                         <img src="/Qoo10.png" alt="Qoo10" style={{ height: '20px', width: 'auto' }} />
                                         API Key 발급 가이드
                                     </h3>
                                 </div>
 
-                                {/* Visual Step Guide */}
-                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', background: '#FFFFFF', padding: '12px 20px', borderRadius: '12px', border: '1px solid #E5E8EB' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <div style={{ width: '22px', height: '22px', borderRadius: '11px', background: '#F2F4F6', color: '#4E5968', fontSize: '12px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>1</div>
-                                        <span style={{ fontSize: '13px', color: '#191F28', fontWeight: 600 }}>QSM 로그인</span>
+                                {/* Visual Step Guide — 접혔을 때 숨김 */}
+                                {!panelCollapsed && (
+                                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', background: '#FFFFFF', padding: '14px 20px', borderRadius: '12px', border: '1px solid #E5E8EB' }}>
+                                        {[
+                                            { num: 1, text: 'QSM 로그인' },
+                                            { num: 2, text: '좌측 하단 QAPI 개발가이드 클릭' },
+                                            { num: 3, text: 'API Key 발급' },
+                                            { num: 4, text: '발급된 API Key 복사 후 연동란에 붙여넣기' },
+                                        ].map((step, idx) => (
+                                            <Fragment key={step.num}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#F0F6FF', padding: '6px 12px', borderRadius: '8px' }}>
+                                                    <div style={{ width: '24px', height: '24px', borderRadius: '12px', background: '#3182F6', color: '#FFFFFF', fontSize: '13px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{step.num}</div>
+                                                    <span style={{ fontSize: '14px', color: '#191F28', fontWeight: 600, whiteSpace: 'nowrap' }}>{step.text}</span>
+                                                </div>
+                                                {idx < 3 && <ArrowRight size={16} color="#3182F6" style={{ flexShrink: 0 }} />}
+                                            </Fragment>
+                                        ))}
                                     </div>
-                                    <ArrowRight size={14} color="#C4CAD4" />
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <div style={{ width: '22px', height: '22px', borderRadius: '11px', background: '#F2F4F6', color: '#4E5968', fontSize: '12px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>2</div>
-                                        <span style={{ fontSize: '13px', color: '#191F28', fontWeight: 600 }}>기본설정 {'>'} API 정보</span>
-                                    </div>
-                                    <ArrowRight size={14} color="#C4CAD4" />
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <div style={{ width: '22px', height: '22px', borderRadius: '11px', background: '#F2F4F6', color: '#4E5968', fontSize: '12px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3</div>
-                                        <span style={{ fontSize: '13px', color: '#191F28', fontWeight: 600 }}>비밀번호 인증</span>
-                                    </div>
-                                    <ArrowRight size={14} color="#C4CAD4" />
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <div style={{ width: '22px', height: '22px', borderRadius: '11px', background: '#F2F4F6', color: '#4E5968', fontSize: '12px', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>4</div>
-                                        <span style={{ fontSize: '13px', color: '#191F28', fontWeight: 600 }}>발급된 API Key 복사 후 연동란에 붙여넣기</span>
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
 
-                        {/* iFrame Content Container */}
+                        {/* iFrame Content Container — 항상 렌더링, 로그인 상태 유지 */}
                         <div style={{ flex: 1, position: 'relative', background: '#F9FAFB', overflow: 'hidden' }}>
                             <iframe
                                 src="https://qsm.qoo10.jp/GMKT.INC.Gsm.Web/Login.aspx"

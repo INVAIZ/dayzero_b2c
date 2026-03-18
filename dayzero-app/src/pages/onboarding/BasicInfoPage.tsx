@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import OnboardingLayout from '../../components/onboarding/OnboardingLayout';
+import { useOnboardingTransition } from '../../components/onboarding/useOnboardingTransition';
+import { colors, font, radius, spacing, shadow } from '../../design/tokens';
 
 import { useOnboarding, type ForwarderValue } from '../../components/onboarding/OnboardingContext';
 
@@ -45,8 +46,11 @@ const PRESETS: ForwarderPreset[] = [
 ];
 
 export default function BasicInfoPage() {
-    const navigate = useNavigate();
     const { state, setState } = useOnboarding();
+    const { exiting, transitionTo } = useOnboardingTransition();
+    const [step, setStep] = useState(1);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const {
         forwarder,
@@ -63,8 +67,6 @@ export default function BasicInfoPage() {
     const updateState = (updates: Partial<typeof state>) => {
         setState(prev => ({ ...prev, ...updates }));
     };
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -94,308 +96,413 @@ export default function BasicInfoPage() {
         setIsDropdownOpen(false);
     };
 
-    const isNextEnabled = () => {
+    const isStep1Valid = () => {
         if (!forwarder) return false;
         if (!zipCode || !addressLine1) return false;
-
         if (!sameAsShipping) {
             if (!returnZipCode || !returnAddressLine1) return false;
         }
-
-        if (!contact) return false;
-
         return true;
     };
 
+    const isStep2Valid = () => {
+        return !!contact;
+    };
+
     const handleNext = () => {
-        if (!isNextEnabled()) return;
-        navigate('/basic-margin');
+        if (step === 1 && isStep1Valid()) {
+            setStep(2);
+        } else if (step === 2 && isStep2Valid()) {
+            transitionTo('/basic-margin');
+        }
     };
 
-    const inputStyles = {
+    const inputStyles: React.CSSProperties = {
         width: '100%',
-        padding: '16px',
-        borderRadius: '12px',
-        border: '1px solid #E5E8EB',
-        fontSize: '15px',
-        color: '#191F28',
-        backgroundColor: '#FFFFFF',
-        boxSizing: 'border-box' as const,
-        transition: 'border-color 0.2s',
+        padding: spacing['4'],
+        borderRadius: radius.lg,
+        border: `1px solid ${colors.border.default}`,
+        fontSize: font.size.base,
+        color: colors.text.primary,
+        backgroundColor: colors.bg.surface,
+        boxSizing: 'border-box',
+        transition: 'border-color 0.2s, box-shadow 0.2s',
         outline: 'none',
-        fontFamily: 'Pretendard, -apple-system, sans-serif'
+        fontFamily: font.family.sans,
     };
 
-    const labelStyles = {
+    const labelStyles: React.CSSProperties = {
         display: 'block',
-        fontSize: '14px',
-        fontWeight: 600,
-        color: '#4E5968',
-        marginBottom: '8px'
+        fontSize: font.size.md,
+        fontWeight: font.weight.semibold,
+        color: colors.text.secondary,
+        marginBottom: spacing['2'],
     };
+
+    const isValid = step === 1 ? isStep1Valid() : isStep2Valid();
 
     return (
-        <OnboardingLayout currentStep={2}>
-            <div style={{ padding: '0 20px' }}>
-                <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#191F28', textAlign: 'center', margin: '0 0 12px', letterSpacing: '-0.5px' }}>
-                    배송지 및 기본 정보 입력
-                </h2>
-                <p style={{ fontSize: '15px', color: '#6B7684', textAlign: 'center', margin: '0 0 40px', lineHeight: 1.5, wordBreak: 'keep-all' }}>
-                    Qoo10 JP에 상품을 등록하려면 일본 내 출하지와 반품 주소가 필요해요.<br />
-                    이용하시는 배송대행사를 선택하면 주소가 자동으로 채워집니다.
-                </p>
+        <OnboardingLayout currentStep={2} exiting={exiting} onStepClick={(stepId) => { if (stepId === 1) transitionTo('/qoo10-connect'); if (stepId === 3) transitionTo('/basic-margin'); }}>
+            <div style={{ padding: `0 ${spacing['5']}` }}>
+                {/* Step 1: Forwarder + Address + Return Address */}
+                {step === 1 && (
+                    <div style={{ animation: 'fadeSlideIn 0.3s ease' }}>
+                        <h2 style={{
+                            fontSize: '26px',
+                            fontWeight: 800,
+                            color: colors.text.primary,
+                            textAlign: 'center',
+                            margin: `0 0 ${spacing['3']}`,
+                            letterSpacing: '-0.5px',
+                        }}>
+                            일본 출하지와 반품 주소를 설정해주세요
+                        </h2>
+                        <p style={{
+                            fontSize: font.size.base,
+                            color: colors.text.tertiary,
+                            textAlign: 'center',
+                            margin: `0 0 ${spacing['8']}`,
+                            lineHeight: font.lineHeight.normal,
+                            wordBreak: 'keep-all',
+                        }}>
+                            배송대행사를 선택하면 해당 창고 주소가 자동으로 입력됩니다.
+                        </p>
 
-                <div style={{
-                    background: '#FFFFFF',
-                    borderRadius: '20px',
-                    padding: '32px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
-                    border: '1px solid #F2F4F6',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '32px'
-                }}>
+                        <div style={{
+                            background: colors.bg.surface,
+                            borderRadius: radius.xl,
+                            padding: spacing['8'],
+                            boxShadow: shadow.sm,
+                            border: `1px solid ${colors.bg.subtle}`,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: spacing['8'],
+                        }}>
+                            {/* Forwarder Dropdown */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['5'] }}>
+                                <div>
+                                    <label style={labelStyles}>출하지 주소 <span style={{ color: colors.primary }}>*</span></label>
+                                    <div style={{ position: 'relative' }} ref={dropdownRef}>
+                                        <div
+                                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                            style={{
+                                                ...inputStyles,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                cursor: 'pointer',
+                                                color: forwarder ? colors.text.primary : colors.text.muted,
+                                                borderColor: isDropdownOpen ? colors.primary : colors.border.default,
+                                                boxShadow: isDropdownOpen ? '0 0 0 3px rgba(49, 130, 246, 0.1)' : 'none',
+                                                userSelect: 'none',
+                                            }}
+                                        >
+                                            <span>
+                                                {forwarder ? PRESETS.find(p => p.id === forwarder)?.label : '배송대행사를 선택하면 주소가 자동 입력됩니다'}
+                                            </span>
+                                            <ChevronDown
+                                                size={20}
+                                                color={isDropdownOpen ? colors.primary : colors.text.muted}
+                                                style={{
+                                                    transform: isDropdownOpen ? 'rotate(180deg)' : 'none',
+                                                    transition: 'transform 0.2s ease, color 0.2s ease',
+                                                }}
+                                            />
+                                        </div>
 
-                    {/* Section 1: Forwarder / Shipping Address */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                        <div>
-                            <label style={labelStyles}>배송대행사 선택 <span style={{ color: '#3182F6' }}>*</span></label>
-                            <div style={{ position: 'relative' }} ref={dropdownRef}>
-                                <div
-                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                    style={{
-                                        ...inputStyles,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        cursor: 'pointer',
-                                        color: forwarder ? '#191F28' : '#8B95A1',
-                                        border: isDropdownOpen ? '1px solid #3182F6' : '1px solid #E5E8EB',
-                                        boxShadow: isDropdownOpen ? '0 0 0 3px rgba(49, 130, 246, 0.1)' : 'none',
-                                        userSelect: 'none'
-                                    }}
-                                >
-                                    <span>
-                                        {forwarder ? PRESETS.find(p => p.id === forwarder)?.label : '이용하시는 배송대행사를 선택해주세요'}
-                                    </span>
-                                    <ChevronDown
-                                        size={20}
-                                        color={isDropdownOpen ? '#3182F6' : '#8B95A1'}
-                                        style={{
-                                            transform: isDropdownOpen ? 'rotate(180deg)' : 'none',
-                                            transition: 'transform 0.2s ease, color 0.2s ease'
-                                        }}
-                                    />
+                                        {isDropdownOpen && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: 'calc(100% + 8px)',
+                                                left: 0,
+                                                width: '100%',
+                                                background: colors.bg.surface,
+                                                border: `1px solid ${colors.border.default}`,
+                                                borderRadius: radius.lg,
+                                                boxShadow: shadow.md,
+                                                overflow: 'hidden',
+                                                zIndex: 10,
+                                                animation: 'dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                            }}>
+                                                <style>{`
+                                                    @keyframes dropdownFadeIn {
+                                                        from { opacity: 0; transform: translateY(-8px); }
+                                                        to { opacity: 1; transform: translateY(0); }
+                                                    }
+                                                    .dropdown-item {
+                                                        padding: 16px;
+                                                        font-size: 15px;
+                                                        color: ${colors.text.primary};
+                                                        cursor: pointer;
+                                                        transition: background 0.2s ease;
+                                                    }
+                                                    .dropdown-item:hover {
+                                                        background: ${colors.bg.page};
+                                                    }
+                                                    .dropdown-item-selected {
+                                                        background: ${colors.primaryLight};
+                                                        color: ${colors.primary};
+                                                        font-weight: 600;
+                                                    }
+                                                    .dropdown-item-selected:hover {
+                                                        background: ${colors.primaryHover};
+                                                    }
+                                                `}</style>
+                                                {PRESETS.map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        className={`dropdown-item ${forwarder === p.id ? 'dropdown-item-selected' : ''}`}
+                                                        onClick={() => handlePresetSelect(p.id)}
+                                                    >
+                                                        {p.label}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
-                                {isDropdownOpen && (
+                                {/* Address auto-fill */}
+                                {forwarder && (
                                     <div style={{
-                                        position: 'absolute',
-                                        top: 'calc(100% + 8px)',
-                                        left: 0,
-                                        width: '100%',
-                                        background: '#FFFFFF',
-                                        border: '1px solid #E5E8EB',
-                                        borderRadius: '12px',
-                                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
-                                        overflow: 'hidden',
-                                        zIndex: 10,
-                                        animation: 'dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                        padding: spacing['5'],
+                                        background: colors.bg.faint,
+                                        borderRadius: radius.lg,
+                                        border: `1px solid ${colors.border.default}`,
+                                        animation: 'fadeSlideIn 0.25s ease',
                                     }}>
-                                        <style>
-                                            {`
-                                            @keyframes dropdownFadeIn {
-                                                from { opacity: 0; transform: translateY(-8px); }
-                                                to { opacity: 1; transform: translateY(0); }
-                                            }
-                                            .dropdown-item {
-                                                padding: 16px;
-                                                font-size: 15px;
-                                                color: #191F28;
-                                                cursor: pointer;
-                                                transition: background 0.2s ease;
-                                            }
-                                            .dropdown-item:hover {
-                                                background: #F9FAFB;
-                                            }
-                                            .dropdown-item-selected {
-                                                background: #F2F8FF;
-                                                color: #3182F6;
-                                                font-weight: 600;
-                                            }
-                                            .dropdown-item-selected:hover {
-                                                background: #E8F3FF;
-                                            }
-                                            `}
-                                        </style>
-                                        {PRESETS.map((p) => (
-                                            <div
-                                                key={p.id}
-                                                className={`dropdown-item ${forwarder === p.id ? 'dropdown-item-selected' : ''}`}
-                                                onClick={() => handlePresetSelect(p.id)}
-                                            >
-                                                {p.label}
-                                            </div>
-                                        ))}
+                                        <div style={{
+                                            fontSize: font.size.base,
+                                            fontWeight: font.weight.bold,
+                                            color: colors.text.primary,
+                                            marginBottom: spacing['3'],
+                                        }}>
+                                            출하지 (일본 창고 주소)
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>
+                                            <input
+                                                value={zipCode}
+                                                onChange={(e) => updateState({ zipCode: e.target.value })}
+                                                placeholder="우편번호 (예: 273-0012)"
+                                                style={{
+                                                    ...inputStyles,
+                                                    background: forwarder !== 'other' ? colors.bg.subtle : colors.bg.surface,
+                                                }}
+                                                disabled={forwarder !== 'other'}
+                                            />
+                                            <input
+                                                value={addressLine1}
+                                                onChange={(e) => updateState({ addressLine1: e.target.value })}
+                                                placeholder="기본 주소"
+                                                style={{
+                                                    ...inputStyles,
+                                                    background: forwarder !== 'other' ? colors.bg.subtle : colors.bg.surface,
+                                                }}
+                                                disabled={forwarder !== 'other'}
+                                            />
+                                            <input
+                                                value={addressLine2}
+                                                onChange={(e) => updateState({ addressLine2: e.target.value })}
+                                                placeholder="상세 주소"
+                                                style={{
+                                                    ...inputStyles,
+                                                    background: forwarder !== 'other' ? colors.bg.subtle : colors.bg.surface,
+                                                }}
+                                                disabled={forwarder !== 'other'}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Return Address */}
+                            <div style={{
+                                borderTop: `1px solid ${colors.bg.subtle}`,
+                                paddingTop: spacing['6'],
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <label style={{ ...labelStyles, marginBottom: 0 }}>
+                                        반품 주소 <span style={{ color: colors.primary }}>*</span>
+                                    </label>
+                                    <label style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: spacing['2'],
+                                        cursor: 'pointer',
+                                    }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={sameAsShipping}
+                                            onChange={(e) => updateState({ sameAsShipping: e.target.checked })}
+                                            style={{
+                                                width: '18px',
+                                                height: '18px',
+                                                cursor: 'pointer',
+                                                accentColor: colors.primary,
+                                            }}
+                                        />
+                                        <span style={{
+                                            fontSize: font.size.md,
+                                            fontWeight: font.weight.medium,
+                                            color: colors.text.secondary,
+                                        }}>
+                                            위 출하지 주소와 동일
+                                        </span>
+                                    </label>
+                                </div>
+
+                                {!sameAsShipping && (
+                                    <div style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: spacing['3'],
+                                        marginTop: spacing['4'],
+                                        animation: 'fadeSlideIn 0.25s ease',
+                                    }}>
+                                        <input
+                                            value={returnZipCode}
+                                            onChange={(e) => updateState({ returnZipCode: e.target.value })}
+                                            placeholder="우편번호"
+                                            style={inputStyles}
+                                        />
+                                        <input
+                                            value={returnAddressLine1}
+                                            onChange={(e) => updateState({ returnAddressLine1: e.target.value })}
+                                            placeholder="기본 주소"
+                                            style={inputStyles}
+                                        />
+                                        <input
+                                            value={returnAddressLine2}
+                                            onChange={(e) => updateState({ returnAddressLine2: e.target.value })}
+                                            placeholder="상세 주소"
+                                            style={inputStyles}
+                                        />
                                     </div>
                                 )}
                             </div>
                         </div>
-
-                        {forwarder && (
-                            <div style={{
-                                display: 'flex', flexDirection: 'column', gap: '16px',
-                                padding: '20px', background: '#F9FAFB', borderRadius: '12px'
-                            }}>
-                                <div style={{ fontSize: '15px', fontWeight: 700, color: '#191F28' }}>출하지 주소 (발송지)</div>
-                                <div>
-                                    <input
-                                        value={zipCode}
-                                        onChange={(e) => updateState({ zipCode: e.target.value })}
-                                        placeholder="우편번호 (예: 273-0012)"
-                                        style={inputStyles}
-                                        disabled={forwarder !== 'other'}
-                                    />
-                                </div>
-                                <div>
-                                    <input
-                                        value={addressLine1}
-                                        onChange={(e) => updateState({ addressLine1: e.target.value })}
-                                        placeholder="기본 주소"
-                                        style={{ ...inputStyles, marginBottom: '8px' }}
-                                        disabled={forwarder !== 'other'}
-                                    />
-                                    <input
-                                        value={addressLine2}
-                                        onChange={(e) => updateState({ addressLine2: e.target.value })}
-                                        placeholder="상세 주소"
-                                        style={inputStyles}
-                                        disabled={forwarder !== 'other'}
-                                    />
-                                </div>
-                            </div>
-                        )}
                     </div>
+                )}
 
-                    {/* Section 2: Return Address */}
-                    <div style={{ borderTop: '1px solid #F2F4F6', paddingTop: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <label style={{ ...labelStyles, marginBottom: 0 }}>반품 주소 <span style={{ color: '#3182F6' }}>*</span></label>
+                {/* Step 2: Contact */}
+                {step === 2 && (
+                    <div style={{ animation: 'fadeSlideIn 0.3s ease' }}>
+                        <h2 style={{
+                            fontSize: '26px',
+                            fontWeight: 800,
+                            color: colors.text.primary,
+                            textAlign: 'center',
+                            margin: `0 0 ${spacing['3']}`,
+                            letterSpacing: '-0.5px',
+                        }}>
+                            연락처를 입력해주세요
+                        </h2>
+                        <p style={{
+                            fontSize: font.size.base,
+                            color: colors.text.tertiary,
+                            textAlign: 'center',
+                            margin: `0 0 ${spacing['8']}`,
+                            lineHeight: font.lineHeight.normal,
+                            wordBreak: 'keep-all',
+                        }}>
+                            배송 문제나 클레임 발생 시 연락 가능한 번호를 입력해주세요.
+                        </p>
 
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={sameAsShipping}
-                                    onChange={(e) => updateState({ sameAsShipping: e.target.checked })}
-                                    style={{
-                                        width: '18px', height: '18px', cursor: 'pointer',
-                                        accentColor: '#3182F6'
-                                    }}
-                                />
-                                <span style={{ fontSize: '14px', fontWeight: 500, color: '#4E5968' }}>출하지와 동일</span>
+                        <div style={{
+                            background: colors.bg.surface,
+                            borderRadius: radius.xl,
+                            padding: spacing['8'],
+                            boxShadow: shadow.sm,
+                            border: `1px solid ${colors.bg.subtle}`,
+                        }}>
+                            <label style={labelStyles}>
+                                스토어 연락처 <span style={{ color: colors.primary }}>*</span>
                             </label>
-                        </div>
-
-                        {!sameAsShipping && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                <div>
-                                    <input
-                                        value={returnZipCode}
-                                        onChange={(e) => updateState({ returnZipCode: e.target.value })}
-                                        placeholder="우편번호"
-                                        style={inputStyles}
-                                    />
-                                </div>
-                                <div>
-                                    <input
-                                        value={returnAddressLine1}
-                                        onChange={(e) => updateState({ returnAddressLine1: e.target.value })}
-                                        placeholder="기본 주소"
-                                        style={{ ...inputStyles, marginBottom: '8px' }}
-                                    />
-                                    <input
-                                        value={returnAddressLine2}
-                                        onChange={(e) => updateState({ returnAddressLine2: e.target.value })}
-                                        placeholder="상세 주소"
-                                        style={inputStyles}
-                                    />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Section 3: Contact */}
-                    <div style={{ borderTop: '1px solid #F2F4F6', paddingTop: '32px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                        <div>
-                            <label style={labelStyles}>스토어 연락처 <span style={{ color: '#3182F6' }}>*</span></label>
                             <input
                                 value={contact}
                                 onChange={(e) => updateState({ contact: e.target.value })}
                                 placeholder="고객 응대용 연락처 입력 (예: 010-1234-5678)"
                                 style={inputStyles}
+                                onFocus={(e) => {
+                                    e.currentTarget.style.borderColor = colors.primary;
+                                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(49, 130, 246, 0.1)';
+                                }}
+                                onBlur={(e) => {
+                                    e.currentTarget.style.borderColor = colors.border.default;
+                                    e.currentTarget.style.boxShadow = 'none';
+                                }}
                             />
-                            <p style={{ margin: '8px 0 0', fontSize: '13px', color: '#8B95A1' }}>
-                                배송 문제나 클레임 발생 시 Qoo10 또는 택배사가 연락하는 수단입니다.
-                            </p>
                         </div>
                     </div>
+                )}
 
-                    {/* Action Buttons */}
-                    <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {/* Navigation Buttons */}
+                <div style={{
+                    marginTop: spacing['6'],
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: spacing['3'],
+                }}>
+                    <button
+                        onClick={handleNext}
+                        disabled={!isValid}
+                        style={{
+                            width: '100%',
+                            height: '52px',
+                            background: !isValid ? colors.border.light : colors.primary,
+                            color: colors.bg.surface,
+                            border: 'none',
+                            borderRadius: radius.lg,
+                            fontSize: '16px',
+                            fontWeight: font.weight.semibold,
+                            cursor: !isValid ? 'not-allowed' : 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: spacing['2'],
+                            transition: 'background 0.2s, transform 0.1s',
+                        }}
+                        onMouseDown={(e) => {
+                            if (isValid) e.currentTarget.style.transform = 'scale(0.98)';
+                        }}
+                        onMouseUp={(e) => {
+                            if (isValid) e.currentTarget.style.transform = 'scale(1)';
+                        }}
+                    >
+                        {step === 1 ? '다음' : '다음 단계로 계속'}
+                    </button>
+                    {step > 1 && (
                         <button
-                            onClick={handleNext}
-                            disabled={!isNextEnabled()}
+                            onClick={() => setStep(step - 1)}
                             style={{
                                 width: '100%',
-                                height: '52px',
-                                background: !isNextEnabled() ? '#D1D6DB' : '#3182F6',
-                                color: '#FFFFFF',
-                                border: 'none',
-                                borderRadius: '12px',
-                                fontSize: '16px',
-                                fontWeight: 600,
-                                cursor: !isNextEnabled() ? 'not-allowed' : 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                                transition: 'background 0.2s, transform 0.1s',
-                            }}
-                            onMouseDown={(e) => {
-                                if (isNextEnabled()) e.currentTarget.style.transform = 'scale(0.98)';
-                            }}
-                            onMouseUp={(e) => {
-                                if (isNextEnabled()) e.currentTarget.style.transform = 'scale(1)';
-                            }}
-                        >
-                            다음 단계로 계속
-                            <ArrowRight size={18} />
-                        </button>
-
-                        <button
-                            onClick={() => navigate('/qoo10-connect')}
-                            style={{
-                                width: '100%',
-                                height: '52px',
+                                height: '44px',
                                 background: 'transparent',
-                                color: '#6B7684',
+                                color: colors.text.tertiary,
                                 border: 'none',
-                                borderRadius: '12px',
-                                fontSize: '15px',
-                                fontWeight: 600,
+                                borderRadius: radius.lg,
+                                fontSize: font.size.base,
+                                fontWeight: font.weight.medium,
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                transition: 'color 0.2s'
+                                transition: 'color 0.2s',
                             }}
-                            onMouseOver={(e) => e.currentTarget.style.color = '#191F28'}
-                            onMouseOut={(e) => e.currentTarget.style.color = '#6B7684'}
+                            onMouseOver={(e) => e.currentTarget.style.color = colors.text.primary}
+                            onMouseOut={(e) => e.currentTarget.style.color = colors.text.tertiary}
                         >
-                            원하는 스토어가 아닌가요? 이전 화면으로 가기
+                            이전으로
                         </button>
-                    </div>
+                    )}
                 </div>
+
+                <style>{`
+                    @keyframes fadeSlideIn {
+                        from { opacity: 0; transform: translateY(8px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                `}</style>
             </div>
         </OnboardingLayout>
     );

@@ -278,10 +278,64 @@
       "status": "completed",
       "completed_at": "2026-03-16T02:17:28.685Z",
       "duration_ms": 109744
+    },
+    {
+      "agent_id": "a7d3e8e6b1bbc4361",
+      "agent_type": "general-purpose",
+      "started_at": "2026-03-18T06:04:33.858Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-18T06:08:03.206Z",
+      "duration_ms": 209348
+    },
+    {
+      "agent_id": "ad3bfa239d27ffaa6",
+      "agent_type": "general-purpose",
+      "started_at": "2026-03-18T07:42:55.839Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-18T07:45:19.134Z",
+      "duration_ms": 143295
+    },
+    {
+      "agent_id": "abb2c11baeb5f7e85",
+      "agent_type": "feature-dev:code-reviewer",
+      "started_at": "2026-03-18T09:06:58.525Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-18T09:08:17.911Z",
+      "duration_ms": 79386
+    },
+    {
+      "agent_id": "a8bce715f488e85d0",
+      "agent_type": "feature-dev:code-reviewer",
+      "started_at": "2026-03-18T09:13:35.793Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-18T09:14:33.632Z",
+      "duration_ms": 57839
+    },
+    {
+      "agent_id": "a5a25505574e7b5a6",
+      "agent_type": "feature-dev:code-reviewer",
+      "started_at": "2026-03-18T09:13:42.707Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-18T09:14:55.767Z",
+      "duration_ms": 73060
+    },
+    {
+      "agent_id": "ab1730e8800c41b49",
+      "agent_type": "feature-dev:code-reviewer",
+      "started_at": "2026-03-18T09:13:48.413Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-03-18T09:14:47.571Z",
+      "duration_ms": 59158
     }
   ],
-  "total_spawned": 31,
-  "total_completed": 31,
+  "total_spawned": 37,
+  "total_completed": 37,
   "total_failed": 0,
-  "last_updated": "2026-03-16T02:22:55.773Z"
+  "last_updated": "2026-03-18T09:14:55.869Z"
 }

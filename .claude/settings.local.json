@@ -43,7 +43,13 @@
       "Bash(pkill -f \"vite\" 2>/dev/null; sleep 1; lsof -ti :5173 2>/dev/null | xargs kill -9 2>/dev/null; echo \"cleaned\")",
       "Bash(cat /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/App.tsx 2>/dev/null || find /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src -name \"App.tsx\" -o -name \"router.tsx\" -o -name \"routes.tsx\" | xargs cat 2>/dev/null | head -80)",
       "Bash(find /Users/invaiz/Documents/develop/dayzero_B2C -name \"*.png\" -o -name \"*.svg\" -o -name \"*.ico\" 2>/dev/null | grep -i -E \"logo|icon|favicon|resources\" | head -30)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(gh deployment:*)",
+      "Bash(cat /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/App.tsx 2>/dev/null || find /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src -name \"App.tsx\" -o -name \"router*\" | head -5)",
+      "Bash(git remote:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(grep -n \"localStorage\\\\|persist\\\\|sessionStorage\" /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/components/onboarding/OnboardingContext.tsx 2>/dev/null || find /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src -name \"OnboardingContext*\" | xargs grep -n \"localStorage\\\\|persist\" 2>/dev/null | head -10)"
     ]
   }
 }

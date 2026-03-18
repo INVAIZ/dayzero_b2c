@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1773627776376,
+  "lastScanned": 1773812826137,
   "projectRoot": "/Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app",
   "techStack": {
     "languages": [
@@ -77,7 +77,7 @@
       "path": "dist",
       "purpose": "Distribution/build output",
       "fileCount": 6,
-      "lastAccessed": 1773627776361,
+      "lastAccessed": 1773812826109,
       "keyFiles": [
         "DayZero Logo.png",
         "Qoo10.png",
@@ -90,7 +90,7 @@
       "path": "public",
       "purpose": "Public files",
       "fileCount": 5,
-      "lastAccessed": 1773627776363,
+      "lastAccessed": 1773812826112,
       "keyFiles": [
         "DayZero Logo.png",
         "Qoo10.png",
@@ -103,7 +103,7 @@
       "path": "reviews",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1773627776363,
+      "lastAccessed": 1773812826112,
       "keyFiles": [
         "2026-03-12-ED-editing-review.md"
       ]
@@ -112,7 +112,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 4,
-      "lastAccessed": 1773627776363,
+      "lastAccessed": 1773812826112,
       "keyFiles": [
         "App.css",
         "App.tsx",
@@ -124,17 +124,17 @@
       "path": "dist/assets",
       "purpose": "Static assets",
       "fileCount": 2,
-      "lastAccessed": 1773627776363,
+      "lastAccessed": 1773812826113,
       "keyFiles": [
         "index-Bjxh_95e.css",
-        "index-CKtUEGYt.js"
+        "index-XjhJQKw9.js"
       ]
     },
     "src/assets": {
       "path": "src/assets",
       "purpose": "Static assets",
       "fileCount": 1,
-      "lastAccessed": 1773627776364,
+      "lastAccessed": 1773812826114,
       "keyFiles": [
         "react.svg"
       ]
@@ -143,19 +143,80 @@
       "path": "src/components",
       "purpose": "UI components",
       "fileCount": 0,
-      "lastAccessed": 1773627776364,
+      "lastAccessed": 1773812826114,
       "keyFiles": []
     },
     "src/pages": {
       "path": "src/pages",
       "purpose": "Page components",
       "fileCount": 1,
-      "lastAccessed": 1773627776364,
+      "lastAccessed": 1773812826115,
       "keyFiles": [
         "SourcingPage.tsx"
       ]
     }
   },
-  "hotPaths": [],
+  "hotPaths": [
+    {
+      "path": "src/pages/onboarding/BasicMarginPage.tsx",
+      "accessCount": 178,
+      "lastAccessed": 1773825683469,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/onboarding/BasicInfoPage.tsx",
+      "accessCount": 41,
+      "lastAccessed": 1773825699254,
+      "type": "file"
+    },
+    {
+      "path": "src/components/onboarding/OnboardingLayout.tsx",
+      "accessCount": 39,
+      "lastAccessed": 1773825868998,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/onboarding/Qoo10ConnectPage.tsx",
+      "accessCount": 16,
+      "lastAccessed": 1773825456904,
+      "type": "file"
+    },
+    {
+      "path": "src/design/tokens.ts",
+      "accessCount": 6,
+      "lastAccessed": 1773825234960,
+      "type": "file"
+    },
+    {
+      "path": "src",
+      "accessCount": 6,
+      "lastAccessed": 1773825243401,
+      "type": "directory"
+    },
+    {
+      "path": "",
+      "accessCount": 4,
+      "lastAccessed": 1773825243672,
+      "type": "directory"
+    },
+    {
+      "path": "src/pages/onboarding",
+      "accessCount": 3,
+      "lastAccessed": 1773823417814,
+      "type": "directory"
+    },
+    {
+      "path": "src/pages/editing/tabs/PriceEditTab.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1773819849520,
+      "type": "directory"
+    },
+    {
+      "path": "src/components/onboarding/useOnboardingTransition.ts",
+      "accessCount": 1,
+      "lastAccessed": 1773825370868,
+      "type": "file"
+    }
+  ],
   "userDirectives": []
 }

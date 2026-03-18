@@ -1,164 +1,262 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { Check } from 'lucide-react';
+import { colors, font, spacing, radius } from '../../design/tokens';
 
 interface StepItem {
     id: number;
     label: string;
-    desc?: string;
 }
 
 interface OnboardingLayoutProps {
     children: ReactNode;
     currentStep: number;
-    wide?: boolean;
+    onStepClick?: (stepId: number) => void;
+    exiting?: boolean;
 }
 
 const STEPS: StepItem[] = [
-    { id: 1, label: '계정 연동', desc: 'Qoo10 API 연결' },
-    { id: 2, label: '기본 정보 입력', desc: '배송 출하지/반품지' },
-    { id: 3, label: '마진/배송비', desc: '상품 자동 가격 계산' },
+    { id: 1, label: '계정 연동' },
+    { id: 2, label: '기본 정보' },
+    { id: 3, label: '마진/배송비' },
 ];
 
-export default function OnboardingLayout({ children, currentStep, wide }: OnboardingLayoutProps) {
+const MAX_STEP_KEY = 'onboarding_max_step';
+const PREV_STEP_KEY = 'onboarding_prev_step';
+
+function getMaxVisitedStep(): number {
+    const val = sessionStorage.getItem(MAX_STEP_KEY);
+    return val ? Number(val) : 1;
+}
+
+function getPrevStep(): number {
+    const val = sessionStorage.getItem(PREV_STEP_KEY);
+    return val ? Number(val) : 1;
+}
+
+export default function OnboardingLayout({ children, currentStep, onStepClick, exiting }: OnboardingLayoutProps) {
+    const prevStepRef = useRef(() => getPrevStep());
+    const [visualStep, setVisualStep] = useState(prevStepRef.current);
+    const [contentVisible, setContentVisible] = useState(false);
+    const [maxVisited, setMaxVisited] = useState(() => Math.max(getMaxVisitedStep(), currentStep));
+
+    useEffect(() => {
+        if (currentStep > maxVisited) {
+            setMaxVisited(currentStep);
+            sessionStorage.setItem(MAX_STEP_KEY, String(currentStep));
+        }
+    }, [currentStep, maxVisited]);
+
+    useEffect(() => {
+        const needsTransition = prevStepRef.current !== currentStep;
+        // 프로그레스 바 먼저 전환
+        const stepTimer = setTimeout(() => {
+            setVisualStep(currentStep);
+            sessionStorage.setItem(PREV_STEP_KEY, String(currentStep));
+            prevStepRef.current = currentStep;
+        }, 100);
+        // 프로그레스 바 애니메이션 완료 후 콘텐츠 표시
+        const contentTimer = setTimeout(() => {
+            setContentVisible(true);
+        }, needsTransition ? 650 : 50);
+        return () => {
+            clearTimeout(stepTimer);
+            clearTimeout(contentTimer);
+        };
+    }, [currentStep]);
+
     return (
         <div
             style={{
-                display: 'flex',
                 minHeight: '100vh',
-                background: '#F9FAFB',
-                fontFamily: 'Pretendard, -apple-system, sans-serif',
+                background: colors.bg.page,
+                fontFamily: font.family.sans,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: `${spacing['10']} ${spacing['6']}`,
+                overflowY: 'auto',
             }}
         >
-            {/* Left Sidebar */}
+            {/* Logo */}
+            <div style={{ marginBottom: spacing['8'] }}>
+                <img
+                    src="/DayZero Logo.png"
+                    alt="DayZero"
+                    style={{ height: '28px', width: 'auto', objectFit: 'contain' }}
+                />
+            </div>
+
+            {/* Progress Stepper */}
             <div
                 style={{
-                    width: '320px',
-                    background: '#FFFFFF',
-                    borderRight: '1px solid #E5E8EB',
-                    padding: '48px 40px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'static',
+                    width: '100%',
+                    maxWidth: '580px',
+                    marginBottom: spacing['12'],
                 }}
             >
-                {/* Logo */}
-                <div style={{ marginBottom: '64px' }}>
-                    <img
-                        src="/DayZero Logo.png"
-                        alt="DayZero"
-                        style={{ height: '32px', width: 'auto', objectFit: 'contain' }}
-                    />
-                </div>
-
-                {/* Progress Stepper */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'center',
+                    }}
+                >
                     {STEPS.map((step, idx) => {
-                        const isCompleted = step.id < currentStep;
-                        const isCurrent = step.id === currentStep;
-                        const isUpcoming = step.id > currentStep;
+                        const isCompleted = step.id < visualStep;
+                        const isCurrent = step.id === visualStep;
+                        const isVisited = step.id <= maxVisited;
+                        const canClick = onStepClick && step.id !== currentStep && isVisited;
 
                         return (
-                            <div key={step.id} style={{ display: 'flex', position: 'relative' }}>
-                                {/* Connecting Line */}
-                                {idx < STEPS.length - 1 && (
-                                    <div
-                                        style={{
-                                            position: 'absolute',
-                                            left: '15px',
-                                            top: '32px',
-                                            bottom: '-32px',
-                                            width: '2px',
-                                            background: isCompleted ? '#3182F6' : '#E5E8EB',
-                                            zIndex: 0,
-                                        }}
-                                    />
-                                )}
-
-                                {/* Step Indicator */}
+                            <div key={step.id} style={{ display: 'flex', alignItems: 'flex-start' }}>
+                                {/* Step column */}
                                 <div
+                                    className={canClick ? 'step-clickable' : undefined}
                                     style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        borderRadius: '50%',
-                                        background: isCompleted ? '#3182F6' : isCurrent ? '#FFFFFF' : '#F5F6F8',
-                                        border: isCurrent ? '2px solid #3182F6' : isUpcoming ? '2px solid #E5E8EB' : 'none',
                                         display: 'flex',
+                                        flexDirection: 'column',
                                         alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: isCompleted ? '#FFFFFF' : isCurrent ? '#3182F6' : '#8B95A1',
-                                        fontSize: '14px',
-                                        fontWeight: 700,
-                                        zIndex: 1,
-                                        boxShadow: isCurrent ? '0 0 0 4px rgba(49, 130, 246, 0.1)' : 'none',
-                                        transition: 'all 0.3s ease',
+                                        cursor: canClick ? 'pointer' : 'default',
+                                        padding: `0 ${spacing['1']}`,
                                     }}
+                                    onClick={() => canClick && onStepClick(step.id)}
                                 >
-                                    {isCompleted ? <Check size={16} strokeWidth={3} /> : step.id}
-                                </div>
-
-                                {/* Step Text */}
-                                <div style={{ marginLeft: '16px', paddingTop: '4px' }}>
+                                    {/* Circle */}
                                     <div
+                                        className={isCurrent ? 'step-current' : undefined}
                                         style={{
-                                            fontSize: '15px',
-                                            fontWeight: isCurrent ? 700 : 600,
-                                            color: isCurrent || isCompleted ? '#191F28' : '#8B95A1',
-                                            marginBottom: '4px',
+                                            width: '36px',
+                                            height: '36px',
+                                            borderRadius: radius.full,
+                                            background: isCompleted
+                                                ? colors.primary
+                                                : isCurrent
+                                                  ? colors.bg.surface
+                                                  : colors.bg.subtle,
+                                            border: isCurrent
+                                                ? `2.5px solid ${colors.primary}`
+                                                : isCompleted
+                                                  ? 'none'
+                                                  : `2px solid ${colors.border.default}`,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: isCompleted
+                                                ? colors.bg.surface
+                                                : isCurrent
+                                                  ? colors.primary
+                                                  : colors.text.muted,
+                                            fontSize: font.size.sm,
+                                            fontWeight: font.weight.bold,
+                                            transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                                            flexShrink: 0,
+                                            boxShadow: isCurrent
+                                                ? `0 0 0 4px ${colors.primaryHover}`
+                                                : 'none',
+                                        }}
+                                    >
+                                        {isCompleted ? <Check size={16} strokeWidth={3} /> : step.id}
+                                    </div>
+
+                                    {/* Label */}
+                                    <span
+                                        style={{
+                                            fontSize: font.size.sm,
+                                            fontWeight: isCurrent
+                                                ? font.weight.semibold
+                                                : font.weight.medium,
+                                            color: isCurrent || isCompleted
+                                                ? colors.text.primary
+                                                : colors.text.muted,
+                                            whiteSpace: 'nowrap',
+                                            marginTop: spacing['2'],
+                                            transition: 'color 0.5s ease',
                                         }}
                                     >
                                         {step.label}
-                                    </div>
+                                    </span>
+                                </div>
+
+                                {/* Connector */}
+                                {idx < STEPS.length - 1 && (
                                     <div
                                         style={{
-                                            fontSize: '13px',
-                                            color: isCurrent ? '#4E5968' : '#B0B8C1',
-                                            fontWeight: 500,
+                                            width: '80px',
+                                            height: '3px',
+                                            borderRadius: radius.full,
+                                            background: colors.border.default,
+                                            margin: `16px ${spacing['3']} 0`,
+                                            flexShrink: 0,
+                                            position: 'relative',
+                                            overflow: 'hidden',
                                         }}
                                     >
-                                        {step.desc}
+                                        <div
+                                            style={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                height: '100%',
+                                                width: isCompleted ? '100%' : '0%',
+                                                background: colors.primary,
+                                                borderRadius: radius.full,
+                                                transition: 'width 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                                            }}
+                                        />
                                     </div>
-                                </div>
+                                )}
                             </div>
                         );
                     })}
                 </div>
-
-                {/* Bottom Help Area */}
-                <div style={{ marginTop: 'auto', paddingTop: '40px' }}>
-                    <div
-                        style={{
-                            padding: '20px',
-                            background: '#F5F6F8',
-                            borderRadius: '16px',
-                        }}
-                    >
-                        <p style={{ fontSize: '13px', color: '#6B7684', lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
-                            진행 중 문제가 발생했나요?<br />
-                            <a href="#" style={{ color: '#3182F6', textDecoration: 'none', fontWeight: 600, marginTop: '4px', display: 'inline-block' }}>
-                                고객 지원팀에 문의하기 →
-                            </a>
-                        </p>
-                    </div>
-                </div>
             </div>
 
-            {/* Main Content Area */}
+            {/* Main Content */}
             <div
                 style={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '60px 40px',
-                    position: 'relative',
-                    overflowY: 'auto',
+                    width: '100%',
+                    maxWidth: '580px',
+                    opacity: exiting || !contentVisible ? 0 : 1,
+                    transform: exiting
+                        ? 'translateY(-12px)'
+                        : contentVisible
+                          ? 'translateY(0)'
+                          : 'translateY(16px)',
+                    transition: exiting
+                        ? 'opacity 0.3s cubic-bezier(0.4, 0, 1, 1), transform 0.3s cubic-bezier(0.4, 0, 1, 1)'
+                        : 'opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
             >
-                <div style={{ width: '100%', maxWidth: wide ? '900px' : '580px', animation: 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-                    {children}
-                </div>
+                {children}
             </div>
+
+            <style>{`
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(16px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes fadeOutUp {
+                    from { opacity: 1; transform: translateY(0); }
+                    to { opacity: 0; transform: translateY(-12px); }
+                }
+                @keyframes subtlePulse {
+                    0%, 100% { box-shadow: 0 0 0 4px ${colors.primaryHover}; }
+                    50% { box-shadow: 0 0 0 6px ${colors.primaryHover}; }
+                }
+                .step-current {
+                    animation: subtlePulse 2.5s ease-in-out infinite;
+                }
+                .step-clickable:hover > div:first-child {
+                    transform: scale(1.1);
+                    box-shadow: 0 0 0 3px ${colors.primaryHover} !important;
+                }
+                .step-clickable:hover span {
+                    color: ${colors.primary} !important;
+                }
+                .step-clickable:active > div:first-child {
+                    transform: scale(0.95);
+                }
+            `}</style>
         </div>
     );
 }

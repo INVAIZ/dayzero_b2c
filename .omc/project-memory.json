@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1773463892005,
+  "lastScanned": 1773808616234,
   "projectRoot": "/Users/invaiz/Documents/develop/dayzero_B2C",
   "techStack": {
     "languages": [],
@@ -38,7 +38,7 @@
       "path": "Resources",
       "purpose": null,
       "fileCount": 4,
-      "lastAccessed": 1773463891988,
+      "lastAccessed": 1773808616217,
       "keyFiles": [
         "DayZero Logo.png",
         "QXpress.webp",
@@ -48,8 +48,8 @@
     "dayzero-app": {
       "path": "dayzero-app",
       "purpose": null,
-      "fileCount": 10,
-      "lastAccessed": 1773463891988,
+      "fileCount": 11,
+      "lastAccessed": 1773808616218,
       "keyFiles": [
         "README.md",
         "eslint.config.js",
@@ -62,14 +62,14 @@
       "path": "design",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1773463891988,
+      "lastAccessed": 1773808616218,
       "keyFiles": []
     },
     "docs": {
       "path": "docs",
       "purpose": "Documentation",
-      "fileCount": 8,
-      "lastAccessed": 1773463891988,
+      "fileCount": 9,
+      "lastAccessed": 1773808616218,
       "keyFiles": [
         "01_솔루션 제안서(RFP).md",
         "02_UX 설계 기준.md",
@@ -81,17 +81,18 @@
     "reviews": {
       "path": "reviews",
       "purpose": null,
-      "fileCount": 1,
-      "lastAccessed": 1773463891989,
+      "fileCount": 2,
+      "lastAccessed": 1773808616218,
       "keyFiles": [
-        "2026-03-11-ED-01-review.md"
+        "2026-03-11-ED-01-review.md",
+        "2026-03-14-UT-readiness-review.md"
       ]
     },
     "rulebook": {
       "path": "rulebook",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1773463891989,
+      "lastAccessed": 1773808616219,
       "keyFiles": [
         "CLAUDE.md"
       ]
@@ -100,7 +101,7 @@
       "path": "skills",
       "purpose": null,
       "fileCount": 5,
-      "lastAccessed": 1773463891989,
+      "lastAccessed": 1773808616219,
       "keyFiles": [
         "feature-dev.md",
         "feature-review.md",
@@ -112,195 +113,87 @@
     "dayzero-app/dist": {
       "path": "dayzero-app/dist",
       "purpose": "Distribution/build output",
-      "fileCount": 5,
-      "lastAccessed": 1773463891989,
+      "fileCount": 6,
+      "lastAccessed": 1773808616220,
       "keyFiles": [
         "DayZero Logo.png",
         "Qoo10.png",
-        "dayzero-logo.png"
+        "dayzero-icon.png"
       ]
     },
     "dayzero-app/node_modules": {
       "path": "dayzero-app/node_modules",
       "purpose": "Dependencies",
       "fileCount": 1,
-      "lastAccessed": 1773463891990,
+      "lastAccessed": 1773808616221,
       "keyFiles": []
     },
     "dayzero-app/public": {
       "path": "dayzero-app/public",
       "purpose": "Public files",
-      "fileCount": 4,
-      "lastAccessed": 1773463891990,
+      "fileCount": 5,
+      "lastAccessed": 1773808616221,
       "keyFiles": [
         "DayZero Logo.png",
         "Qoo10.png",
-        "dayzero-logo.png"
+        "dayzero-icon.png"
       ]
     }
   },
   "hotPaths": [
     {
-      "path": "dayzero-app/src/pages/registration/ProductDetailPage.tsx",
-      "accessCount": 29,
-      "lastAccessed": 1773484264178,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/pages/registration/RegistrationResultPage.tsx",
-      "accessCount": 18,
-      "lastAccessed": 1773627916242,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src",
-      "accessCount": 13,
-      "lastAccessed": 1773482533840,
-      "type": "directory"
-    },
-    {
-      "path": "dayzero-app/src/pages/registration/components/SuccessSummaryCard.tsx",
-      "accessCount": 11,
-      "lastAccessed": 1773627894851,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/pages/registration/components/AllProductsTable.tsx",
-      "accessCount": 8,
-      "lastAccessed": 1773627919867,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/store/useRegistrationStore.ts",
-      "accessCount": 6,
-      "lastAccessed": 1773482468568,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/pages/registration/components/FailedBulkActionBar.tsx",
-      "accessCount": 6,
-      "lastAccessed": 1773482682834,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/pages/editing/components/EditingHeader.tsx",
+      "path": "dayzero-app/src/pages/onboarding/Qoo10ConnectPage.tsx",
       "accessCount": 5,
-      "lastAccessed": 1773482677738,
+      "lastAccessed": 1773809989554,
       "type": "file"
     },
     {
-      "path": "docs/04_화면별 기능 명세서.md",
-      "accessCount": 4,
-      "lastAccessed": 1773464526580,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/types/registration.ts",
-      "accessCount": 4,
-      "lastAccessed": 1773465348490,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/App.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1773465690904,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/pages/registration/components/MonitoringStatusTabs.tsx",
-      "accessCount": 3,
-      "lastAccessed": 1773482462578,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/design/tokens.ts",
-      "accessCount": 2,
-      "lastAccessed": 1773465300999,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/pages/registration/components/RegistrationProgressSection.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1773465308463,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/components/common/StatusComponents.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1773482475497,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/utils/editing.ts",
-      "accessCount": 2,
-      "lastAccessed": 1773482635430,
-      "type": "file"
-    },
-    {
-      "path": "docs/03_IA 구조 설계.md",
+      "path": "docs/07. 1차 UT 테스트 인사이트.md",
       "accessCount": 1,
-      "lastAccessed": 1773464498846,
+      "lastAccessed": 1773809145623,
       "type": "file"
     },
     {
-      "path": "docs/02_UX 설계 기준.md",
+      "path": "docs/08. 2차 UT 테스트를 위한 수정안 기획.md",
       "accessCount": 1,
-      "lastAccessed": 1773464499824,
+      "lastAccessed": 1773809146145,
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/components/layout/Sidebar.tsx",
+      "path": "docs/UT_화면_흐름_정리.md",
       "accessCount": 1,
-      "lastAccessed": 1773464519453,
+      "lastAccessed": 1773809294927,
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/pages/registration/components/RegistrationTabBar.tsx",
+      "path": "dayzero-app/src/pages/onboarding/BasicInfoPage.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773465262479,
+      "lastAccessed": 1773809620732,
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/components/common/ConfirmModal.tsx",
+      "path": "dayzero-app/src/pages/onboarding/BasicMarginPage.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773465263540,
+      "lastAccessed": 1773809621541,
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/store/useToastStore.ts",
+      "path": "dayzero-app/src/components/onboarding/OnboardingLayout.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773465263757,
+      "lastAccessed": 1773809630842,
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/types/editing.ts",
+      "path": "dayzero-app/src/components/onboarding/OnboardingContext.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773465307741,
+      "lastAccessed": 1773809631551,
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/pages/registration/components/MonitoringSummaryCard.tsx",
+      "path": "dayzero-app/src/components/onboarding/OnboardingProgress.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773465426910,
+      "lastAccessed": 1773809631842,
       "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/utils",
-      "accessCount": 1,
-      "lastAccessed": 1773482468629,
-      "type": "directory"
-    },
-    {
-      "path": "dayzero-app/src/components",
-      "accessCount": 1,
-      "lastAccessed": 1773482468917,
-      "type": "directory"
-    },
-    {
-      "path": "",
-      "accessCount": 1,
-      "lastAccessed": 1773627892657,
-      "type": "directory"
     }
   ],
   "userDirectives": []

@@ -1,0 +1,16 @@
+{"t":0,"agent":"a3bdb5b","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a7d3e8e","agent_type":"general-purpose","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a7d3e8e","agent_type":"general-purpose","event":"agent_stop","success":true,"duration_ms":209348}
+{"t":0,"agent":"a336afc","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"ad3bfa2","agent_type":"general-purpose","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"ad3bfa2","agent_type":"general-purpose","event":"agent_stop","success":true,"duration_ms":143295}
+{"t":0,"agent":"a88874e","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"abb2c11","agent_type":"feature-dev:code-reviewer","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"abb2c11","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":79386}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"simplify"}
+{"t":0,"agent":"a8bce71","agent_type":"feature-dev:code-reviewer","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a5a2550","agent_type":"feature-dev:code-reviewer","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"ab1730e","agent_type":"feature-dev:code-reviewer","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a8bce71","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":57839}
+{"t":0,"agent":"ab1730e","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":59158}
+{"t":0,"agent":"a5a2550","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":73060}
