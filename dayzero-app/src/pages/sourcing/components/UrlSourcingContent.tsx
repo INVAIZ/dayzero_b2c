@@ -7,7 +7,7 @@ import { useEditingStore } from '../../../store/useEditingStore';
 
 import { Link2, AlertCircle, Loader2, CheckCircle2, XCircle, ArrowRight, X } from 'lucide-react';
 import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
-import { colors } from '../../../design/tokens';
+import { colors, font, radius, spacing } from '../../../design/tokens';
 
 interface ParsedUrl {
     id: string;
@@ -61,7 +61,6 @@ export const UrlSourcingContent = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [urls, collectionStarted]);
 
-    // Use urls.length instead of parsedUrls since parsedUrls might not update instantly, or just check parsing correctly. Wait, parsedUrls length is already derived from urls.
     const validCount = parsedUrls.filter(p => !p.error).length;
     const completedCount = parsedUrls.filter(p => p.status === 'completed' || p.status === 'failed').length;
     const isAllCompleted = collectionStarted && completedCount === parsedUrls.length;
@@ -125,7 +124,7 @@ export const UrlSourcingContent = () => {
 
                 const realisticTitles = isKpop ? kpopTitles : generalTitles;
                 const realTitle = realisticTitles[i % realisticTitles.length];
-const orgPrice = Math.floor(Math.random() * 20000) + 15000;
+                const orgPrice = Math.floor(Math.random() * 20000) + 15000;
 
                 const mockProduct: SourcedProduct = {
                     id: `prod-${Date.now()}-${i}`,
@@ -305,32 +304,20 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
 
     return (
         <div style={{ animation: 'fadeInUp 0.4s ease', position: 'relative' }}>
-            {/* Info Callout */}
-            <div style={{ background: colors.bg.faint, borderRadius: '12px', padding: '16px', marginBottom: '32px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <Link2 size={16} color={colors.primary} style={{ marginTop: '3px', flexShrink: 0 }} />
-                <div>
-                    <h3 style={{ fontSize: '15px', fontWeight: 600, color: colors.text.primary, marginBottom: '4px' }}>직접 수집이란?</h3>
-                    <p style={{ fontSize: '14px', color: colors.text.secondary, lineHeight: '1.5' }}>
-                        원하는 특정 상품의 상세 페이지 주소(URL)를 직접 입력하여 리스트 형태로 수집하는 기능이에요.<br />
-                        주소를 입력하고 엔터(Enter)나 스페이스바를 누르거나, 여러 개의 주소를 한 번에 붙여넣기 하여 최대 20개까지 추가할 수 있어요.
-                    </p>
-                </div>
-            </div>
-
             {/* Input Area */}
             {!collectionStarted && (
-                <div style={{ background: colors.bg.surface, borderRadius: '16px', border: `1px solid ${colors.border.default}`, padding: '24px', marginBottom: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '13px', fontWeight: 600, color: colors.text.secondary }}>수집할 URL 목록 ({urls.length}/20)</span>
+                <div style={{ background: colors.bg.surface, borderRadius: radius.xl, border: `1px solid ${colors.border.default}`, padding: spacing['6'], marginBottom: spacing['6'], boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: spacing['2'] }}>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>{urls.length > 0 ? `수집할 URL 목록 (${urls.length}개)` : '수집할 URL 목록'}</span>
                     </div>
                     <div
                         onClick={() => inputRef.current?.focus()}
                         style={{
                             display: 'flex',
                             flexWrap: 'wrap',
-                            gap: '8px',
-                            padding: '16px',
-                            borderRadius: '12px',
+                            gap: spacing['2'],
+                            padding: spacing['4'],
+                            borderRadius: radius.lg,
                             border: `1px solid ${colors.border.light}`,
                             background: colors.bg.page,
                             minHeight: '160px',
@@ -348,7 +335,7 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                 alignItems: 'center',
                                 gap: '6px',
                                 padding: '6px 10px',
-                                borderRadius: '20px',
+                                borderRadius: radius.full,
                                 background: colors.bg.surface,
                                 border: `1px solid ${!p.error ? colors.border.default : colors.dangerLight}`,
                                 boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
@@ -356,14 +343,14 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                 {!p.error ? (
                                     <>
                                         {p.provider && <img src={SOURCING_PROVIDERS.find(s => s.name === p.provider)?.logo} alt={p.provider} style={{ width: 16, height: 16, borderRadius: 4 }} />}
-                                        <span style={{ color: colors.text.primary, fontSize: '13px', fontWeight: 600, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.url}</span>
+                                        <span style={{ color: colors.text.primary, fontSize: font.size.sm, fontWeight: font.weight.semibold, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.url}</span>
                                         <CheckCircle2 size={14} color={colors.success} />
                                     </>
                                 ) : (
                                     <>
                                         <AlertCircle size={14} color={colors.danger} />
-                                        <span style={{ color: colors.text.muted, fontSize: '13px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'line-through' }}>{p.url}</span>
-                                        <span style={{ color: colors.danger, fontSize: '12px', fontWeight: 600 }}>{p.error}</span>
+                                        <span style={{ color: colors.text.muted, fontSize: font.size.sm, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'line-through' }}>{p.url}</span>
+                                        <span style={{ color: colors.danger, fontSize: font.size.xs, fontWeight: font.weight.semibold }}>{p.error}</span>
                                     </>
                                 )}
                                 <button
@@ -371,7 +358,7 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                         e.stopPropagation();
                                         setUrls(prev => prev.filter(u => u !== p.url));
                                     }}
-                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', marginLeft: '2px', display: 'flex', color: colors.text.muted, borderRadius: '50%' }}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', marginLeft: '2px', display: 'flex', color: colors.text.muted, borderRadius: radius.full }}
                                     onMouseOver={(e) => e.currentTarget.style.background = colors.bg.subtle}
                                     onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                                 >
@@ -392,14 +379,12 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                     if (matches && matches.length > 0) {
                                         setUrls(prev => {
                                             const combined = [...prev, ...matches];
-                                            return Array.from(new Set(combined)).slice(0, 20);
+                                            return Array.from(new Set(combined));
                                         });
                                     } else {
                                         const newUrl = pendingInput.trim();
                                         if (newUrl && !urls.includes(newUrl)) {
-                                            if (urls.length < 20) {
-                                                setUrls(prev => [...prev, newUrl]);
-                                            }
+                                            setUrls(prev => [...prev, newUrl]);
                                         }
                                     }
                                     setPendingInput('');
@@ -410,9 +395,7 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                             onBlur={() => {
                                 const newUrl = pendingInput.trim();
                                 if (newUrl && !urls.includes(newUrl)) {
-                                    if (urls.length < 20) {
-                                        setUrls(prev => [...prev, newUrl]);
-                                    }
+                                    setUrls(prev => [...prev, newUrl]);
                                 }
                                 setPendingInput('');
                                 if (inputRef.current?.parentElement) {
@@ -433,41 +416,40 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                 if (matches && matches.length > 0) {
                                     setUrls(prev => {
                                         const combined = [...prev, ...matches];
-                                        return Array.from(new Set(combined)).slice(0, 20);
+                                        return Array.from(new Set(combined));
                                     });
                                 } else {
                                     const newUrls = pastedText.split(/[\n\s]+/).map(s => s.trim()).filter(Boolean);
                                     if (newUrls.length > 0) {
                                         setUrls(prev => {
                                             const combined = [...prev, ...newUrls];
-                                            return Array.from(new Set(combined)).slice(0, 20);
+                                            return Array.from(new Set(combined));
                                         });
                                     }
                                 }
                             }}
-                            placeholder={urls.length === 0 ? "쇼핑몰 상품 URL을 입력하고 엔터 및 스페이스 바를 누르세요" : ""}
+                            placeholder={urls.length === 0 ? "지원 쇼핑몰의 상품 URL만 붙여넣으면 모든 상품 정보를 가져와요. 여러 개도 한 번에 요청할 수 있어요." : ""}
                             style={{
                                 flex: 1,
                                 minWidth: '200px',
                                 background: 'transparent',
                                 border: 'none',
                                 outline: 'none',
-                                fontSize: '14px',
+                                fontSize: font.size.md,
                                 color: colors.text.primary,
                                 fontFamily: 'Pretendard, -apple-system, sans-serif',
                                 padding: '6px 4px'
                             }}
-                            disabled={urls.length >= 20}
                         />
                     </div>
 
-                    <div style={{ marginTop: '24px', borderTop: `1px solid ${colors.border.default}`, paddingTop: '16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                            <div style={{ fontSize: '13px', fontWeight: 600, color: colors.text.muted }}>
+                    <div style={{ marginTop: spacing['6'], borderTop: `1px solid ${colors.border.default}`, paddingTop: spacing['4'] }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing['3'] }}>
+                            <div style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.muted }}>
                                 지원 쇼핑몰에서 찾아보세요
                             </div>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: spacing['3'] }}>
                             {SOURCING_PROVIDERS.map(p => (
                                 <button
                                     key={p.name}
@@ -477,9 +459,9 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                         background: colors.bg.page,
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '8px',
-                                        padding: '12px',
-                                        borderRadius: '8px',
+                                        gap: spacing['2'],
+                                        padding: spacing['3'],
+                                        borderRadius: radius.md,
                                         cursor: 'pointer',
                                         transition: 'all 0.2s',
                                         color: 'inherit',
@@ -494,8 +476,8 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                         e.currentTarget.style.borderColor = colors.border.default;
                                     }}
                                 >
-                                    <img src={p.logo} alt={p.name} style={{ width: '24px', height: '24px', borderRadius: '4px' }} />
-                                    <span style={{ fontSize: '13px', fontWeight: 600, color: colors.text.secondary }}>{p.name}</span>
+                                    <img src={p.logo} alt={p.name} style={{ width: '24px', height: '24px', borderRadius: radius.xs }} />
+                                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>{p.name}</span>
                                 </button>
                             ))}
                         </div>
@@ -509,7 +491,7 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                     className="btn-primary"
                     disabled={validCount === 0}
                     onClick={handleStartCollection}
-                    style={{ height: '56px', fontSize: '16px' }}
+                    style={{ height: '56px', fontSize: font.size.base }}
                 >
                     <Link2 size={20} />
                     총 {validCount}건 수집 시작하기
@@ -518,32 +500,32 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
 
             {/* Progress Area */}
             {collectionStarted && (
-                <div style={{ background: colors.bg.surface, borderRadius: '16px', border: `1px solid ${colors.border.default}`, padding: '32px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)', animation: 'slideUp 0.4s ease' }}>
+                <div style={{ background: colors.bg.surface, borderRadius: radius.xl, border: `1px solid ${colors.border.default}`, padding: spacing['8'], boxShadow: '0 4px 16px rgba(0,0,0,0.04)', animation: 'slideUp 0.4s ease' }}>
 
                     {/* Overall Progress */}
-                    <div style={{ marginBottom: '32px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                            <h2 style={{ fontSize: '18px', fontWeight: 700, color: colors.text.primary, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ marginBottom: spacing['8'] }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing['3'] }}>
+                            <h2 style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
                                 {isCollecting ? <Loader2 size={20} className="spin" color={colors.primary} /> : <CheckCircle2 size={20} color={colors.success} />}
                                 {isCollecting ? '상품 정보를 수집하고 있어요' : '수집이 완료됐어요'}
                             </h2>
-                            <span style={{ fontSize: '15px', fontWeight: 600, color: colors.primary }}>
+                            <span style={{ fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.primary }}>
                                 {completedCount} / {parsedUrls.length}건 완료
                             </span>
                         </div>
-                        <div style={{ width: '100%', height: '8px', background: colors.bg.subtle, borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ width: '100%', height: '8px', background: colors.bg.subtle, borderRadius: radius.xs, overflow: 'hidden' }}>
                             <div style={{
                                 width: `${(completedCount / parsedUrls.length) * 100}%`,
                                 height: '100%',
                                 background: isAllCompleted && successCount === parsedUrls.length ? colors.success : colors.primary,
-                                borderRadius: '4px',
+                                borderRadius: radius.xs,
                                 transition: 'width 0.4s ease, background 0.4s ease'
                             }} />
                         </div>
                     </div>
 
                     {/* Item List */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '40px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['4'], marginBottom: spacing['10'] }}>
                         {parsedUrls.map(item => (
                             <div
                                 key={item.id}
@@ -551,9 +533,9 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                 style={{
                                     display: 'flex',
                                     alignItems: 'flex-start',
-                                    gap: '16px',
-                                    padding: '16px',
-                                    borderRadius: '12px',
+                                    gap: spacing['4'],
+                                    padding: spacing['4'],
+                                    borderRadius: radius.lg,
                                     background: item.status === 'failed' ? colors.dangerBg : colors.bg.page,
                                     border: `1px solid ${item.status === 'failed' ? colors.dangerLight : colors.border.default}`,
                                     transition: 'all 0.3s ease'
@@ -561,10 +543,10 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                             >
                                 {/* Status Icon */}
                                 <div style={{ marginTop: '2px', display: 'flex', alignItems: 'center' }}>
-                                    {item.status === 'idle' && <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${colors.border.light}` }} />}
+                                    {item.status === 'idle' && <div style={{ width: '20px', height: '20px', borderRadius: radius.full, border: `2px solid ${colors.border.light}` }} />}
                                     {item.status === 'running' && <Loader2 size={20} color={colors.primary} className="spin" />}
                                     {item.status === 'completed' && (
-                                        <div style={{ width: 20, height: 20, borderRadius: '50%', border: `1.5px solid ${colors.success}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div style={{ width: 20, height: 20, borderRadius: radius.full, border: `1.5px solid ${colors.success}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={colors.success} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                             </svg>
@@ -576,9 +558,9 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                 {/* Content */}
                                 <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
 
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        {item.provider && <img src={SOURCING_PROVIDERS.find(p => p.name === item.provider)?.logo} alt={item.provider} style={{ width: '20px', height: '20px', borderRadius: '50%', objectFit: 'cover' }} />}
-                                        <div style={{ fontSize: '15px', fontWeight: 600, color: colors.text.primary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                                        {item.provider && <img src={SOURCING_PROVIDERS.find(p => p.name === item.provider)?.logo} alt={item.provider} style={{ width: '20px', height: '20px', borderRadius: radius.full, objectFit: 'cover' }} />}
+                                        <div style={{ fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.text.primary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                             {item.product ?
                                                 <a href={item.url} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }} onMouseOver={(e) => e.currentTarget.style.textDecoration = 'underline'} onMouseOut={(e) => e.currentTarget.style.textDecoration = 'none'}>
                                                     {item.product.title}
@@ -589,9 +571,9 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
 
                                     {item.product ? (() => {
                                         return (
-                                            <div style={{ fontSize: '13px', color: colors.text.secondary, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ fontSize: font.size.sm, color: colors.text.secondary, display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
                                                 <span style={{ color: colors.text.muted }}>원가</span>
-                                                <span style={{ fontWeight: 600 }}>₩{item.product.originalPriceKrw.toLocaleString()}</span>
+                                                <span style={{ fontWeight: font.weight.semibold }}>₩{item.product.originalPriceKrw.toLocaleString()}</span>
                                                 <span style={{ color: colors.border.default, margin: '0 4px' }}>|</span>
                                                 <span style={{ color: colors.text.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '240px' }}>{item.url}</span>
                                             </div>
@@ -599,21 +581,21 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
                                     })() : (
                                         <>
                                             {item.error && (
-                                                <div style={{ fontSize: '13px', color: colors.danger, marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <div style={{ fontSize: font.size.sm, color: colors.danger, marginTop: spacing['1'], display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
                                                     {item.error}
-                                                    <button onClick={() => handleRetry(item.id)} style={{ background: 'none', border: 'none', color: colors.danger, fontWeight: 600, textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>재시도</button>
+                                                    <button onClick={() => handleRetry(item.id)} style={{ background: 'none', border: 'none', color: colors.danger, fontWeight: font.weight.semibold, textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>재시도</button>
                                                 </div>
                                             )}
                                         </>
                                     )}
 
-                                    {item.status === 'idle' && !item.error && <div style={{ fontSize: '13px', color: colors.text.muted, marginTop: '4px' }}>대기 중...</div>}
-                                    {item.status === 'running' && <div style={{ fontSize: '13px', color: colors.primary, marginTop: '4px' }}>정보를 가져오고 있어요...</div>}
+                                    {item.status === 'idle' && !item.error && <div style={{ fontSize: font.size.sm, color: colors.text.muted, marginTop: spacing['1'] }}>대기 중...</div>}
+                                    {item.status === 'running' && <div style={{ fontSize: font.size.sm, color: colors.primary, marginTop: spacing['1'] }}>정보를 가져오고 있어요...</div>}
                                 </div>
 
                                 {/* Thumbnail Preview */}
                                 {item.product && (
-                                    <div style={{ width: '48px', height: '48px', borderRadius: '8px', border: `1px solid ${colors.border.default}`, backgroundColor: colors.bg.subtle, flexShrink: 0 }} />
+                                    <div style={{ width: '48px', height: '48px', borderRadius: radius.md, border: `1px solid ${colors.border.default}`, backgroundColor: colors.bg.subtle, flexShrink: 0 }} />
                                 )}
                             </div>
                         ))}
@@ -621,13 +603,13 @@ const orgPrice = Math.floor(Math.random() * 20000) + 15000;
 
                     {/* Result Actions */}
                     {isAllCompleted && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', animation: 'fadeInUp 0.4s ease' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['3'], animation: 'fadeInUp 0.4s ease' }}>
                             {successCount > 0 && (
-                                <button className="btn-primary" onClick={handleEditClick} style={{ width: '100%', padding: '16px', fontSize: '15px' }}>
+                                <button className="btn-primary" onClick={handleEditClick} style={{ width: '100%', padding: spacing['4'], fontSize: font.size.base }}>
                                     수집된 상품 확인하기 <ArrowRight size={18} />
                                 </button>
                             )}
-                            <button className="btn-google" onClick={() => { setCollectionStarted(false); setUrls([]); }} style={{ width: '100%', background: colors.bg.subtle, border: 'none', padding: '16px', fontSize: '15px' }}>
+                            <button className="btn-google" onClick={() => { setCollectionStarted(false); setUrls([]); }} style={{ width: '100%', background: colors.bg.subtle, border: 'none', padding: spacing['4'], fontSize: font.size.base }}>
                                 추가 수집하기
                             </button>
                         </div>

@@ -142,9 +142,63 @@
   },
   "hotPaths": [
     {
+      "path": "dayzero-app/src/pages/sourcing/components/UrlSourcingContent.tsx",
+      "accessCount": 40,
+      "lastAccessed": 1773884697073,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/SourcingPage.tsx",
+      "accessCount": 29,
+      "lastAccessed": 1773884642644,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/sourcing/AutoSourcingPage.tsx",
+      "accessCount": 22,
+      "lastAccessed": 1773884539465,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/store/useSourcingStore.ts",
+      "accessCount": 12,
+      "lastAccessed": 1773884543924,
+      "type": "file"
+    },
+    {
+      "path": "docs/04_화면별 기능 명세서.md",
+      "accessCount": 10,
+      "lastAccessed": 1773884118664,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/onboarding/BasicMarginPage.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1773882122742,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src",
+      "accessCount": 6,
+      "lastAccessed": 1773884546699,
+      "type": "directory"
+    },
+    {
       "path": "dayzero-app/src/pages/onboarding/Qoo10ConnectPage.tsx",
       "accessCount": 5,
       "lastAccessed": 1773809989554,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/types/sourcing.ts",
+      "accessCount": 3,
+      "lastAccessed": 1773882095243,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/design/tokens.ts",
+      "accessCount": 3,
+      "lastAccessed": 1773884501774,
       "type": "file"
     },
     {
@@ -172,12 +226,6 @@
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/pages/onboarding/BasicMarginPage.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773809621541,
-      "type": "file"
-    },
-    {
       "path": "dayzero-app/src/components/onboarding/OnboardingLayout.tsx",
       "accessCount": 1,
       "lastAccessed": 1773809630842,
@@ -193,6 +241,36 @@
       "path": "dayzero-app/src/components/onboarding/OnboardingProgress.tsx",
       "accessCount": 1,
       "lastAccessed": 1773809631842,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/sourcing/UrlSourcingPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773874494843,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/App.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773874499293,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/reviews/2026-03-19-SC-03-auto-sourcing-review.md",
+      "accessCount": 1,
+      "lastAccessed": 1773881854363,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/onboarding",
+      "accessCount": 1,
+      "lastAccessed": 1773881924589,
+      "type": "directory"
+    },
+    {
+      "path": "dayzero-app/reviews/2026-03-19-SC-sourcing-ux-improvement-review.md",
+      "accessCount": 1,
+      "lastAccessed": 1773884214526,
       "type": "file"
     }
   ],

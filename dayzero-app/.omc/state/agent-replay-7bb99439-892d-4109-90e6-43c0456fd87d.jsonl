@@ -14,3 +14,4 @@
 {"t":0,"agent":"a8bce71","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":57839}
 {"t":0,"agent":"ab1730e","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":59158}
 {"t":0,"agent":"a5a2550","agent_type":"feature-dev:code-reviewer","event":"agent_stop","success":true,"duration_ms":73060}
+{"t":0,"agent":"abfe7cc","agent_type":"unknown","event":"agent_stop","success":true}

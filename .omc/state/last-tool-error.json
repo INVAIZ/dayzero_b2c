@@ -1,7 +1,7 @@
 {
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"cd /Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app && npx tsc -b --noEmit 2>&1\",\"description\":\"TypeScript 빌드 검증\"}",
-  "error": "Exit code 2\nsrc/pages/registration/ProductDetailPage.tsx(883,35): error TS2304: Cannot find name 'toY'.",
-  "timestamp": "2026-03-14T10:30:53.136Z",
-  "retry_count": 2
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"/Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/pages/sourcing\"}",
+  "error": "EISDIR: illegal operation on a directory, read '/Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/pages/sourcing'",
+  "timestamp": "2026-03-18T22:54:52.699Z",
+  "retry_count": 1
 }

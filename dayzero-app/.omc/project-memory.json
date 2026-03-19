@@ -159,26 +159,56 @@
   "hotPaths": [
     {
       "path": "src/pages/onboarding/BasicMarginPage.tsx",
-      "accessCount": 178,
-      "lastAccessed": 1773825683469,
+      "accessCount": 191,
+      "lastAccessed": 1773884874651,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/sourcing/AutoSourcingPage.tsx",
+      "accessCount": 107,
+      "lastAccessed": 1773884889747,
       "type": "file"
     },
     {
       "path": "src/pages/onboarding/BasicInfoPage.tsx",
-      "accessCount": 41,
-      "lastAccessed": 1773825699254,
+      "accessCount": 43,
+      "lastAccessed": 1773877029467,
       "type": "file"
     },
     {
       "path": "src/components/onboarding/OnboardingLayout.tsx",
-      "accessCount": 39,
-      "lastAccessed": 1773825868998,
+      "accessCount": 41,
+      "lastAccessed": 1773877230759,
       "type": "file"
     },
     {
+      "path": "src/pages/SourcingPage.tsx",
+      "accessCount": 41,
+      "lastAccessed": 1773883992125,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/sourcing/components/UrlSourcingContent.tsx",
+      "accessCount": 20,
+      "lastAccessed": 1773882962502,
+      "type": "directory"
+    },
+    {
       "path": "src/pages/onboarding/Qoo10ConnectPage.tsx",
-      "accessCount": 16,
-      "lastAccessed": 1773825456904,
+      "accessCount": 17,
+      "lastAccessed": 1773875311043,
+      "type": "file"
+    },
+    {
+      "path": "src",
+      "accessCount": 8,
+      "lastAccessed": 1773883029008,
+      "type": "directory"
+    },
+    {
+      "path": "src/store/useSourcingStore.ts",
+      "accessCount": 7,
+      "lastAccessed": 1773880907842,
       "type": "file"
     },
     {
@@ -188,12 +218,6 @@
       "type": "file"
     },
     {
-      "path": "src",
-      "accessCount": 6,
-      "lastAccessed": 1773825243401,
-      "type": "directory"
-    },
-    {
       "path": "",
       "accessCount": 4,
       "lastAccessed": 1773825243672,
@@ -201,9 +225,15 @@
     },
     {
       "path": "src/pages/onboarding",
-      "accessCount": 3,
-      "lastAccessed": 1773823417814,
+      "accessCount": 4,
+      "lastAccessed": 1773877025454,
       "type": "directory"
+    },
+    {
+      "path": "src/pages/registration/RegistrationResultPage.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1773883123265,
+      "type": "file"
     },
     {
       "path": "src/pages/editing/tabs/PriceEditTab.tsx",
@@ -212,9 +242,21 @@
       "type": "directory"
     },
     {
+      "path": "src/pages",
+      "accessCount": 2,
+      "lastAccessed": 1773877021624,
+      "type": "directory"
+    },
+    {
       "path": "src/components/onboarding/useOnboardingTransition.ts",
       "accessCount": 1,
       "lastAccessed": 1773825370868,
+      "type": "file"
+    },
+    {
+      "path": "src/components/onboarding/OnboardingProgress.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1773877037136,
       "type": "file"
     }
   ],

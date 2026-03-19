@@ -25,7 +25,6 @@ interface SourcingState {
     particleOrigin: { x: number; y: number } | null;
     flyingBalls: Array<{ id: number; originX: number; originY: number }>;
     selectedAutoFilter: string;
-
     urlSourcing: {
         urls: string[];
         parsedUrls: ParsedUrl[];
