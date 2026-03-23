@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1773808616234,
+  "lastScanned": 1774218960633,
   "projectRoot": "/Users/invaiz/Documents/develop/dayzero_B2C",
   "techStack": {
     "languages": [],
@@ -38,7 +38,7 @@
       "path": "Resources",
       "purpose": null,
       "fileCount": 4,
-      "lastAccessed": 1773808616217,
+      "lastAccessed": 1774218960613,
       "keyFiles": [
         "DayZero Logo.png",
         "QXpress.webp",
@@ -49,7 +49,7 @@
       "path": "dayzero-app",
       "purpose": null,
       "fileCount": 11,
-      "lastAccessed": 1773808616218,
+      "lastAccessed": 1774218960613,
       "keyFiles": [
         "README.md",
         "eslint.config.js",
@@ -62,14 +62,14 @@
       "path": "design",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1773808616218,
+      "lastAccessed": 1774218960614,
       "keyFiles": []
     },
     "docs": {
       "path": "docs",
       "purpose": "Documentation",
-      "fileCount": 9,
-      "lastAccessed": 1773808616218,
+      "fileCount": 11,
+      "lastAccessed": 1774218960614,
       "keyFiles": [
         "01_솔루션 제안서(RFP).md",
         "02_UX 설계 기준.md",
@@ -82,7 +82,7 @@
       "path": "reviews",
       "purpose": null,
       "fileCount": 2,
-      "lastAccessed": 1773808616218,
+      "lastAccessed": 1774218960615,
       "keyFiles": [
         "2026-03-11-ED-01-review.md",
         "2026-03-14-UT-readiness-review.md"
@@ -92,7 +92,7 @@
       "path": "rulebook",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1773808616219,
+      "lastAccessed": 1774218960616,
       "keyFiles": [
         "CLAUDE.md"
       ]
@@ -101,7 +101,7 @@
       "path": "skills",
       "purpose": null,
       "fileCount": 5,
-      "lastAccessed": 1773808616219,
+      "lastAccessed": 1774218960617,
       "keyFiles": [
         "feature-dev.md",
         "feature-review.md",
@@ -114,7 +114,7 @@
       "path": "dayzero-app/dist",
       "purpose": "Distribution/build output",
       "fileCount": 6,
-      "lastAccessed": 1773808616220,
+      "lastAccessed": 1774218960620,
       "keyFiles": [
         "DayZero Logo.png",
         "Qoo10.png",
@@ -125,152 +125,105 @@
       "path": "dayzero-app/node_modules",
       "purpose": "Dependencies",
       "fileCount": 1,
-      "lastAccessed": 1773808616221,
+      "lastAccessed": 1774218960621,
       "keyFiles": []
-    },
-    "dayzero-app/public": {
-      "path": "dayzero-app/public",
-      "purpose": "Public files",
-      "fileCount": 5,
-      "lastAccessed": 1773808616221,
-      "keyFiles": [
-        "DayZero Logo.png",
-        "Qoo10.png",
-        "dayzero-icon.png"
-      ]
     }
   },
   "hotPaths": [
     {
-      "path": "dayzero-app/src/pages/sourcing/components/UrlSourcingContent.tsx",
-      "accessCount": 40,
-      "lastAccessed": 1773884697073,
+      "path": "dayzero-app/src/pages/editing/tabs/BasicEditTab.tsx",
+      "accessCount": 35,
+      "lastAccessed": 1774235626754,
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/pages/SourcingPage.tsx",
-      "accessCount": 29,
-      "lastAccessed": 1773884642644,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/pages/sourcing/AutoSourcingPage.tsx",
-      "accessCount": 22,
-      "lastAccessed": 1773884539465,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/store/useSourcingStore.ts",
-      "accessCount": 12,
-      "lastAccessed": 1773884543924,
-      "type": "file"
-    },
-    {
-      "path": "docs/04_화면별 기능 명세서.md",
-      "accessCount": 10,
-      "lastAccessed": 1773884118664,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/pages/onboarding/BasicMarginPage.tsx",
+      "path": "",
       "accessCount": 7,
-      "lastAccessed": 1773882122742,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src",
-      "accessCount": 6,
-      "lastAccessed": 1773884546699,
+      "lastAccessed": 1774235430539,
       "type": "directory"
     },
     {
-      "path": "dayzero-app/src/pages/onboarding/Qoo10ConnectPage.tsx",
-      "accessCount": 5,
-      "lastAccessed": 1773809989554,
+      "path": "docs/04_화면별 기능 명세서.md",
+      "accessCount": 2,
+      "lastAccessed": 1774219087293,
+      "type": "directory"
+    },
+    {
+      "path": "docs/08. 2차 UT 테스트를 위한 수정안 기획.md",
+      "accessCount": 2,
+      "lastAccessed": 1774219130503,
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/types/sourcing.ts",
-      "accessCount": 3,
-      "lastAccessed": 1773882095243,
+      "path": "dayzero-app/src/pages/editing/EditingListPage.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1774235423073,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/editing/EditingDetailPage.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1774219072376,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/editing/components/EditingHeader.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1774219084024,
+      "type": "file"
+    },
+    {
+      "path": "dayzero-app/src/pages/editing/components/EditingTabBar.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1774219088045,
+      "type": "file"
+    },
+    {
+      "path": "docs/02_UX 설계 기준.md",
+      "accessCount": 1,
+      "lastAccessed": 1774219658887,
       "type": "file"
     },
     {
       "path": "dayzero-app/src/design/tokens.ts",
-      "accessCount": 3,
-      "lastAccessed": 1773884501774,
+      "accessCount": 1,
+      "lastAccessed": 1774219965828,
       "type": "file"
     },
     {
-      "path": "docs/07. 1차 UT 테스트 인사이트.md",
+      "path": "dayzero-app/src/components/common/StatusComponents.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773809145623,
+      "lastAccessed": 1774235408811,
       "type": "file"
     },
     {
-      "path": "docs/08. 2차 UT 테스트를 위한 수정안 기획.md",
+      "path": "dayzero-app/src/components/common/SourceTag.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773809146145,
-      "type": "file"
-    },
-    {
-      "path": "docs/UT_화면_흐름_정리.md",
-      "accessCount": 1,
-      "lastAccessed": 1773809294927,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/pages/onboarding/BasicInfoPage.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773809620732,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/components/onboarding/OnboardingLayout.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773809630842,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/components/onboarding/OnboardingContext.tsx",
-      "accessCount": 1,
-      "lastAccessed": 1773809631551,
+      "lastAccessed": 1774235409296,
       "type": "file"
     },
     {
       "path": "dayzero-app/src/components/onboarding/OnboardingProgress.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773809631842,
+      "lastAccessed": 1774235409891,
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/pages/sourcing/UrlSourcingPage.tsx",
+      "path": "dayzero-app/src/index.css",
       "accessCount": 1,
-      "lastAccessed": 1773874494843,
+      "lastAccessed": 1774235434479,
       "type": "file"
     },
     {
-      "path": "dayzero-app/src/App.tsx",
+      "path": "dayzero-app/src/pages/editing/components/BulkActionBar.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773874499293,
+      "lastAccessed": 1774235435495,
       "type": "file"
     },
     {
-      "path": "dayzero-app/reviews/2026-03-19-SC-03-auto-sourcing-review.md",
+      "path": "dayzero-app/src/pages/registration/components/RegistrationProgressSection.tsx",
       "accessCount": 1,
-      "lastAccessed": 1773881854363,
-      "type": "file"
-    },
-    {
-      "path": "dayzero-app/src/pages/onboarding",
-      "accessCount": 1,
-      "lastAccessed": 1773881924589,
-      "type": "directory"
-    },
-    {
-      "path": "dayzero-app/reviews/2026-03-19-SC-sourcing-ux-improvement-review.md",
-      "accessCount": 1,
-      "lastAccessed": 1773884214526,
+      "lastAccessed": 1774235436322,
       "type": "file"
     }
   ],

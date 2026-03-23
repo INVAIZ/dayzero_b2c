@@ -170,6 +170,12 @@
       "type": "file"
     },
     {
+      "path": "src/pages/editing/tabs/BasicEditTab.tsx",
+      "accessCount": 79,
+      "lastAccessed": 1774234043370,
+      "type": "file"
+    },
+    {
       "path": "src/pages/onboarding/BasicInfoPage.tsx",
       "accessCount": 43,
       "lastAccessed": 1773877029467,
@@ -185,6 +191,12 @@
       "path": "src/pages/SourcingPage.tsx",
       "accessCount": 41,
       "lastAccessed": 1773883992125,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/editing/EditingDetailPage.tsx",
+      "accessCount": 28,
+      "lastAccessed": 1774232137575,
       "type": "file"
     },
     {
@@ -258,6 +270,18 @@
       "accessCount": 1,
       "lastAccessed": 1773877037136,
       "type": "file"
+    },
+    {
+      "path": "src/pages/editing/components/EditingHeader.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1774228031774,
+      "type": "file"
+    },
+    {
+      "path": "src/utils",
+      "accessCount": 1,
+      "lastAccessed": 1774228043845,
+      "type": "directory"
     }
   ],
   "userDirectives": []

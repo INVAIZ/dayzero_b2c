@@ -1,7 +1,7 @@
 {
   "tool_name": "Read",
-  "tool_input_preview": "{\"file_path\":\"/Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/pages/sourcing\"}",
-  "error": "EISDIR: illegal operation on a directory, read '/Users/invaiz/Documents/develop/dayzero_B2C/dayzero-app/src/pages/sourcing'",
-  "timestamp": "2026-03-18T22:54:52.699Z",
+  "tool_input_preview": "{\"file_path\":\"/Users/invaiz/Documents/develop/dayzero_B2C/docs/04_화면별 기능 명세서.md\"}",
+  "error": "File content (50957 tokens) exceeds maximum allowed tokens (25000). Use offset and limit parameters to read specific portions of the file, or search for specific content instead of reading the whole file.",
+  "timestamp": "2026-03-22T22:37:49.407Z",
   "retry_count": 1
 }
