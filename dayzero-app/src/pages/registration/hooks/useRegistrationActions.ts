@@ -14,8 +14,8 @@ export function useRegistrationActions(
     jobs: RegistrationJob[],
     allSuccessResults: RegistrationResult[],
     selectedIds: string[],
-    selectedMonitoringInfo: { unmonitoredCount: number; monitoredCount: number },
-    monitoringCount: number,
+    _selectedMonitoringInfo: { unmonitoredCount: number; monitoredCount: number },
+    _monitoringCount: number,
     clearSelection: () => void,
     actions: Actions,
 ) {
