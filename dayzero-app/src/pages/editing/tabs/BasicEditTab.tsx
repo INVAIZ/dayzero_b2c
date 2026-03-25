@@ -399,6 +399,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
     const [descJa, setDescJa] = useState(product.descriptionJa ?? '');
     const [options, setOptions] = useState<ProductOption[]>([...product.options]);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [saveSection, setSaveSection] = useState<string | null>(null);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
     const [isTranslatingTitle, setIsTranslatingTitle] = useState(false);
@@ -471,9 +472,10 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
         }
     }, [product.descriptionJa]);
 
-    const triggerSave = useCallback(() => {
+    const triggerSave = useCallback((section?: string) => {
         if (saveTimer.current) clearTimeout(saveTimer.current);
         if (savedTimer.current) clearTimeout(savedTimer.current);
+        if (section) setSaveSection(section);
         setSaveStatus('saving');
         saveTimer.current = setTimeout(() => {
             updateProduct(product.id, {
@@ -482,7 +484,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 options: optionsRef.current,
             });
             setSaveStatus('saved');
-            savedTimer.current = setTimeout(() => setSaveStatus('idle'), 2000);
+            savedTimer.current = setTimeout(() => { setSaveStatus('idle'); setSaveSection(null); }, 2000);
         }, 2000);
     }, [product.id, updateProduct]);
 
@@ -568,17 +570,17 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
 
     const updateOption = (id: string, field: keyof ProductOption, value: string | number) => {
         setOptions(prev => prev.map(o => o.id === id ? { ...o, [field]: value } : o));
-        triggerSave();
+        triggerSave('options');
     };
 
     const addOption = () => {
         setOptions(prev => [...prev, { id: `opt-${Date.now()}`, nameKo: '', nameJa: '', stock: 0 }]);
-        triggerSave();
+        triggerSave('options');
     };
 
     const deleteOption = (id: string) => {
         setOptions(prev => prev.filter(o => o.id !== id));
-        triggerSave();
+        triggerSave('options');
     };
 
     const descCount = (descMode === 'ko' ? descKo : descJa).length;
@@ -707,10 +709,10 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                         }
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                        {saveStatus === 'saving' && (
+                        {saveSection === 'title' && saveStatus === 'saving' && (
                             <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>저장 중...</span>
                         )}
-                        {saveStatus === 'saved' && (
+                        {saveSection === 'title' && saveStatus === 'saved' && (
                             <span style={{ fontSize: font.size.xs, color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>
                         )}
                         <div
@@ -771,7 +773,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                             className={hasJaTitle ? 'content-fade-in' : undefined}
                             type="text"
                             value={titleJa}
-                            onChange={e => { setTitleJa(e.target.value); triggerSave(); }}
+                            onChange={e => { setTitleJa(e.target.value); triggerSave('title'); }}
                             placeholder={titleJa ? '일본어 상품명을 수정하세요' : 'AI 번역 버튼을 눌러 자동 번역하거나 직접 입력하세요'}
                             style={{ ...inputBase, ...(!hasJaTitle ? warningBorderStyle : {}) }}
                             onFocus={handleWarningFocus}
@@ -803,6 +805,13 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                             {options.length}개
                         </span>
                     </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                        {saveSection === 'options' && saveStatus === 'saving' && (
+                            <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>저장 중...</span>
+                        )}
+                        {saveSection === 'options' && saveStatus === 'saved' && (
+                            <span style={{ fontSize: font.size.xs, color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>
+                        )}
                     <div
                         style={{ position: 'relative' }}
                         onMouseEnter={e => { if (allOptionsDone) (e.currentTarget.querySelector('[data-opt-tip]') as HTMLElement)?.style.setProperty('display', 'block'); }}
@@ -827,6 +836,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                 <div style={{ position: 'absolute', top: '100%', right: '12px', border: '4px solid transparent', borderTopColor: colors.text.primary }} />
                             </div>
                         )}
+                    </div>
                     </div>
                 </div>
 
@@ -895,6 +905,12 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                         }
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                        {saveSection === 'desc' && saveStatus === 'saving' && (
+                            <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>저장 중...</span>
+                        )}
+                        {saveSection === 'desc' && saveStatus === 'saved' && (
+                            <span style={{ fontSize: font.size.xs, color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>
+                        )}
                         <AIButton loading={isWritingDesc} onClick={handleWriteDesc} label={hasDescContent ? 'AI 재작성' : 'AI 작성'} loadingLabel="작성 중..." icon={<PenLine size={13} />} />
                             <div
                                 style={{ position: 'relative' }}
@@ -970,7 +986,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                 if (descMode === 'ko') {
                                     setDescKo(e.target.value);
                                 } else {
-                                    if (e.target.value.length <= MAX_DESC) { setDescJa(e.target.value); triggerSave(); }
+                                    if (e.target.value.length <= MAX_DESC) { setDescJa(e.target.value); triggerSave('desc'); }
                                 }
                             }}
                             placeholder={
