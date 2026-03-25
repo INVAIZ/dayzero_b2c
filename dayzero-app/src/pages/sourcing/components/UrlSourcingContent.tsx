@@ -198,6 +198,35 @@ export const UrlSourcingContent = () => {
                     }));
                 };
 
+                // 상품 유형별 브랜드/제조사/원산지
+                const productMeta = (() => {
+                    if (isKpop) {
+                        const labels = [
+                            { brand: 'HYBE', manufacturer: '하이브(주)', productionPlace: '대한민국' },
+                            { brand: 'SM Entertainment', manufacturer: '(주)에스엠엔터테인먼트', productionPlace: '대한민국' },
+                            { brand: 'YG Entertainment', manufacturer: '(주)YG엔터테인먼트', productionPlace: '대한민국' },
+                            { brand: 'JYP Entertainment', manufacturer: '(주)JYP엔터테인먼트', productionPlace: '대한민국' },
+                        ];
+                        return labels[i % labels.length];
+                    }
+                    if (catPath.includes('生活雑貨') || catPath.includes('洗剤')) {
+                        const labels = [
+                            { brand: 'LG생활건강', manufacturer: 'LG생활건강(주)', productionPlace: '대한민국' },
+                            { brand: '아모레퍼시픽', manufacturer: '(주)아모레퍼시픽', productionPlace: '대한민국' },
+                        ];
+                        return labels[i % labels.length];
+                    }
+                    // 뷰티 기본
+                    const labels = [
+                        { brand: 'Dr.G', manufacturer: '(주)고운세상코스메틱', productionPlace: '대한민국' },
+                        { brand: 'illiyoon', manufacturer: '(주)아모레퍼시픽', productionPlace: '대한민국' },
+                        { brand: 'LANEIGE', manufacturer: '(주)아모레퍼시픽', productionPlace: '대한민국' },
+                        { brand: 'COSRX', manufacturer: '(주)코스알엑스', productionPlace: '대한민국' },
+                        { brand: 'CLIO', manufacturer: '(주)클리오', productionPlace: '대한민국' },
+                    ];
+                    return labels[i % labels.length];
+                })();
+
                 useEditingStore.getState().addProduct({
                     id: mockProduct.id,
                     titleKo: mockProduct.title,
@@ -212,9 +241,9 @@ export const UrlSourcingContent = () => {
                     qoo10CategoryPath: catPath,
                     aiRecommendedCategoryPath: catPath,
                     sourceCategoryPath: sourceCatPath,
-                    brand: '',
-                    manufacturer: '',
-                    productionPlace: '',
+                    brand: productMeta.brand,
+                    manufacturer: productMeta.manufacturer,
+                    productionPlace: productMeta.productionPlace,
                     provider: mockProduct.provider,
                     sourceUrl: mockProduct.sourceUrl,
                     thumbnailUrl: mockProduct.thumbnailUrl,
