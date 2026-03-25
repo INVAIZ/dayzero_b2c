@@ -265,6 +265,8 @@ export const ProductDetailPage: React.FC = () => {
                         description={monitoring?.issueDescription ?? ''}
                         sourceUrl={product.sourceUrl}
                         qoo10Url={result.qoo10ProductUrl}
+                        isPaused={result.salesStatus === 'paused'}
+                        isMonitored={isMonitored}
                     />
                 )}
 
@@ -621,13 +623,36 @@ const AlertCard: React.FC<{
     description: string;
     sourceUrl: string;
     qoo10Url?: string;
-}> = ({ type, description, sourceUrl, qoo10Url }) => {
+    isPaused?: boolean;
+    isMonitored?: boolean;
+}> = ({ type, description, sourceUrl, qoo10Url, isPaused, isMonitored }) => {
     const isMargin = type === 'negative_margin';
+    const isOutOfStock = type === 'out_of_stock';
+
+    // 품절 + 이미 일시중지된 경우 다른 메시지
+    const getDescription = () => {
+        if (isOutOfStock && isPaused && isMonitored) {
+            return '현재 판매가 일시 중지된 상태예요. 쇼핑몰에서 재입고되면 변동 알림으로 알려드릴게요.';
+        }
+        if (isOutOfStock && isPaused && !isMonitored) {
+            return '현재 판매가 일시 중지된 상태예요. 변동 알림을 켜면 재입고 시 바로 알려드릴게요.';
+        }
+        return description;
+    };
+
+    const getTitle = () => {
+        if (isOutOfStock && isPaused) return '쇼핑몰 품절 — 판매 일시 중지 중';
+        if (isMargin) return '역마진이 발생했어요';
+        return '쇼핑몰에서 품절됐어요';
+    };
+
+    const cardBg = (isOutOfStock && isPaused) ? colors.bg.info : colors.dangerBg;
+    const cardBorder = (isOutOfStock && isPaused) ? colors.primaryLightBorder : colors.dangerLight;
 
     return (
         <div style={{
-            background: colors.dangerBg,
-            border: `1px solid ${colors.dangerLight}`,
+            background: cardBg,
+            border: `1px solid ${cardBorder}`,
             borderRadius: radius.lg,
             padding: spacing['5'],
             marginBottom: spacing['5'],
@@ -641,14 +666,14 @@ const AlertCard: React.FC<{
             }}>
                 {isMargin
                     ? <AlertTriangle size={18} color={colors.danger} />
-                    : <PackageX size={18} color={colors.text.primary} />
+                    : <PackageX size={18} color={(isOutOfStock && isPaused) ? colors.primary : colors.text.primary} />
                 }
                 <span style={{
                     fontSize: font.size.base,
                     fontWeight: 700,
                     color: colors.text.primary,
                 }}>
-                    {isMargin ? '역마진이 발생했어요' : '쇼핑몰에서 품절됐어요'}
+                    {getTitle()}
                 </span>
             </div>
             <p style={{
@@ -658,7 +683,7 @@ const AlertCard: React.FC<{
                 margin: 0,
                 marginBottom: spacing['4'],
             }}>
-                {description}
+                {getDescription()}
             </p>
             <div style={{ display: 'flex', gap: spacing['3'] }}>
                 {qoo10Url && (
