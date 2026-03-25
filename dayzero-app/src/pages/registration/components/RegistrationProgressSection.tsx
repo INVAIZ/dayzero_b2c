@@ -78,7 +78,7 @@ export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss })
                 display: 'flex',
                 alignItems: 'center',
                 gap: spacing['3'],
-                marginBottom: spacing['5'],
+                marginBottom: justCompleted ? spacing['3'] : '0',
                 position: 'relative',
             }}>
                 {/* 로고 아이콘 */}
@@ -90,6 +90,7 @@ export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss })
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                     transition: 'border-color 0.4s',
+                    position: 'relative',
                 }}>
                     {isDone
                         ? <CheckCircle2 size={22} color={colors.success} />
@@ -130,48 +131,56 @@ export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss })
                     </div>
                 </div>
 
-                {/* 퍼센트 */}
+                {/* 프로그레스 바 + 퍼센트 */}
                 <div style={{
-                    fontSize: font.size.xl,
-                    fontWeight: 700,
-                    color: isDone ? colors.success : colors.primary,
-                    fontVariantNumeric: 'tabular-nums',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: spacing['3'],
                     flexShrink: 0,
-                    lineHeight: 1,
-                    transition: 'color 0.4s',
+                    width: '160px',
                 }}>
-                    {percent}
-                    <span style={{ fontSize: font.size.sm, fontWeight: 600, marginLeft: '1px' }}>%</span>
-                </div>
-            </div>
-
-            {/* 프로그레스 바 */}
-            <div style={{
-                height: '8px',
-                background: 'rgba(0,0,0,0.04)',
-                borderRadius: radius.full,
-                overflow: 'hidden',
-                marginBottom: justCompleted ? spacing['3'] : '0',
-            }}>
-                <div style={{
-                    height: '100%',
-                    width: `${percent}%`,
-                    background: isDone
-                        ? `linear-gradient(90deg, ${colors.success}, ${colors.successAlt})`
-                        : `linear-gradient(90deg, ${colors.primary}, #60A5FA)`,
-                    borderRadius: radius.full,
-                    transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s',
-                    position: 'relative',
-                    overflow: 'hidden',
-                }}>
-                    {!isDone && (
+                    <div style={{
+                        flex: 1,
+                        height: '8px',
+                        background: 'rgba(0,0,0,0.04)',
+                        borderRadius: radius.full,
+                        overflow: 'hidden',
+                    }}>
                         <div style={{
-                            position: 'absolute',
-                            inset: 0,
-                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
-                            animation: 'shimmer 1.5s ease-in-out infinite',
-                        }} />
-                    )}
+                            height: '100%',
+                            width: `${percent}%`,
+                            background: isDone
+                                ? `linear-gradient(90deg, ${colors.success}, ${colors.successAlt})`
+                                : `linear-gradient(90deg, ${colors.primary}, #60A5FA)`,
+                            borderRadius: radius.full,
+                            transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s',
+                            position: 'relative',
+                            overflow: 'hidden',
+                        }}>
+                            {!isDone && (
+                                <div style={{
+                                    position: 'absolute',
+                                    inset: 0,
+                                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                                    animation: 'shimmer 1.5s ease-in-out infinite',
+                                }} />
+                            )}
+                        </div>
+                    </div>
+                    <div style={{
+                        fontSize: font.size.lg,
+                        fontWeight: 700,
+                        color: isDone ? colors.success : colors.primary,
+                        fontVariantNumeric: 'tabular-nums',
+                        flexShrink: 0,
+                        lineHeight: 1,
+                        transition: 'color 0.4s',
+                        minWidth: '42px',
+                        textAlign: 'right',
+                    }}>
+                        {percent}
+                        <span style={{ fontSize: font.size.xs, fontWeight: 600, marginLeft: '1px' }}>%</span>
+                    </div>
                 </div>
             </div>
 

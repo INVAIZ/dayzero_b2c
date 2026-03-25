@@ -32,6 +32,9 @@ interface RegistrationState {
     setAutoPauseOnOutOfStock: (enabled: boolean) => void;
     setAutoPauseOnNegativeMargin: (enabled: boolean) => void;
 
+    // 등록 상품 수정
+    updateRegisteredProduct: (resultId: string, product: ProductDetail) => void;
+
     // 변동 확인
     enableMonitoring: (resultIds: string[]) => void;
     disableMonitoring: (resultIds: string[]) => void;
@@ -171,6 +174,17 @@ export const useRegistrationStore = create<RegistrationState>()(
                             successCount: remaining.length,
                         };
                     }),
+                }));
+            },
+
+            updateRegisteredProduct: (resultId, product) => {
+                set((state) => ({
+                    jobs: state.jobs.map(j => ({
+                        ...j,
+                        results: j.results.map(r =>
+                            r.id === resultId ? { ...r, product } : r
+                        ),
+                    })),
                 }));
             },
 

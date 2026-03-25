@@ -95,6 +95,65 @@ const pendingProductsData = [
     { id: 'prod-48', title: '[다이소] 모션 감지 LED 센서등 실내용', krw: 5000, provider: '다이소', cat: 'インテリア・寝具 > 照明器具', catId: 'qoo10-light' },
 ];
 
+const BRAND_MAP: Record<string, { brand: string; manufacturer: string; productionPlace: string; sourceCategoryPath: string }> = {
+    // 올리브영
+    'prod-1': { brand: 'TORRIDEN', manufacturer: '(주)토리든', productionPlace: '대한민국', sourceCategoryPath: '올리브영 > 스킨케어 > 에센스/세럼/앰플' },
+    'prod-2': { brand: 'ROUND LAB', manufacturer: '(주)라운드랩', productionPlace: '대한민국', sourceCategoryPath: '올리브영 > 스킨케어 > 스킨/토너' },
+    'prod-3': { brand: 'ANUA', manufacturer: '(주)아누아', productionPlace: '대한민국', sourceCategoryPath: '올리브영 > 스킨케어 > 패드/필링' },
+    'prod-4': { brand: 'MEDIHEAL', manufacturer: '(주)엘앤피코스메틱', productionPlace: '대한민국', sourceCategoryPath: '올리브영 > 스킨케어 > 마스크/팩' },
+    'prod-5': { brand: 'Baiohealbeau', manufacturer: '(주)바이오힐보', productionPlace: '대한민국', sourceCategoryPath: '올리브영 > 스킨케어 > 스킨/토너' },
+    // 쿠팡
+    'prod-6': { brand: 'LocknLock', manufacturer: '(주)락앤락', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 주방용품 > 보관/밀폐용기' },
+    'prod-7': { brand: '3M', manufacturer: '3M Company', productionPlace: '미국', sourceCategoryPath: '쿠팡 > 문구/오피스 > 테이프/접착제' },
+    'prod-8': { brand: 'Persil', manufacturer: 'Henkel', productionPlace: '독일', sourceCategoryPath: '쿠팡 > 생활용품 > 세탁세제/비누' },
+    // 다이소
+    'prod-9': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 주방 > 주방잡화' },
+    'prod-10': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 생활 > 분리수거/재활용' },
+    'prod-11': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 욕실 > 욕실수납' },
+    // 쿠팡
+    'prod-12': { brand: '-', manufacturer: '-', productionPlace: '중국', sourceCategoryPath: '쿠팡 > 가전디지털 > 휴대폰액세서리 > 케이스' },
+    'prod-13': { brand: '-', manufacturer: '-', productionPlace: '중국', sourceCategoryPath: '쿠팡 > 가전디지털 > 충전기/케이블 > USB-C' },
+    'prod-14': { brand: 'Crocs', manufacturer: 'Crocs Inc.', productionPlace: '베트남', sourceCategoryPath: '쿠팡 > 패션의류/잡화 > 남녀공용신발 > 샌들/슬리퍼' },
+    'prod-15': { brand: '오뚜기', manufacturer: '(주)오뚜기', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 식품 > 라면/즉석식품 > 봉지라면' },
+    'prod-16': { brand: '남양유업', manufacturer: '남양유업(주)', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 식품 > 음료/생수 > 두유/식물성음료' },
+    'prod-17': { brand: 'bibigo', manufacturer: 'CJ제일제당(주)', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 식품 > 냉동/간편조리 > 냉동만두' },
+    'prod-18': { brand: '농심', manufacturer: '(주)농심', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 식품 > 라면/즉석식품 > 봉지라면' },
+    'prod-19': { brand: '동원', manufacturer: '동원F&B(주)', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 식품 > 통조림/캔 > 참치캔' },
+    'prod-20': { brand: 'SPAM', manufacturer: 'CJ제일제당(주)', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 식품 > 통조림/캔 > 햄/소시지캔' },
+    'prod-21': { brand: '삼양', manufacturer: '삼양식품(주)', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 식품 > 라면/즉석식품 > 봉지라면' },
+    'prod-22': { brand: 'T-fal', manufacturer: 'Groupe SEB', productionPlace: '프랑스', sourceCategoryPath: '쿠팡 > 주방용품 > 프라이팬/냄비 > 프라이팬' },
+    'prod-23': { brand: 'CUCKOO', manufacturer: '(주)쿠쿠전자', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 가전디지털 > 주방가전 > 전기밥솥' },
+    'prod-24': { brand: 'Dyson', manufacturer: 'Dyson Ltd.', productionPlace: '말레이시아', sourceCategoryPath: '쿠팡 > 가전디지털 > 미용가전 > 헤어스타일러' },
+    'prod-25': { brand: 'Philips', manufacturer: 'Philips N.V.', productionPlace: '네덜란드', sourceCategoryPath: '쿠팡 > 가전디지털 > 미용가전 > 전동칫솔' },
+    'prod-26': { brand: '휴테크', manufacturer: '(주)휴테크', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 가전디지털 > 건강가전 > 안마의자' },
+    'prod-27': { brand: 'Nike', manufacturer: 'Nike Inc.', productionPlace: '베트남', sourceCategoryPath: '쿠팡 > 패션의류/잡화 > 남성신발 > 스니커즈' },
+    'prod-28': { brand: 'New Balance', manufacturer: 'New Balance Athletics', productionPlace: '미국', sourceCategoryPath: '쿠팡 > 패션의류/잡화 > 남성신발 > 스니커즈' },
+    'prod-29': { brand: 'Apple', manufacturer: 'Apple Inc.', productionPlace: '중국', sourceCategoryPath: '쿠팡 > 가전디지털 > 휴대폰액세서리 > 케이스' },
+    'prod-30': { brand: 'Samsung', manufacturer: '삼성전자(주)', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 가전디지털 > 이어폰/헤드셋 > 무선이어폰' },
+    'prod-31': { brand: 'Logicool', manufacturer: 'Logitech International', productionPlace: '중국', sourceCategoryPath: '쿠팡 > 가전디지털 > PC주변기기 > 키보드' },
+    'prod-32': { brand: 'Head & Shoulders', manufacturer: 'P&G', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 뷰티 > 헤어케어 > 샴푸' },
+    'prod-33': { brand: 'Downy', manufacturer: 'P&G', productionPlace: '대한민국', sourceCategoryPath: '쿠팡 > 생활용품 > 세탁용품 > 섬유유연제' },
+    // 다이소
+    'prod-34': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 가전 > 생활가전 > 다리미' },
+    'prod-35': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 문구 > 데스크정리' },
+    'prod-36': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 스포츠/레저 > 물통/텀블러' },
+    'prod-37': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 가전 > 생활가전 > 선풍기' },
+    'prod-38': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 수납/정리 > 화장대정리' },
+    'prod-39': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 생활 > 세탁용품 > 빨래건조대' },
+    'prod-40': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 문구 > 독서대/북스탠드' },
+    'prod-41': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 주방 > 주방잡화 > 빨대/컵' },
+    'prod-42': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 문구 > 보드/게시판' },
+    'prod-43': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 스포츠/레저 > 캠핑용품 > 캠핑의자' },
+    'prod-44': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 수납/정리 > 지퍼백/보관백' },
+    'prod-45': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 욕실 > 욕실매트' },
+    'prod-46': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 주방 > 세제/디스펜서' },
+    'prod-47': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 생활 > 쓰레기통/분리수거' },
+    'prod-48': { brand: '다이소', manufacturer: '(주)아성다이소', productionPlace: '중국', sourceCategoryPath: '다이소 > 인테리어 > 조명/무드등' },
+};
+
+export const getProductMeta = (id: string) =>
+    BRAND_MAP[id] ?? { brand: '-', manufacturer: '-', productionPlace: '대한민국', sourceCategoryPath: '기타' };
+
 const makeSourceUrl = (provider: string, id: string): string => {
     const num = id.replace('prod-', '');
     switch (provider) {
@@ -117,6 +176,8 @@ const pendingProducts: ProductDetail[] = pendingProductsData.map((p) => ({
     salePriceJpy: Math.round((p.krw / 10.5) * 1.3 / 10) * 10,
     qoo10CategoryId: p.catId,
     qoo10CategoryPath: p.cat,
+    aiRecommendedCategoryPath: p.cat,
+    ...getProductMeta(p.id),
     provider: p.provider,
     sourceUrl: makeSourceUrl(p.provider, p.id),
     thumbnailUrl: `https://placehold.co/600x600/F2F4F6/8B95A1?text=${p.id}`,

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, ExternalLink, Shield, AlertTriangle, PackageX,
-    TrendingDown, TrendingUp, ChevronLeft, ChevronRight,
+    TrendingDown, TrendingUp, ChevronLeft, ChevronRight, PenLine,
 } from 'lucide-react';
 import { colors, font, spacing, radius, shadow } from '../../design/tokens';
 import { MainLayout } from '../../components/layout/MainLayout';
@@ -276,40 +276,85 @@ export const ProductDetailPage: React.FC = () => {
                     marginBottom: spacing['5'],
                 }}>
                     {/* Qoo10 등록 정보 */}
-                    <InfoCard title="Qoo10 JP 등록 정보">
+                    <InfoCard
+                        title={
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: spacing['2'] }}>
+                                Qoo10 JP 등록 정보
+                                {result.qoo10ProductUrl && (
+                                    <a
+                                        href={result.qoo10ProductUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        title="Qoo10에서 확인"
+                                        style={{
+                                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                            color: colors.text.muted,
+                                            transition: 'color 0.15s',
+                                        }}
+                                        onMouseEnter={e => { e.currentTarget.style.color = colors.primary; }}
+                                        onMouseLeave={e => { e.currentTarget.style.color = colors.text.muted; }}
+                                    >
+                                        <ExternalLink size={12} />
+                                    </a>
+                                )}
+                            </span>
+                        }
+                        headerRight={
+                            <button
+                                onClick={() => navigate(`/registration/${resultId}/edit`)}
+                                style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                    padding: 0,
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: font.size.xs, fontWeight: 600,
+                                    color: colors.text.muted,
+                                    cursor: 'pointer',
+                                    transition: 'color 0.15s',
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.color = colors.primary; }}
+                                onMouseLeave={e => { e.currentTarget.style.color = colors.text.muted; }}
+                            >
+                                <PenLine size={11} />
+                                수정하기
+                            </button>
+                        }
+                    >
                         <InfoRow label="판매가" value={`¥${product.salePriceJpy.toLocaleString()}`} highlight />
                         <InfoRow
                             label="마진율"
                             value={`${currentMargin.toFixed(1)}%`}
                             valueColor={currentMargin < 0 ? colors.danger : currentMargin < 10 ? colors.warningIcon : colors.success}
+                            highlight
                         />
                         <InfoRow label="카테고리" value={product.qoo10CategoryPath} />
                         <InfoRow label="상품번호" value={result.qoo10ItemCode ?? '—'} mono />
                         <InfoRow label="등록일" value={formatFullDate(result.registeredAt)} />
-                        {result.qoo10ProductUrl && (
-                            <div style={{ marginTop: spacing['3'] }}>
-                                <a
-                                    href={result.qoo10ProductUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '4px',
-                                        fontSize: font.size.sm,
-                                        color: colors.primary,
-                                        fontWeight: 500,
-                                        textDecoration: 'none',
-                                    }}
-                                >
-                                    Qoo10에서 확인 <ExternalLink size={12} />
-                                </a>
-                            </div>
-                        )}
                     </InfoCard>
 
                     {/* 원본 쇼핑몰 정보 */}
-                    <InfoCard title="원본 쇼핑몰 정보">
+                    <InfoCard
+                        title={
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: spacing['2'] }}>
+                                원본 쇼핑몰 정보
+                                <a
+                                    href={product.sourceUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="쇼핑몰에서 확인"
+                                    style={{
+                                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                        color: colors.text.muted,
+                                        transition: 'color 0.15s',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.color = colors.primary; }}
+                                    onMouseLeave={e => { e.currentTarget.style.color = colors.text.muted; }}
+                                >
+                                    <ExternalLink size={12} />
+                                </a>
+                            </span>
+                        }
+                    >
                         <div style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -358,24 +403,6 @@ export const ProductDetailPage: React.FC = () => {
                             value={`${originalMargin.toFixed(1)}%`}
                             valueColor={originalMargin < 10 ? colors.warningIcon : colors.text.primary}
                         />
-                        <div style={{ marginTop: spacing['3'] }}>
-                            <a
-                                href={product.sourceUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '4px',
-                                    fontSize: font.size.sm,
-                                    color: colors.primary,
-                                    fontWeight: 500,
-                                    textDecoration: 'none',
-                                }}
-                            >
-                                쇼핑몰에서 확인 <ExternalLink size={12} />
-                            </a>
-                        </div>
                     </InfoCard>
                 </div>
 
@@ -522,9 +549,10 @@ const MonitoringToggle: React.FC<{
 );
 
 const InfoCard: React.FC<{
-    title: string;
+    title: React.ReactNode;
+    headerRight?: React.ReactNode;
     children: React.ReactNode;
-}> = ({ title, children }) => (
+}> = ({ title, headerRight, children }) => (
     <div style={{
         background: colors.bg.surface,
         border: `1px solid ${colors.border.default}`,
@@ -532,14 +560,21 @@ const InfoCard: React.FC<{
         padding: spacing['5'],
     }}>
         <div style={{
-            fontSize: font.size.sm,
-            fontWeight: 700,
-            color: colors.text.tertiary,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             marginBottom: spacing['4'],
-            textTransform: 'uppercase',
-            letterSpacing: '0.3px',
         }}>
-            {title}
+            <span style={{
+                fontSize: font.size.sm,
+                fontWeight: 700,
+                color: colors.text.tertiary,
+                textTransform: 'uppercase',
+                letterSpacing: '0.3px',
+            }}>
+                {title}
+            </span>
+            {headerRight}
         </div>
         {children}
     </div>

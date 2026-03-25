@@ -1,4 +1,5 @@
-import { Sparkles, Trash2, Upload, X } from 'lucide-react';
+import { Trash2, Upload, X } from 'lucide-react';
+import { AIIcon } from '../../../components/common/AIIcon';
 import { colors, font, radius, shadow, spacing, zIndex } from '../../../design/tokens';
 
 interface Props {
@@ -86,7 +87,7 @@ export const BulkActionBar: React.FC<Props> = ({
                         cursor: translateCount > 0 ? 'pointer' : 'default',
                     }}
                 >
-                    <Sparkles size={16} />
+                    <AIIcon size={16} color="#fff" />
                     AI로 편집하기 ({translateCount})
                 </button>
                 {translateCount === 0 && selectedCount > 0 && (

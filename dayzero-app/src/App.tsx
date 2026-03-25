@@ -10,6 +10,7 @@ import EditingListPage from './pages/editing/EditingListPage';
 import EditingDetailPage from './pages/editing/EditingDetailPage';
 import { RegistrationResultPage } from './pages/registration/RegistrationResultPage';
 import { ProductDetailPage } from './pages/registration/ProductDetailPage';
+import RegistrationEditPage from './pages/registration/RegistrationEditPage';
 import { OnboardingProvider } from './components/onboarding/OnboardingContext';
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
           {/* Registration Section (= 판매 중인 상품 + 변동 확인) */}
           <Route path="/registration" element={<RegistrationResultPage />} />
           <Route path="/registration/:resultId" element={<ProductDetailPage />} />
+          <Route path="/registration/:resultId/edit" element={<RegistrationEditPage />} />
 
           {/* Default redirect to splash */}
           <Route path="*" element={<Navigate to="/" replace />} />

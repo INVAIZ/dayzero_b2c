@@ -35,6 +35,13 @@ export interface ProductDetail {
     // Qoo10 카테고리 (자동 매핑)
     qoo10CategoryId: string;
     qoo10CategoryPath: string;    // 표시용 "패션 > 여성의류 > 원피스"
+    aiRecommendedCategoryPath: string; // AI가 최초 추천한 카테고리 (변경 추적용)
+
+    // 상품 기본 정보
+    brand: string;
+    manufacturer: string;
+    productionPlace: string; // 원산지
+    sourceCategoryPath: string; // 소싱처 원본 카테고리
 
     // 소싱 정보
     provider: string;

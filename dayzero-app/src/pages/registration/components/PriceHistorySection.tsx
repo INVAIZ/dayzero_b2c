@@ -11,14 +11,10 @@ export const PriceHistorySection: React.FC<Props> = ({ history }) => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
         if (!history) return;
-        const svg = e.currentTarget;
-        const rect = svg.getBoundingClientRect();
+        const rect = e.currentTarget.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const svgX = (mouseX / rect.width) * 620;
-
-        const padL = 52;
-        const plotW = 548;
-        const ratio = (svgX - padL) / plotW;
+        const ratio = (svgX - 52) / 548;
         const idx = Math.round(ratio * (history.length - 1));
         if (idx >= 0 && idx < history.length) {
             setHoveredIndex(idx);
@@ -236,6 +232,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history }) => {
                 {history.slice(-5).reverse().map((entry, i) => {
                     const isIssue = entry.marginPercent < 0 || entry.stockStatus === 'out_of_stock';
                     const priceChangeFromBase = entry.sourcePriceKrw - history[0].sourcePriceKrw;
+                    const changeColor = priceChangeFromBase > 0 ? colors.danger : colors.primary;
                     return (
                         <div
                             key={i}
@@ -243,7 +240,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history }) => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: spacing['3'],
-                                padding: `${spacing['2']} 0`,
+                                padding: `${spacing['3']} 0`,
                                 borderBottom: i < 4 ? `1px solid ${colors.bg.subtle}` : 'none',
                             }}
                         >
@@ -264,33 +261,45 @@ export const PriceHistorySection: React.FC<Props> = ({ history }) => {
                                 {formatShortDate(entry.date)}
                             </span>
                             <span style={{
-                                fontSize: font.size.sm,
-                                fontWeight: 600,
+                                fontSize: font.size.base,
+                                fontWeight: 700,
                                 color: colors.text.primary,
                                 flex: 1,
                             }}>
                                 ₩{entry.sourcePriceKrw.toLocaleString()}
                             </span>
-                            {priceChangeFromBase !== 0 && (
-                                <span style={{
-                                    fontSize: font.size.xs,
-                                    fontWeight: 600,
-                                    color: priceChangeFromBase > 0 ? colors.danger : colors.success,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '2px',
-                                }}>
-                                    {priceChangeFromBase > 0 ? '+' : ''}₩{priceChangeFromBase.toLocaleString()}
-                                </span>
-                            )}
                             <span style={{
-                                fontSize: font.size.xs,
-                                fontWeight: 600,
+                                fontSize: font.size.base,
+                                fontWeight: 700,
+                                color: priceChangeFromBase !== 0 ? changeColor : colors.text.muted,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                                width: '100px',
+                                flexShrink: 0,
+                            }}>
+                                {priceChangeFromBase !== 0 ? (
+                                    <>
+                                        <svg width="10" height="10" viewBox="0 0 10 10" fill={changeColor} style={{ flexShrink: 0 }}>
+                                            {priceChangeFromBase > 0
+                                                ? <path d="M5 1L9.5 8H0.5L5 1Z" />
+                                                : <path d="M5 9L0.5 2H9.5L5 9Z" />
+                                            }
+                                        </svg>
+                                        ₩{Math.abs(priceChangeFromBase).toLocaleString()}
+                                    </>
+                                ) : (
+                                    <span style={{ fontSize: font.size.sm, fontWeight: 500 }}>—</span>
+                                )}
+                            </span>
+                            <span style={{
+                                fontSize: font.size.base,
+                                fontWeight: 700,
                                 color: entry.marginPercent < 0 ? colors.danger
                                     : entry.marginPercent < 10 ? colors.warningIcon
                                         : colors.success,
-                                width: '48px',
-                                textAlign: 'right',
+                                width: '56px',
+                                textAlign: 'left',
                                 flexShrink: 0,
                             }}>
                                 {entry.marginPercent.toFixed(1)}%

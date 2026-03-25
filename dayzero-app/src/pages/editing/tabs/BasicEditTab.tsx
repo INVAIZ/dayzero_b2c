@@ -1,8 +1,9 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { ChevronDown, Plus, Trash2, Search, Check, X, Loader2, PenLine, Languages, Info, Sparkles } from 'lucide-react';
+import { ChevronDown, Plus, Trash2, Search, Check, X, Loader2, PenLine, Languages, Info } from 'lucide-react';
+import { AIIcon } from '../../../components/common/AIIcon';
 import type { ProductDetail, ProductOption } from '../../../types/editing';
 import { useEditingStore } from '../../../store/useEditingStore';
-import { QOO10_CATEGORY_KO, toKoCategory } from '../../../mock/categoryMap';
+import { QOO10_CATEGORY_KO, toKoCategory, toJaCategory } from '../../../mock/categoryMap';
 import { PENDING_JA_TITLES } from '../../../mock/editingMock';
 import { colors, font, radius, shadow, spacing, zIndex } from '../../../design/tokens';
 import { stripPrefix, toJaTitle, mockTranslateOption as mockTranslateOpt, hasKorean } from '../../../utils/editing';
@@ -11,6 +12,7 @@ import { ConfirmModal } from '../../../components/common/ConfirmModal';
 
 interface Props {
     product: ProductDetail;
+    hideProgress?: boolean;
 }
 
 const MAX_DESC = 10000;
@@ -57,7 +59,7 @@ const createWarningBlur = (isComplete: boolean) => (e: React.FocusEvent<HTMLInpu
 const STATUS_TAG_CONFIG = {
     needsTranslation: { color: colors.warningIcon, bg: colors.warningLight, icon: <Info size={11} /> },
     translated: { color: colors.primary, bg: colors.primaryLight, icon: <Check size={11} /> },
-    aiAvailable: { color: colors.primary, bg: colors.primaryLight, icon: <Sparkles size={11} /> },
+    aiAvailable: { color: colors.primary, bg: colors.primaryLight, icon: <AIIcon size={11} /> },
 } as const;
 
 // ── CSS 애니메이션 (정적 문자열) ─────────────────────────────────────────────
@@ -92,37 +94,6 @@ const STATIC_STYLES = `
 `;
 
 // ── 한국어 원문 hover 툴팁 ────────────────────────────────────────────────────
-const KoTooltip: React.FC<{ pos: { x: number; y: number }; text: string }> = ({ pos, text }) => {
-    const ref = useRef<HTMLDivElement>(null);
-    const [adjusted, setAdjusted] = useState(pos);
-
-    useEffect(() => {
-        if (!ref.current) return;
-        const { width, height } = ref.current.getBoundingClientRect();
-        const vw = window.innerWidth;
-        let x = pos.x + 12;
-        let y = pos.y - height - 10;
-        if (x + width > vw - 16) x = vw - width - 16;
-        if (y < 8) y = pos.y + 16;
-        setAdjusted({ x, y });
-    }, [pos.x, pos.y]);
-
-    return (
-        <div ref={ref} style={{
-            position: 'fixed', left: adjusted.x, top: adjusted.y,
-            zIndex: zIndex.toast,
-            background: colors.text.primary, color: '#fff',
-            borderRadius: radius.lg, padding: `${spacing['3']} ${spacing['4']}`,
-            fontSize: font.size.base, pointerEvents: 'none',
-            boxShadow: shadow.lg,
-            maxWidth: '400px', wordBreak: 'keep-all',
-            animation: 'koIn 0.12s ease',
-        }}>
-            <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: font.size.xs, marginBottom: '4px', fontWeight: 500 }}>한국어 원문</div>
-            <div style={{ whiteSpace: 'normal', lineHeight: 1.4, fontWeight: 600 }}>{text}</div>
-        </div>
-    );
-};
 
 // ── 구분선 ───────────────────────────────────────────────────────────────────
 const Divider = () => (
@@ -186,9 +157,10 @@ const StatusTag: React.FC<{
 // ── 카테고리 모달 ──────────────────────────────────────────────────────────────
 const CategoryModal: React.FC<{
     current: string;
+    aiRecommended?: string;
     onSelect: (jaPath: string) => void;
     onClose: () => void;
-}> = ({ current, onSelect, onClose }) => {
+}> = ({ current, aiRecommended, onSelect, onClose }) => {
     const [query, setQuery] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -199,8 +171,15 @@ const CategoryModal: React.FC<{
         return () => window.removeEventListener('keydown', onKey);
     }, [onClose]);
 
-    const results = Object.entries(QOO10_CATEGORY_KO).filter(([ja, ko]) =>
-        !query || ko.includes(query) || ja.includes(query)
+    const results = useMemo(() =>
+        Object.entries(QOO10_CATEGORY_KO)
+            .filter(([ja, ko]) => !query || ko.includes(query) || ja.includes(query))
+            .sort((a, b) => {
+                if (a[0] === aiRecommended) return -1;
+                if (b[0] === aiRecommended) return 1;
+                return 0;
+            }),
+        [query, aiRecommended]
     );
 
     return (
@@ -273,6 +252,7 @@ const CategoryModal: React.FC<{
                         </div>
                     ) : results.map(([ja, ko]) => {
                         const isSelected = ja === current;
+                        const isAiRec = ja === aiRecommended;
                         return (
                             <button key={ja}
                                 onClick={() => { onSelect(ja); onClose(); }}
@@ -287,12 +267,24 @@ const CategoryModal: React.FC<{
                                 onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = colors.bg.faint; }}
                                 onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
                             >
-                                <div style={{ minWidth: 0 }}>
-                                    <div style={{
-                                        fontSize: font.size.sm, fontWeight: isSelected ? 700 : 500,
-                                        color: isSelected ? colors.primary : colors.text.primary, marginBottom: '3px',
-                                    }}>
-                                        {ko}
+                                <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                                        <span style={{
+                                            fontSize: font.size.sm, fontWeight: isSelected ? 700 : 500,
+                                            color: isSelected ? colors.primary : colors.text.primary,
+                                        }}>
+                                            {ko}
+                                        </span>
+                                        {isAiRec && (
+                                            <span style={{
+                                                display: 'inline-flex', alignItems: 'center', gap: '3px',
+                                                fontSize: font.size.xs, fontWeight: 600,
+                                                color: colors.primary, background: colors.primaryLight,
+                                                padding: '1px 6px', borderRadius: radius.full,
+                                            }}>
+                                                <AIIcon size={9} /> AI 추천
+                                            </span>
+                                        )}
                                     </div>
                                     <div style={{ fontSize: font.size.xs, color: colors.text.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                         {ja}
@@ -316,9 +308,9 @@ const OptionRow: React.FC<{
     onChange: (field: keyof ProductOption, value: string | number) => void;
     onDelete: () => void;
 }> = ({ option, imageUrl, isTranslating, onChange, onDelete }) => {
-    const [tooltip, setTooltip] = useState<{ x: number; y: number } | null>(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const hasNameJa = !isTranslating && !!option.nameJa;
+    const needsTranslation = hasKorean(option.nameKo);
+    const hasNameJa = !isTranslating && (!!option.nameJa || !needsTranslation);
 
     return (
         <div style={{
@@ -336,12 +328,8 @@ const OptionRow: React.FC<{
                     border: `1px solid ${colors.border.default}`, flexShrink: 0,
                 }} />
 
-            {/* 옵션명 입력 (hover → 한국어 원문 툴팁) */}
-            <div
-                style={{ minWidth: 0, position: 'relative' }}
-                onMouseMove={(option.nameJa && option.nameJa !== option.nameKo) ? e => setTooltip({ x: e.clientX, y: e.clientY }) : undefined}
-                onMouseLeave={(option.nameJa && option.nameJa !== option.nameKo) ? () => setTooltip(null) : undefined}
-            >
+            {/* 옵션명 */}
+            <div style={{ minWidth: 0 }}>
                 {isTranslating ? (
                     <div style={{
                         ...inputBase,
@@ -363,9 +351,6 @@ const OptionRow: React.FC<{
                         onFocus={handleWarningFocus}
                         onBlur={createWarningBlur(hasNameJa)}
                     />
-                )}
-                {tooltip && option.nameKo && (
-                    <KoTooltip pos={tooltip} text={option.nameKo} />
                 )}
             </div>
 
@@ -407,7 +392,7 @@ const OptionRow: React.FC<{
 };
 
 // ── 메인 탭 ────────────────────────────────────────────────────────────────────
-export const BasicEditTab: React.FC<Props> = ({ product }) => {
+export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
     const { updateProduct } = useEditingStore();
 
     const [titleJa, setTitleJa] = useState(product.titleJa ? stripPrefix(product.titleJa) : stripPrefix(product.titleKo));
@@ -415,7 +400,6 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
     const [options, setOptions] = useState<ProductOption[]>([...product.options]);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-    const [titleTooltip, setTitleTooltip] = useState<{ x: number; y: number } | null>(null);
 
     const [isTranslatingTitle, setIsTranslatingTitle] = useState(false);
     const [titleKoEdited, setTitleKoEdited] = useState(false);
@@ -457,7 +441,6 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
         setShowDescManual(false);
         setShowTranslateTooltip(false);
         setTranslatingOptionIds(new Set());
-        setTitleTooltip(null);
         setTitleKoEdited(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product.id]);
@@ -536,7 +519,11 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
     };
 
     const handleTranslateDesc = () => {
-        if (isTranslatingDesc || !descKo.trim()) return;
+        const koSource = descKo.trim() || (descJaHasKorean ? descJa.trim() : '');
+        if (isTranslatingDesc || !koSource) return;
+        if (!descKo.trim() && descJaHasKorean) {
+            setDescKo(descJa);
+        }
         setIsTranslatingDesc(true);
         setTimeout(() => {
             const newJa = '肌タイプに合わせた優しい成分で作られたスキンケア製品です。刺激なくしっとりと肌を整えます。\n\n【特徴】\n・敏感肌にも優しい低刺激処方\n・長時間保湿をキープするヒアルロン酸配合\n・韓国コスメブランドの人気商品\n\n【使用方法】\n洗顔後、適量をお肌に優しく馴染ませてください。';
@@ -604,13 +591,17 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
         product.thumbnails[idx]?.url ?? product.thumbnailUrl;
 
     const isTranslatingAnyOption = translatingOptionIds.size > 0;
-    const allOptionsDone = options.length > 0 && options.every(o => !!o.nameJa);
+    const allOptionsDone = options.length === 0 || options.every(o => !!o.nameJa || !hasKorean(o.nameKo));
     const titleJaHasKorean = hasKorean(titleJa);
     const descJaHasKorean = hasKorean(descJa);
     const hasJaTitle = !!titleJa && titleJa !== stripPrefix(product.titleKo) && !titleJaHasKorean;
     const isDescDone = !!descJa && !descJaHasKorean;
     // titleJa가 null이거나 titleKoEdited가 true이면 AI 번역 버튼 활성화
     const titleTranslateDisabled = hasJaTitle && !titleKoEdited;
+
+    // 카테고리가 AI 추천 그대로인지 확인
+    const isAiCategory = !!product.aiRecommendedCategoryPath &&
+        product.qoo10CategoryPath === product.aiRecommendedCategoryPath;
 
     const progressItems = useMemo(() => [
         { label: '상품명을 번역하세요', done: hasJaTitle, target: 'section-title' },
@@ -634,7 +625,7 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
             <style>{STATIC_STYLES}</style>
 
             {/* ── 진행 상태 콜아웃 ── */}
-            {(() => {
+            {!hideProgress && (() => {
                 const allDone = hasJaTitle && allOptionsDone && isDescDone;
 
                 return (
@@ -709,6 +700,7 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                 <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span style={sectionLabelStyle}>상품명</span>
+                        <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
                         {hasJaTitle
                             ? <StatusTag type="translated" label="작성 완료" />
                             : <StatusTag type="needsTranslation" label="번역 필요" />
@@ -750,12 +742,19 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                         </div>
                     </div>
                 </div>
-                {/* hover 시 한국어 원문 툴팁 */}
-                <div
-                    style={{ position: 'relative' }}
-                    onMouseMove={(!isTranslatingTitle && hasJaTitle) ? e => setTitleTooltip({ x: e.clientX, y: e.clientY }) : undefined}
-                    onMouseLeave={(!isTranslatingTitle && hasJaTitle) ? () => setTitleTooltip(null) : undefined}
-                >
+                {/* 수집 원본 */}
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>원본 상품명</div>
+                <div style={{
+                    ...inputBase,
+                    background: colors.bg.faint,
+                    color: colors.text.tertiary,
+                    cursor: 'default',
+                    marginBottom: spacing['3'],
+                }}>
+                    {stripPrefix(product.titleKo)}
+                </div>
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>판매 상품명</div>
+                <div style={{ position: 'relative' }}>
                     {isTranslatingTitle ? (
                         <div style={{
                             ...inputBase,
@@ -775,12 +774,9 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                             onChange={e => { setTitleJa(e.target.value); triggerSave(); }}
                             placeholder={titleJa ? '일본어 상품명을 수정하세요' : 'AI 번역 버튼을 눌러 자동 번역하거나 직접 입력하세요'}
                             style={{ ...inputBase, ...(!hasJaTitle ? warningBorderStyle : {}) }}
-                            onFocus={e => { handleWarningFocus(e); setTitleTooltip(null); }}
+                            onFocus={handleWarningFocus}
                             onBlur={createWarningBlur(hasJaTitle)}
                         />
-                    )}
-                    {titleTooltip && hasJaTitle && (
-                        <KoTooltip pos={titleTooltip} text={stripPrefix(product.titleKo)} />
                     )}
                     {!hasJaTitle && (
                         <p style={{ margin: `${spacing['1']} 0 0`, display: 'flex', alignItems: 'center', gap: '4px', fontSize: font.size.xs, color: colors.warningIcon }}>
@@ -798,6 +794,7 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                 <div style={{ ...flexBetween, marginBottom: spacing['3'] }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span style={sectionLabelStyle}>옵션</span>
+                        <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
                         {allOptionsDone
                             ? <StatusTag type="translated" label="작성 완료" />
                             : <StatusTag type="needsTranslation" label="번역 필요" />
@@ -889,6 +886,7 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                 <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
                         <span style={sectionLabelStyle}>상세설명</span>
+                        <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
                         {isDescDone
                             ? <StatusTag type="translated" label="작성 완료" />
                             : !hasDescContent && !isWritingDesc && !isTranslatingDesc && !showDescManual
@@ -896,15 +894,14 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                                 : <StatusTag type="needsTranslation" label="번역 필요" />
                         }
                     </div>
-                    {(hasDescContent || showDescManual || isWritingDesc || isTranslatingDesc) && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                            <AIButton loading={isWritingDesc} onClick={handleWriteDesc} label={hasDescContent ? 'AI 재작성' : 'AI 작성'} loadingLabel="작성 중..." icon={<PenLine size={13} />} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                        <AIButton loading={isWritingDesc} onClick={handleWriteDesc} label={hasDescContent ? 'AI 재작성' : 'AI 작성'} loadingLabel="작성 중..." icon={<PenLine size={13} />} />
                             <div
                                 style={{ position: 'relative' }}
                                 onMouseEnter={() => { if (!descKo.trim() || !!descJa) setShowTranslateTooltip(true); }}
                                 onMouseLeave={() => setShowTranslateTooltip(false)}
                             >
-                                <AIButton loading={isTranslatingDesc} onClick={handleTranslateDesc} label="AI 번역" loadingLabel="번역 중..." disabled={!descKo.trim() || !!descJa} icon={<Languages size={13} />} />
+                                <AIButton loading={isTranslatingDesc} onClick={handleTranslateDesc} label="AI 번역" loadingLabel="번역 중..." disabled={(!descKo.trim() && !descJa.trim()) || (!!descJa && !descJaHasKorean)} icon={<Languages size={13} />} />
                                 {showTranslateTooltip && (!descKo.trim() || !!descJa) && (
                                     <div style={{
                                         position: 'absolute', top: 'calc(100% + 6px)', right: 0,
@@ -919,8 +916,7 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                                     </div>
                                 )}
                             </div>
-                        </div>
-                    )}
+                    </div>
                 </div>
 
                 {(isWritingDesc || isTranslatingDesc) ? (
@@ -948,57 +944,26 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                         minHeight: '280px',
                     }}>
                         <p style={{ margin: 0, fontSize: font.size.md, fontWeight: 600, color: colors.text.primary, marginBottom: spacing['1'] }}>
-                            큐텐에 등록될 상품 상세 설명이에요
+                            AI가 상세 설명을 작성해 드려요
                         </p>
                         <p style={{ margin: 0, fontSize: font.size.sm, color: colors.text.tertiary, marginBottom: spacing['4'] }}>
-                            AI 작성을 누르면 상품 정보를 기반으로 작성해 드려요
+                            수집 사이트의 상품명, 카테고리, 성분 등을 분석해서 작성해요
                         </p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'], width: '200px' }}>
-                            <button
-                                onClick={handleWriteDesc}
-                                style={{
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                                    padding: `${spacing['2']} ${spacing['4']}`,
-                                    background: colors.primary, color: '#fff',
-                                    border: 'none', borderRadius: radius.md,
-                                    fontSize: font.size.sm, fontWeight: 600,
-                                    cursor: 'pointer', transition: 'opacity 0.15s',
-                                    width: '100%',
-                                }}
-                                onMouseEnter={e => (e.currentTarget.style.opacity = '0.9')}
-                                onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-                            >
-                                <PenLine size={14} />
-                                AI 작성
-                            </button>
-                            <button
-                                onClick={() => setShowDescManual(true)}
-                                style={{
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                                    padding: `${spacing['2']} ${spacing['4']}`,
-                                    background: 'none', color: colors.text.secondary,
-                                    border: `1.5px solid ${colors.border.default}`, borderRadius: radius.md,
-                                    fontSize: font.size.sm, fontWeight: 600,
-                                    cursor: 'pointer', transition: 'all 0.15s',
-                                    width: '100%',
-                                }}
-                                onMouseEnter={e => {
-                                    e.currentTarget.style.borderColor = colors.text.secondary;
-                                    e.currentTarget.style.background = colors.bg.surface;
-                                }}
-                                onMouseLeave={e => {
-                                    e.currentTarget.style.borderColor = colors.border.default;
-                                    e.currentTarget.style.background = 'none';
-                                }}
-                            >
-                                직접 작성
-                            </button>
-                        </div>
+                        <button
+                            onClick={() => setShowDescManual(true)}
+                            style={{
+                                ...ghostButtonBase,
+                                fontSize: font.size.sm, fontWeight: 500,
+                                color: colors.text.muted, textDecoration: 'underline',
+                            }}
+                        >
+                            직접 작성하기
+                        </button>
                     </div>
                 ) : (
                     <div style={{ position: 'relative' }}>
                         <textarea
-                            key={descMode === 'ja' && descJa ? 'ja-filled' : descMode === 'ko' && descKo ? 'ko-filled' : 'empty'}
+                            key={descMode}
                             className={(descMode === 'ja' && descJa) || (descMode === 'ko' && descKo) ? 'content-fade-in' : undefined}
                             value={descMode === 'ko' ? descKo : descJa}
                             onChange={e => {
@@ -1045,7 +1010,19 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
             <div>
                 <div style={{ marginBottom: spacing['2'] }}>
                     <span style={sectionLabelStyle}>카테고리</span>
+                    <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
                 </div>
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>원본 카테고리</div>
+                <div style={{
+                    ...inputBase,
+                    background: colors.bg.faint,
+                    color: colors.text.tertiary,
+                    cursor: 'default',
+                    marginBottom: spacing['3'],
+                }}>
+                    {product.sourceCategoryPath}
+                </div>
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>Qoo10 카테고리</div>
                 <div
                     onClick={() => setShowCategoryModal(true)}
                     style={{
@@ -1053,20 +1030,89 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
                         padding: `11px ${spacing['3']}`,
                         border: `1.5px solid ${colors.border.default}`,
                         borderRadius: radius.md,
-                        fontSize: font.size.base, color: colors.text.primary,
                         background: colors.bg.surface,
                         cursor: 'pointer', transition: 'border-color 0.15s',
+                        position: 'relative',
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = colors.primary)}
-                    onMouseLeave={e => (e.currentTarget.style.borderColor = colors.border.default)}
+                    onMouseEnter={e => {
+                        e.currentTarget.style.borderColor = colors.primary;
+                        if (isAiCategory) (e.currentTarget.querySelector('[data-cat-tip]') as HTMLElement)?.style.setProperty('display', 'flex');
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.borderColor = colors.border.default;
+                        if (isAiCategory) (e.currentTarget.querySelector('[data-cat-tip]') as HTMLElement)?.style.setProperty('display', 'none');
+                    }}
                 >
-                    {toKoCategory(product.qoo10CategoryPath)}
+                    {isAiCategory && (
+                        <>
+                            <div style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: colors.primary,
+                                borderRadius: radius.xs,
+                                padding: '3px 5px',
+                                marginRight: spacing['2'],
+                                flexShrink: 0,
+                                lineHeight: 1,
+                            }}>
+                                <AIIcon size={12} color="#fff" />
+                            </div>
+                            <div data-cat-tip="" style={{
+                                display: 'none',
+                                alignItems: 'center', gap: '6px',
+                                position: 'absolute', top: 'calc(100% + 8px)', left: '0',
+                                background: colors.text.primary, color: '#fff',
+                                fontSize: font.size.sm, fontWeight: 500,
+                                padding: `${spacing['2']} ${spacing['3']}`, borderRadius: radius.md,
+                                whiteSpace: 'nowrap', pointerEvents: 'none',
+                                zIndex: zIndex.dropdown,
+                            }}>
+                                <div style={{
+                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                    background: colors.primary,
+                                    padding: '3px 5px', borderRadius: radius.xs, lineHeight: 1,
+                                }}>
+                                    <AIIcon size={10} color="#fff" />
+                                </div>
+                                AI가 쇼핑몰 카테고리를 분석해 자동 매칭했어요
+                            </div>
+                        </>
+                    )}
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontSize: font.size.base, color: colors.text.primary }}>
+                            {toKoCategory(product.qoo10CategoryPath)}
+                        </div>
+                        <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginTop: '2px' }}>
+                            {toJaCategory(product.qoo10CategoryPath)}
+                        </div>
+                    </div>
                     <ChevronDown size={15} color={colors.text.muted} style={{ flexShrink: 0 }} />
                 </div>
-                <div style={{ marginTop: spacing['2'], display: 'flex', alignItems: 'center', gap: '4px', fontSize: font.size.xs, color: colors.text.muted }}>
-                    <Sparkles size={11} />
-                    AI가 쇼핑몰 카테고리를 분석해 자동 매칭했어요.
-                </div>
+            </div>
+
+            <Divider />
+
+            {/* ── 브랜드 / 제조사 / 원산지 ── */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['4'] }}>
+                {([
+                    { label: '브랜드', field: 'brand' as const, placeholder: '브랜드명을 입력하세요' },
+                    { label: '제조사', field: 'manufacturer' as const, placeholder: '제조사를 입력하세요' },
+                    { label: '원산지', field: 'productionPlace' as const, placeholder: '원산지를 입력하세요 (예: 대한민국)' },
+                ] as const).map(({ label, field, placeholder }) => (
+                    <div key={field}>
+                        <div style={{ marginBottom: spacing['2'] }}>
+                            <span style={sectionLabelStyle}>{label}</span>
+                        </div>
+                        <input
+                            type="text"
+                            value={product[field]}
+                            onChange={e => updateProduct(product.id, { [field]: e.target.value })}
+                            placeholder={placeholder}
+                            style={inputBase}
+                            onFocus={e => { e.target.style.borderColor = colors.primary; }}
+                            onBlur={e => { e.target.style.borderColor = colors.border.default; }}
+                        />
+                    </div>
+                ))}
             </div>
 
             <ConfirmModal
@@ -1083,6 +1129,7 @@ export const BasicEditTab: React.FC<Props> = ({ product }) => {
             {showCategoryModal && (
                 <CategoryModal
                     current={product.qoo10CategoryPath}
+                    aiRecommended={product.aiRecommendedCategoryPath}
                     onSelect={(jaPath) => updateProduct(product.id, {
                         qoo10CategoryPath: jaPath,
                         qoo10CategoryId: `cat-${jaPath.replace(/[^\w]/g, '-')}`,

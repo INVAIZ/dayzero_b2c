@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ProductDetail, TranslationJob, EditTabFilter, TranslationBatch, RegistrationBatch } from '../types/editing';
-import { PENDING_JA_TITLES } from '../mock/editingMock';
+import { PENDING_JA_TITLES, getProductMeta } from '../mock/editingMock';
+import { toJaCategory } from '../mock/categoryMap';
 import { toJaTitle, mockTranslateOption, MOCK_DESC_JA } from '../utils/editing';
 
 interface EditingState {
@@ -45,6 +46,7 @@ interface EditingState {
     deleteProducts: (ids: string[]) => void;
     setCurrentEditProduct: (id: string | null) => void;
     addProduct: (product: ProductDetail) => void;
+    removeProduct: (id: string) => void;
 
     markTranslationsRead: () => void;
     markRegistrationsRead: () => void;
@@ -225,6 +227,10 @@ export const useEditingStore = create<EditingState>()(
         products: [{ ...product, isRead: false }, ...state.products],
     })),
 
+    removeProduct: (id) => set((state) => ({
+        products: state.products.filter(p => p.id !== id),
+    })),
+
     markTranslationsRead: () => set((state) => {
         const anyUnread = state.translationJobs.some(j => !j.isRead) || state.translationBatches.some(b => !b.isRead);
         if (!anyUnread) return state;
@@ -339,6 +345,8 @@ export const useEditingStore = create<EditingState>()(
       partialize: (state) => ({ products: state.products }),
       onRehydrateStorage: () => (state) => {
           if (!state) return;
+          // 수정 페이지 임시 상품 제거
+          state.products = state.products.filter(p => !p.id.startsWith('__reg_edit__'));
           state.products = state.products.map(p => {
               let updated = p;
               // titleJa가 titleKo와 동일하면 번역 실패 → 초기화
@@ -361,6 +369,31 @@ export const useEditingStore = create<EditingState>()(
               }
               if (!updated.priceSource) {
                   updated = { ...updated, priceSource: 'crawled' as const };
+              }
+              // brand / manufacturer / productionPlace / sourceCategoryPath 기본값
+              if (!updated.brand || !updated.manufacturer || !updated.productionPlace || !updated.sourceCategoryPath) {
+                  const meta = getProductMeta(updated.id);
+                  updated = {
+                      ...updated,
+                      brand: updated.brand || meta.brand,
+                      manufacturer: updated.manufacturer || meta.manufacturer,
+                      productionPlace: updated.productionPlace || meta.productionPlace,
+                      sourceCategoryPath: updated.sourceCategoryPath || meta.sourceCategoryPath,
+                  };
+              }
+              // qoo10CategoryPath가 한국어로 저장된 경우 일본어로 변환
+              const jaPath = toJaCategory(updated.qoo10CategoryPath);
+              if (jaPath !== updated.qoo10CategoryPath) {
+                  updated = { ...updated, qoo10CategoryPath: jaPath };
+              }
+              // aiRecommendedCategoryPath 기본값 (일본어 변환 후 설정)
+              if (!updated.aiRecommendedCategoryPath) {
+                  updated = { ...updated, aiRecommendedCategoryPath: updated.qoo10CategoryPath };
+              } else {
+                  const jaAiPath = toJaCategory(updated.aiRecommendedCategoryPath);
+                  if (jaAiPath !== updated.aiRecommendedCategoryPath) {
+                      updated = { ...updated, aiRecommendedCategoryPath: jaAiPath };
+                  }
               }
               return updated;
           });

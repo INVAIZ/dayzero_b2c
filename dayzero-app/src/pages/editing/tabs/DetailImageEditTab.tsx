@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Sparkles, Loader2, Check, RotateCcw } from 'lucide-react';
+import { Loader2, Check, RotateCcw } from 'lucide-react';
+import { AIIcon } from '../../../components/common/AIIcon';
 import type { ProductDetail } from '../../../types/editing';
 import { useEditingStore } from '../../../store/useEditingStore';
 import { colors, font, radius, spacing } from '../../../design/tokens';
@@ -88,7 +89,7 @@ export const DetailImageEditTab: React.FC<Props> = ({ product }) => {
                     >
                         {status === 'translating'
                             ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />
-                            : isDone ? <Check size={13} /> : <Sparkles size={13} />
+                            : isDone ? <Check size={13} /> : <AIIcon size={13} />
                         }
                         {isDone ? '편집 완료' : status === 'translating' ? `편집 중... ${progress}%` : 'AI 편집'}
                     </button>

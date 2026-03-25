@@ -138,13 +138,6 @@ export const RegistrationResultPage: React.FC = () => {
                     <SuccessSummaryCard results={allSuccessResults} />
                 )}
 
-                {/* 모니터링 상태 탭 */}
-                <MonitoringStatusTabs
-                    activeTab={filters.monitoringTab}
-                    onChange={handleTabChange}
-                    counts={filters.monitoringCounts}
-                />
-
                 {/* 변동 확인 콜아웃 */}
                 <MonitoringInfoCallout
                     monitoringCount={filters.monitoringCounts.monitoring}
@@ -152,6 +145,13 @@ export const RegistrationResultPage: React.FC = () => {
                     autoPauseOnOutOfStock={autoPauseOnOutOfStock}
                     autoPauseOnNegativeMargin={autoPauseOnNegativeMargin}
                     onClick={() => setIsSettingsOpen(true)}
+                />
+
+                {/* 모니터링 상태 탭 */}
+                <MonitoringStatusTabs
+                    activeTab={filters.monitoringTab}
+                    onChange={handleTabChange}
+                    counts={filters.monitoringCounts}
                 />
 
                 {/* 검색 */}

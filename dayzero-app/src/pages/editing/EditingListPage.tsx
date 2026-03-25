@@ -191,11 +191,7 @@ export default function EditingListPage() {
 
     const selectedTranslatedIds = useMemo(() =>
         products.filter(p =>
-            selectedProductIds.includes(p.id) &&
-            p.translationStatus === 'completed' &&
-            !!p.titleJa &&
-            !!p.descriptionJa &&
-            p.options.length > 0 && p.options.every(o => !!o.nameJa)
+            selectedProductIds.includes(p.id) && isFullyTranslated(p)
         ).map(p => p.id),
         [products, selectedProductIds]
     );

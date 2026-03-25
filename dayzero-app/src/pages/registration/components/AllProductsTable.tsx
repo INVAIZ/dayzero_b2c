@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { ExternalLink, Check, Shield, AlertTriangle, PackageX, TrendingDown, Minus, ShoppingBag } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { ExternalLink, Check, Shield, AlertTriangle, PackageX, TrendingDown, Minus, ShoppingBag, ChevronUp, ChevronDown } from 'lucide-react';
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
 import { getProviderLogo } from '../../../types/sourcing';
 import { stripPrefix } from '../../../utils/editing';
@@ -111,8 +111,21 @@ export const AllProductsTable: React.FC<Props> = ({
     emptyMessage = '등록된 상품이 없어요',
 }) => {
     const [tooltip, setTooltip] = useState<TooltipData | null>(null);
+    const [dateSortDir, setDateSortDir] = useState<'asc' | 'desc' | null>(null);
     const hasSelection = !!onToggleSelect;
     const allSelected = results.length > 0 && selectedIds.length === results.length;
+
+    const sortedResults = useMemo(() => {
+        if (!dateSortDir) return results;
+        return [...results].sort((a, b) => {
+            const diff = new Date(a.registeredAt).getTime() - new Date(b.registeredAt).getTime();
+            return dateSortDir === 'asc' ? diff : -diff;
+        });
+    }, [results, dateSortDir]);
+
+    const toggleDateSort = () => {
+        setDateSortDir(prev => prev === null ? 'desc' : prev === 'desc' ? 'asc' : null);
+    };
 
     if (results.length === 0) {
         return (
@@ -158,7 +171,22 @@ export const AllProductsTable: React.FC<Props> = ({
                 {showMonitoring && (
                     <div style={{ width: '84px', flexShrink: 0, ...colHeader }}>변동 알림</div>
                 )}
-                <div style={{ width: '64px', flexShrink: 0, ...colHeader }}>등록일</div>
+                <div
+                    onClick={toggleDateSort}
+                    style={{
+                        width: '64px', flexShrink: 0,
+                        display: 'flex', alignItems: 'center', gap: '3px',
+                        fontSize: font.size.xs, fontWeight: 600,
+                        color: colors.text.muted,
+                        cursor: 'pointer', userSelect: 'none',
+                    }}
+                >
+                    등록일
+                    <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+                        <ChevronUp size={10} style={{ opacity: dateSortDir === 'asc' ? 1 : 0.25 }} />
+                        <ChevronDown size={10} style={{ opacity: dateSortDir === 'desc' ? 1 : 0.25 }} />
+                    </span>
+                </div>
                 <div style={{ width: '36px', flexShrink: 0, ...colHeader, textAlign: 'center' }}>판매처</div>
                 <div style={{ width: '36px', flexShrink: 0, ...colHeader, textAlign: 'center' }}>수집처</div>
             </div>
@@ -168,7 +196,7 @@ export const AllProductsTable: React.FC<Props> = ({
                 display: 'flex', flexDirection: 'column', gap: spacing['2'], paddingBottom: '100px',
                 animation: 'listFadeIn 0.4s ease',
             }}>
-                {results.map((r, i) => {
+                {sortedResults.map((r, i) => {
                     const isSelected = selectedIds.includes(r.id);
                     const margin = calcMargin(r.product);
                     const isTranslated = !!r.product.titleJa;

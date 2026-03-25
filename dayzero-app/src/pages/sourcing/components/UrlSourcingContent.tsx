@@ -149,14 +149,17 @@ export const UrlSourcingContent = () => {
                 // Realistic category mapping
                 const providerName = typeof current.provider === 'string' ? current.provider : (current.provider as any)?.name || '기타';
                 let catId = '100000001';
-                let catPath = '뷰티 > 스킨케어 > 크림';
+                let catPath = 'ビューティー > スキンケア > クリーム';
+                let sourceCatPath = '뷰티 > 스킨케어 > 크림';
 
                 if (isKpop || providerName.includes('알라딘') || providerName.includes('케이타운') || providerName.includes('Weverse')) {
                     catId = '200000001';
-                    catPath = '엔터테인먼트 > 음반 > K-POP';
+                    catPath = 'エンターテインメント > CD・音楽 > K-POP';
+                    sourceCatPath = '엔터테인먼트 > 음반 > K-POP';
                 } else if (providerName.includes('쿠팡') || providerName.includes('다이소')) {
                     catId = '300000001';
-                    catPath = '생활용품 > 세제/세정 > 주방세제';
+                    catPath = '日用品・生活雑貨 > 洗剤・クリーナー > 台所用洗剤';
+                    sourceCatPath = '생활용품 > 세제/세정 > 주방세제';
                 }
 
                 // 무게 시뮬레이션 (수집된 무게 vs AI 예측 무게)
@@ -207,6 +210,11 @@ export const UrlSourcingContent = () => {
                     salePriceJpy,
                     qoo10CategoryId: catId,
                     qoo10CategoryPath: catPath,
+                    aiRecommendedCategoryPath: catPath,
+                    sourceCategoryPath: sourceCatPath,
+                    brand: '',
+                    manufacturer: '',
+                    productionPlace: '',
                     provider: mockProduct.provider,
                     sourceUrl: mockProduct.sourceUrl,
                     thumbnailUrl: mockProduct.thumbnailUrl,

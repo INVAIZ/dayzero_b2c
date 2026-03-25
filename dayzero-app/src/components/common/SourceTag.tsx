@@ -1,5 +1,6 @@
-import { Globe, Sparkles } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { colors, radius } from '../../design/tokens';
+import { AIIcon } from './AIIcon';
 
 export const SOURCE_TAG_STYLES: Record<string, { bg: string; color: string }> = {
     ai: { bg: colors.primary, color: '#fff' },
@@ -18,7 +19,7 @@ export const SourceTag: React.FC<{ source: SourceType; size?: number }> = ({ sou
             padding: '3px 5px', borderRadius: radius.xs,
             lineHeight: 1, flexShrink: 0,
         }}>
-            {source === 'ai' ? <Sparkles size={size} /> : <Globe size={size} />}
+            {source === 'ai' ? <AIIcon size={size} color={tag.color} /> : <Globe size={size} />}
         </span>
     );
 };

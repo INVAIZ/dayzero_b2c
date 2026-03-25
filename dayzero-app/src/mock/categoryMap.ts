@@ -37,13 +37,24 @@ export const QOO10_CATEGORY_KO: Record<string, string> = {
     'スポーツ・アウトドア > ウォーターボトル': '스포츠/아웃도어 > 물병',
     'スポーツ・アウトドア > アウトドアチェア': '스포츠/아웃도어 > 야외 의자',
     'インテリア・寝具 > 照明器具': '인테리어/침구 > 조명기구',
-    'エン터테인먼트 > 음반 > K-POP': '엔터테인먼트 > 음반 > K-POP',
+    'エンターテインメント > CD・音楽 > K-POP': '엔터테인먼트 > 음반 > K-POP',
+    'ビューティー > スキンケア > クリーム': '뷰티 > 스킨케어 > 크림',
+    '日用品・生活雑貨 > 洗剤・クリーナー > 台所用洗剤': '생활용품 > 세제/세정 > 주방세제',
 };
 
 export const EXCHANGE_RATE = 10.5; // ¥1 = ₩10.5 (MOCK 고정값)
 
 export const toKoCategory = (jaPath: string): string =>
     QOO10_CATEGORY_KO[jaPath] ?? jaPath;
+
+/** 한국어 경로 → 일본어 경로 역조회 (없으면 원본 반환) */
+export const toJaCategory = (path: string): string => {
+    // 이미 일본어면 그대로
+    if (QOO10_CATEGORY_KO[path]) return path;
+    // 한국어 → 일본어 역조회
+    const entry = Object.entries(QOO10_CATEGORY_KO).find(([, ko]) => ko === path);
+    return entry ? entry[0] : path;
+};
 
 export const shortKoCategory = (jaPath: string): string => {
     const ko = toKoCategory(jaPath);

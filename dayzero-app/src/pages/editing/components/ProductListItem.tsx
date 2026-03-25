@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Loader2, Check, Globe, Sparkles, Info, AlertCircle } from 'lucide-react';
+import { Loader2, Check, Globe, Info, AlertCircle } from 'lucide-react';
+import { AIIcon } from '../../../components/common/AIIcon';
 import type { ProductDetail } from '../../../types/editing';
 import { getProviderLogo } from '../../../types/sourcing';
 import { Checkbox } from '../../../components/common/Checkbox';
@@ -98,7 +99,7 @@ const WeightSection: React.FC<{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                     background: tag.bg, color: tag.color,
                     padding: '3px 5px', borderRadius: '4px', lineHeight: 1, flexShrink: 0,
-                }}>{source === 'ai' ? <Sparkles size={10} /> : <Globe size={10} />}</div>
+                }}>{source === 'ai' ? <AIIcon size={10} color="#fff" /> : <Globe size={10} />}</div>
             )}
             <span>{SOURCE_TOOLTIPS[source] ?? ''}</span>
         </div>
@@ -128,19 +129,19 @@ const WeightSection: React.FC<{
                 })}
                 onMouseLeave={() => onUpdateTooltip(null)}
             >
-                {hasWeight ? (
-                    <span>{product.weightKg}<span style={{ fontSize: font.size['2xs+'], marginLeft: '2px', opacity: 0.6, fontWeight: 500 }}>kg</span></span>
-                ) : (
-                    <span style={{ fontSize: font.size.xs, fontWeight: 600 }}>무게 설정 필요</span>
-                )}
-
                 {tag && (
                     <div style={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                         background: tag.bg, color: tag.color,
                         padding: '2px 4px', borderRadius: '3px',
                         lineHeight: 1,
-                    }}>{source === 'ai' ? <Sparkles size={9} /> : <Globe size={9} />}</div>
+                    }}>{source === 'ai' ? <AIIcon size={9} color="#fff" /> : <Globe size={9} />}</div>
+                )}
+
+                {hasWeight ? (
+                    <span>{product.weightKg}<span style={{ fontSize: font.size['2xs+'], marginLeft: '2px', opacity: 0.6, fontWeight: 500 }}>kg</span></span>
+                ) : (
+                    <span style={{ fontSize: font.size.xs, fontWeight: 600 }}>무게 설정 필요</span>
                 )}
             </div>
         </div>
@@ -156,7 +157,7 @@ export const ProductListItem: React.FC<Props> = ({
     const isProcessing = product.translationStatus === 'processing' || !!product.isReTranslating;
     const isTranslated = !!product.titleJa;
     const titleDone = !!product.titleJa && !hasKorean(product.titleJa);
-    const optionsDone = product.options.length > 0 && product.options.every(o => !!o.nameJa);
+    const optionsDone = product.options.length === 0 || product.options.every(o => !!o.nameJa || !hasKorean(o.nameKo));
     const descDone = !!product.descriptionJa;
     const allDone = titleDone && optionsDone && descDone;
     const displayTitle = product.titleJa
@@ -300,7 +301,6 @@ export const ProductListItem: React.FC<Props> = ({
                 </div>
                 {/* 남은 할 일 칩 (미완료 항목만 표시) */}
                 {!isProcessing && (() => {
-
                     if (allDone) {
                         return (
                             <div style={{ display: 'flex', marginTop: '5px', paddingLeft: '26px' }}>
@@ -316,13 +316,11 @@ export const ProductListItem: React.FC<Props> = ({
                             </div>
                         );
                     }
-
                     const allItems = [
                         { label: '상품명 번역', done: titleDone },
                         { label: '옵션 번역', done: optionsDone },
                         { label: '상세설명 작성 및 번역', done: descDone },
                     ];
-
                     const tooltipContent = (
                         <div style={{ minWidth: '210px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: font.size.sm, fontWeight: 700, marginBottom: '10px' }}>
@@ -344,7 +342,6 @@ export const ProductListItem: React.FC<Props> = ({
                             </div>
                         </div>
                     );
-
                     return (
                         <div style={{ display: 'flex', marginTop: '5px', paddingLeft: '26px' }}>
                             <span
