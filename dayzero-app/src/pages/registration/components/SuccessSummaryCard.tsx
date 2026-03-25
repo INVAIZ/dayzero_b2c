@@ -199,7 +199,7 @@ const IssueStatCard: React.FC<{
                 marginBottom: spacing['4'],
             }}>
                 <span style={{ fontSize: font.size.sm, fontWeight: 500, color: colors.text.tertiary }}>
-                    품절·역마진 상품
+                    미처리 품절·역마진
                 </span>
                 <AlertTriangle size={18} color={total > 0 ? colors.warningIcon : colors.text.muted} />
             </div>

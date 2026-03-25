@@ -44,6 +44,9 @@ export interface RegistrationResult {
     // 판매 중지 여부 (없으면 active로 간주)
     salesStatus?: 'active' | 'paused';
 
+    // 중지 사유 (auto: 품절 자동 중지, manual: 수동 중지)
+    pauseReason?: 'auto' | 'manual';
+
     // 변동 확인
     monitoring?: MonitoringInfo;
 }

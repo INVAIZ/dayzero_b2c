@@ -87,11 +87,18 @@ function calcMargin(product: { originalPriceKrw: number; salePriceJpy: number })
     return ((sale - cost) / sale) * 100;
 }
 
+/** yy.mm.dd 형식 등록일 */
+function formatShortRegisteredDate(iso: string): string {
+    const d = new Date(iso);
+    const yy = String(d.getFullYear()).slice(2);
+    return `${yy}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
 const MONITORING_LABELS: Record<MonitoringCheckResult, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
     normal: { label: '정상', color: colors.success, bg: colors.successLight, icon: <Shield size={12} /> },
     price_changed: { label: '가격 변동', color: colors.warningIcon, bg: colors.warningLight, icon: <TrendingDown size={12} /> },
     negative_margin: { label: '역마진', color: colors.danger, bg: colors.dangerLight, icon: <AlertTriangle size={12} /> },
-    out_of_stock: { label: '품절', color: colors.text.primary, bg: colors.bg.subtle, icon: <PackageX size={12} /> },
+    out_of_stock: { label: '품절', color: colors.danger, bg: colors.dangerLight, icon: <PackageX size={12} /> },
 };
 
 export const AllProductsTable: React.FC<Props> = ({
@@ -142,18 +149,18 @@ export const AllProductsTable: React.FC<Props> = ({
             }}>
                 {hasSelection && <Checkbox checked={allSelected} onClick={() => onSelectAll?.()} />}
                 <div style={{ width: '48px', flexShrink: 0, ...colHeader }}>이미지</div>
-                <div style={{ width: '56px', flexShrink: 0, marginRight: spacing['1'], ...colHeader }}>판매처</div>
+                <div style={{ width: '64px', flexShrink: 0, ...colHeader }}>상태</div>
                 <div style={{ flex: 3, minWidth: 0, ...colHeader }}>
                     {hasSelection && selectedIds.length > 0 ? `${selectedIds.length}건 선택` : '상품명'}
                 </div>
-                <div style={{ width: '76px', flexShrink: 0, ...colHeader }}>판매가</div>
-                <div style={{ width: '48px', flexShrink: 0, ...colHeader }}>마진율</div>
-                <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>상품번호</div>
-                <div style={{ width: '80px', flexShrink: 0, ...colHeader }}>등록일시</div>
+                <div style={{ width: '72px', flexShrink: 0, ...colHeader }}>판매가</div>
+                <div style={{ width: '56px', flexShrink: 0, ...colHeader }}>마진율</div>
                 {showMonitoring && (
-                    <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>변동 알림</div>
+                    <div style={{ width: '84px', flexShrink: 0, ...colHeader }}>변동 알림</div>
                 )}
-                <div style={{ width: '40px', flexShrink: 0, ...colHeader, textAlign: 'center' }}>링크</div>
+                <div style={{ width: '64px', flexShrink: 0, ...colHeader }}>등록일</div>
+                <div style={{ width: '36px', flexShrink: 0, ...colHeader, textAlign: 'center' }}>판매처</div>
+                <div style={{ width: '36px', flexShrink: 0, ...colHeader, textAlign: 'center' }}>수집처</div>
             </div>
 
             {/* 상품 목록 */}
@@ -170,7 +177,7 @@ export const AllProductsTable: React.FC<Props> = ({
                         : stripPrefix(r.product.titleKo);
                     const monitoringResult = r.monitoring?.lastCheckResult;
                     const isMonitored = r.monitoring?.status === 'active';
-                    const isIssueRow = isMonitored && (monitoringResult === 'negative_margin' || monitoringResult === 'out_of_stock');
+                    const isIssueRow = isMonitored && (monitoringResult === 'negative_margin' || monitoringResult === 'out_of_stock') && r.salesStatus !== 'paused';
 
                     return (
                         <div
@@ -216,13 +223,41 @@ export const AllProductsTable: React.FC<Props> = ({
                                 }}
                             />
 
-                            {/* 판매처 (큐텐) */}
-                            <div style={{ width: '56px', flexShrink: 0, marginRight: spacing['1'], display: 'flex', alignItems: 'center' }}>
-                                <img
-                                    src="/logos/큐텐.png"
-                                    alt="Qoo10"
-                                    style={{ height: '14px', objectFit: 'contain', flexShrink: 0 }}
-                                />
+                            {/* 상태 */}
+                            <div style={{ width: '64px', flexShrink: 0 }}>
+                                {r.salesStatus === 'paused' ? (
+                                    <span style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '4px',
+                                        fontSize: font.size.xs,
+                                        fontWeight: 600,
+                                        color: colors.warningIcon,
+                                        background: colors.warningLight,
+                                        padding: '3px 8px',
+                                        borderRadius: radius.full,
+                                        whiteSpace: 'nowrap',
+                                    }}>
+                                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: colors.warningIcon, flexShrink: 0 }} />
+                                        {r.pauseReason === 'auto' ? '자동 중지' : '일시 중지'}
+                                    </span>
+                                ) : (
+                                    <span style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '4px',
+                                        fontSize: font.size.xs,
+                                        fontWeight: 600,
+                                        color: colors.primary,
+                                        background: colors.primaryLight,
+                                        padding: '3px 8px',
+                                        borderRadius: radius.full,
+                                        whiteSpace: 'nowrap',
+                                    }}>
+                                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: colors.primary, flexShrink: 0 }} />
+                                        판매 중
+                                    </span>
+                                )}
                             </div>
 
                             {/* 상품명 (소싱 로고 + 이름 + 호버 툴팁) */}
@@ -266,7 +301,7 @@ export const AllProductsTable: React.FC<Props> = ({
                             </div>
 
                             {/* 판매가 */}
-                            <div style={{ width: '76px', flexShrink: 0 }}>
+                            <div style={{ width: '72px', flexShrink: 0 }}>
                                 <span style={{
                                     fontSize: font.size.base, fontWeight: 700, color: colors.text.primary,
                                 }}>
@@ -276,30 +311,16 @@ export const AllProductsTable: React.FC<Props> = ({
 
                             {/* 마진율 */}
                             <div style={{
-                                width: '48px', flexShrink: 0,
-                                fontSize: font.size.sm, fontWeight: 600,
+                                width: '56px', flexShrink: 0,
+                                fontSize: font.size.base, fontWeight: 600,
                                 color: margin >= 20 ? colors.success : colors.text.secondary,
                             }}>
                                 {margin.toFixed(1)}%
                             </div>
 
-                            {/* Qoo10 상품번호 */}
-                            <div style={{
-                                width: '100px', flexShrink: 0,
-                                fontSize: font.size.xs, color: colors.text.muted,
-                                fontFamily: 'monospace',
-                            }}>
-                                {r.qoo10ItemCode ?? '—'}
-                            </div>
-
-                            {/* 등록일시 */}
-                            <div style={{ width: '80px', flexShrink: 0, fontSize: font.size.sm, color: colors.text.muted }}>
-                                {formatDate(r.registeredAt)}
-                            </div>
-
                             {/* 변동 알림 상태 */}
                             {showMonitoring && (
-                                <div style={{ width: '100px', flexShrink: 0 }}>
+                                <div style={{ width: '84px', flexShrink: 0 }}>
                                     {isMonitored && monitoringResult ? (
                                         <span style={{
                                             display: 'inline-flex',
@@ -331,14 +352,36 @@ export const AllProductsTable: React.FC<Props> = ({
                                 </div>
                             )}
 
-                            {/* 링크 */}
-                            <div style={{ width: '40px', flexShrink: 0, textAlign: 'center' }}>
+                            {/* 등록일 */}
+                            <div style={{ width: '64px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, whiteSpace: 'nowrap' }}>
+                                {formatShortRegisteredDate(r.registeredAt)}
+                            </div>
+
+                            {/* 판매처 링크 */}
+                            <div style={{ width: '36px', flexShrink: 0, textAlign: 'center' }} onClick={e => e.stopPropagation()}>
                                 {r.qoo10ProductUrl ? (
                                     <a
                                         href={r.qoo10ProductUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        onClick={e => e.stopPropagation()}
+                                        title="Qoo10에서 보기"
+                                        style={{ color: colors.primary, display: 'inline-flex', alignItems: 'center' }}
+                                    >
+                                        <ExternalLink size={14} />
+                                    </a>
+                                ) : (
+                                    <span style={{ color: colors.text.disabled }}>—</span>
+                                )}
+                            </div>
+
+                            {/* 수집처 링크 */}
+                            <div style={{ width: '36px', flexShrink: 0, textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+                                {r.product.sourceUrl ? (
+                                    <a
+                                        href={r.product.sourceUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        title="수집처에서 보기"
                                         style={{ color: colors.primary, display: 'inline-flex', alignItems: 'center' }}
                                     >
                                         <ExternalLink size={14} />
@@ -372,16 +415,6 @@ export const AllProductsTable: React.FC<Props> = ({
         </>
     );
 };
-
-function formatDate(iso: string): string {
-    const d = new Date(iso);
-    const yy = String(d.getFullYear()).slice(2);
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    const hh = String(d.getHours()).padStart(2, '0');
-    const min = String(d.getMinutes()).padStart(2, '0');
-    return `${yy}.${mm}.${dd} ${hh}:${min}`;
-}
 
 const colHeader: React.CSSProperties = {
     fontSize: font.size.xs,

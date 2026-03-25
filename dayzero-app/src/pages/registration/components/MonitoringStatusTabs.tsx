@@ -1,6 +1,6 @@
 import { colors, font, spacing, radius } from '../../../design/tokens';
 
-export type MonitoringTabFilter = '판매 중' | '변동 알림 중' | '판매 중지';
+export type MonitoringTabFilter = '판매 중' | '변동 알림 중' | '품절' | '역마진' | '일시 중지';
 
 interface Props {
     activeTab: MonitoringTabFilter;
@@ -8,7 +8,8 @@ interface Props {
     counts: {
         active: number;
         monitoring: number;
-        issues: number;
+        outOfStock: number;
+        negativeMargin: number;
         paused: number;
     };
 }
@@ -22,7 +23,6 @@ export const MonitoringStatusTabs: React.FC<Props> = ({ activeTab, onChange, cou
             borderBottom: `1px solid ${colors.border.default}`,
             paddingBottom: '0',
         }}>
-            {/* 판매 중 */}
             <TabButton
                 label="판매 중"
                 isActive={activeTab === '판매 중'}
@@ -37,7 +37,6 @@ export const MonitoringStatusTabs: React.FC<Props> = ({ activeTab, onChange, cou
                 )}
             </TabButton>
 
-            {/* 변동 알림 중 */}
             <TabButton
                 label="변동 알림 중"
                 isActive={activeTab === '변동 알림 중'}
@@ -50,25 +49,45 @@ export const MonitoringStatusTabs: React.FC<Props> = ({ activeTab, onChange, cou
                         variant="blue"
                     />
                 )}
-                {counts.issues > 0 && (
+            </TabButton>
+
+            <TabButton
+                label="품절"
+                isActive={activeTab === '품절'}
+                onClick={() => onChange('품절')}
+            >
+                {counts.outOfStock > 0 && (
                     <CountBadge
-                        count={counts.issues}
-                        isActive={activeTab === '변동 알림 중'}
-                        variant="red"
+                        count={counts.outOfStock}
+                        isActive={activeTab === '품절'}
+                        variant="blue"
                     />
                 )}
             </TabButton>
 
-            {/* 판매 중지 */}
             <TabButton
-                label="판매 중지"
-                isActive={activeTab === '판매 중지'}
-                onClick={() => onChange('판매 중지')}
+                label="역마진"
+                isActive={activeTab === '역마진'}
+                onClick={() => onChange('역마진')}
+            >
+                {counts.negativeMargin > 0 && (
+                    <CountBadge
+                        count={counts.negativeMargin}
+                        isActive={activeTab === '역마진'}
+                        variant="blue"
+                    />
+                )}
+            </TabButton>
+
+            <TabButton
+                label="일시 중지"
+                isActive={activeTab === '일시 중지'}
+                onClick={() => onChange('일시 중지')}
             >
                 {counts.paused > 0 && (
                     <CountBadge
                         count={counts.paused}
-                        isActive={activeTab === '판매 중지'}
+                        isActive={activeTab === '일시 중지'}
                         variant="gray"
                     />
                 )}

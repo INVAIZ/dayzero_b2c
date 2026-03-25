@@ -1,5 +1,6 @@
 import { X, Shield, AlertTriangle, PackageX, TrendingDown, Clock, RefreshCw } from 'lucide-react';
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
+import { formatCheckTime } from '../../../utils/formatDate';
 import type { RegistrationResult } from '../../../types/registration';
 
 interface Props {
@@ -8,10 +9,11 @@ interface Props {
     results: RegistrationResult[];
     onSimulate: () => void;
     onForceIssue: () => void;
+    onSeedDemoIssues?: () => void;
 }
 
 /** 변동 기록 모달 — 매일 오전 7시 자동 확인 이력 */
-export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, results, onSimulate, onForceIssue }) => {
+export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, results, onSimulate, onForceIssue, onSeedDemoIssues }) => {
     if (!isOpen) return null;
 
     const monitored = results.filter(r => r.monitoring?.status === 'active');
@@ -217,6 +219,31 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                                 <RefreshCw size={11} />
                                 1건 이슈
                             </button>
+                            {onSeedDemoIssues && (
+                                <button
+                                    onClick={onSeedDemoIssues}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: spacing['1'],
+                                        padding: `${spacing['1']} ${spacing['3']}`,
+                                        background: colors.warningLight,
+                                        border: 'none',
+                                        borderRadius: radius.md,
+                                        fontSize: font.size.xs,
+                                        fontWeight: 500,
+                                        color: colors.warningIcon,
+                                        cursor: 'pointer',
+                                        transition: 'opacity 0.15s',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.opacity = '0.75'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
+                                    title="UT 테스트용: 품절 1건 + 역마진 1건 강제 생성"
+                                >
+                                    <AlertTriangle size={11} />
+                                    데모 이슈
+                                </button>
+                            )}
                             <button
                                 onClick={onSimulate}
                                 style={{
@@ -352,16 +379,6 @@ const DailyCheckRow: React.FC<{
 );
 
 // ── 유틸 ──────────────────────────────────────────────────────────────────
-
-function formatCheckTime(iso: string): string {
-    const d = new Date(iso);
-    const now = new Date();
-    const isToday = d.toDateString() === now.toDateString();
-    const hh = String(d.getHours()).padStart(2, '0');
-    const mm = String(d.getMinutes()).padStart(2, '0');
-    if (isToday) return `오늘 ${hh}:${mm}`;
-    return `${d.getMonth() + 1}/${d.getDate()} ${hh}:${mm}`;
-}
 
 /** 과거 7일간 더미 확인 기록 생성 */
 function generateCheckHistory(totalCount: number): Array<{
