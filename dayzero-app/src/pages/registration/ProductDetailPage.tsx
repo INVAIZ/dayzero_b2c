@@ -5,6 +5,7 @@ import {
     TrendingDown, TrendingUp, ChevronLeft, ChevronRight, PenLine,
 } from 'lucide-react';
 import { colors, font, spacing, radius, shadow } from '../../design/tokens';
+import { CategorySelectModal } from '../../components/common/CategorySelectModal';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { getProviderLogo } from '../../types/sourcing';
@@ -17,11 +18,11 @@ import { PriceHistorySection } from './components/PriceHistorySection';
 export const ProductDetailPage: React.FC = () => {
     const { resultId } = useParams<{ resultId: string }>();
     const navigate = useNavigate();
-    const { jobs, enableMonitoring, disableMonitoring } = useRegistrationStore();
-
+    const { jobs, enableMonitoring, disableMonitoring, updateRegisteredProduct } = useRegistrationStore();
 
     const [isEnableModalOpen, setIsEnableModalOpen] = useState(false);
     const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
 
     // 모든 성공 결과 통합 + 현재 상품 찾기
     const allResults = useMemo(
@@ -329,7 +330,27 @@ export const ProductDetailPage: React.FC = () => {
                             valueColor={currentMargin < 0 ? colors.danger : currentMargin < 10 ? colors.warningIcon : colors.success}
                             highlight
                         />
-                        <InfoRow label="카테고리" value={product.qoo10CategoryPath} />
+                        <InfoRow
+                            label="카테고리"
+                            value={product.qoo10CategoryPath}
+                            action={
+                                <button
+                                    onClick={() => setShowCategoryModal(true)}
+                                    style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '3px',
+                                        background: 'none', border: 'none',
+                                        fontSize: font.size.xs, fontWeight: 600,
+                                        color: colors.text.muted, cursor: 'pointer',
+                                        transition: 'color 0.15s',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.color = colors.primary; }}
+                                    onMouseLeave={e => { e.currentTarget.style.color = colors.text.muted; }}
+                                >
+                                    <PenLine size={11} />
+                                    변경
+                                </button>
+                            }
+                        />
                         <InfoRow label="상품번호" value={result.qoo10ItemCode ?? '—'} mono />
                         <InfoRow label="등록일" value={formatFullDate(result.registeredAt)} />
                     </InfoCard>
@@ -486,6 +507,21 @@ export const ProductDetailPage: React.FC = () => {
                     to { opacity: 1; transform: translateY(0); }
                 }
             `}</style>
+
+            {showCategoryModal && (
+                <CategorySelectModal
+                    currentCode={product.qoo10CategoryId}
+                    currentPath={product.qoo10CategoryPath}
+                    onSelect={(item) => {
+                        updateRegisteredProduct(result.id, {
+                            ...product,
+                            qoo10CategoryPath: item.path,
+                            qoo10CategoryId: item.smallCode,
+                        });
+                    }}
+                    onClose={() => setShowCategoryModal(false)}
+                />
+            )}
         </MainLayout>
     );
 };
@@ -589,7 +625,8 @@ const InfoRow: React.FC<{
     mono?: boolean;
     valueColor?: string;
     suffix?: React.ReactNode;
-}> = ({ label, value, highlight, mono, valueColor, suffix }) => (
+    action?: React.ReactNode;
+}> = ({ label, value, highlight, mono, valueColor, suffix, action }) => (
     <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -611,8 +648,10 @@ const InfoRow: React.FC<{
             fontFamily: mono ? font.family.mono : undefined,
             display: 'flex',
             alignItems: 'center',
+            gap: spacing['2'],
         }}>
             {value}
+            {action}
             {suffix}
         </span>
     </div>

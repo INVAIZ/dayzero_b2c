@@ -3,14 +3,17 @@ import type { ProductDetail } from '../types/editing';
 /** 상품명 앞의 [소싱처] 프리픽스를 제거한다 */
 export const stripPrefix = (title: string) => title.replace(/^\[[^\]]+\]\s*/, '');
 
-/** URL 수집 상품 제목 번역 매핑 (소싱 시 수집되는 타이틀 기준) */
+/** URL 수집 상품 제목 번역 매핑 (소싱 시 수집되는 타이틀 기준)
+ *  Qoo10 가이드라인 자동 적용: 브랜드 등록 상품은 브랜드명 제거, 특수문자·홍보문구 제거 */
 export const KO_TO_JA_TITLE: Record<string, string> = {
-    '[단독기획] 닥터지 레드 블레미쉬 클리어 수딩 크림 70ml+30ml 세트': '【独占企画】Dr.G レッドブレミッシュ クリア スージングクリーム 70ml+30ml セット',
-    '일리윤 세라마이드 아토 집중 크림 200ml 탑퍼 기획': 'illiyoon セラミドアト 集中クリーム 200ml トッパー企画セット',
-    '[NEW/2026년까지] 라네즈 네오 쿠션 매트 15g 본품+리필': '【NEW/2026年まで】LANEIGE ネオクッション マット 15g 本品+リフィル',
-    '코스알엑스 패드 3종 비교 기획세트 (오리지널/모이스쳐/포어리스)': 'COSRX パッド 3種 比較企画セット (オリジナル/モイスチャー/ポアレス)',
-    '클리오 킬커버 더뉴 파운웨어 쿠션 (본품+리필+퍼프2매)': 'CLIO キルカバー ザニュー ファウンウェアクッション (本品+リフィル+パフ2枚)',
-    '[예약판매] 뉴진스 (NewJeans) - 2nd EP [Get Up] (Bunny Beach Bag ver.)': '【予約販売】NewJeans - 2nd EP [Get Up] (Bunny Beach Bag ver.)',
+    // 뷰티 — 브랜드 등록(matched) → 브랜드명·홍보문구·특수문자 제거
+    '[단독기획] 닥터지 레드 블레미쉬 클리어 수딩 크림 70ml+30ml 세트': 'レッドブレミッシュ クリア スージングクリーム 70ml+30ml セット',
+    '일리윤 세라마이드 아토 집중 크림 200ml 탑퍼 기획': 'セラミドアト 集中クリーム 200ml',
+    '[NEW/2026년까지] 라네즈 네오 쿠션 매트 15g 본품+리필': 'ネオクッション マット 15g 本品+リフィル',
+    '코스알엑스 패드 3종 비교 기획세트 (오리지널/모이스쳐/포어리스)': 'パッド 3種 比較セット (オリジナル/モイスチャー/ポアレス)',
+    '클리오 킬커버 더뉴 파운웨어 쿠션 (본품+리필+퍼프2매)': 'キルカバー ザニュー ファウンウェアクッション (本品+リフィル+パフ2枚)',
+    // K-pop — 아티스트명은 브랜드가 아니므로 유지, 특수문자·홍보문구만 제거
+    '[예약판매] 뉴진스 (NewJeans) - 2nd EP [Get Up] (Bunny Beach Bag ver.)': 'NewJeans - 2nd EP [Get Up] (Bunny Beach Bag ver.)',
     '세븐틴 (SEVENTEEN) - 10th Mini Album [FML] (일반반)': 'SEVENTEEN - 10th ミニアルバム [FML] (通常版)',
     '르세라핌 (LE SSERAFIM) - 1st Studio Album [UNFORGIVEN] (Weverse Albums ver.)': 'LE SSERAFIM - 1st スタジオアルバム [UNFORGIVEN] (Weverse Albums ver.)',
     '스트레이 키즈 (Stray Kids) - 5-STAR (Limited Edition)': 'Stray Kids - 5-STAR (Limited Edition)',
@@ -78,3 +81,4 @@ export const isFullyTranslated = (p: ProductDetail): boolean =>
     (p.options.length === 0 || p.options.every(o => !!o.nameJa || !hasKorean(o.nameKo)));
 
 export const hasKorean = (s: string): boolean => /[\uAC00-\uD7AF]/.test(s);
+

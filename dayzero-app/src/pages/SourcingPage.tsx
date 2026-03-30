@@ -45,6 +45,22 @@ export default function SourcingPage() {
         setDraggedId(null);
     };
 
+    const tabStyle = (isActive: boolean): React.CSSProperties => ({
+        padding: `${spacing['3']} ${spacing['6']}`,
+        fontSize: font.size.base,
+        fontWeight: isActive ? font.weight.bold : font.weight.medium,
+        color: isActive ? colors.text.primary : colors.text.muted,
+        background: isActive ? colors.bg.surface : 'transparent',
+        borderRadius: radius.md,
+        border: 'none',
+        boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+        cursor: 'pointer',
+        transition: 'all 0.2s',
+        display: 'flex',
+        alignItems: 'center',
+        gap: spacing['1.5'],
+    });
+
     const renderTabs = () => (
         <div style={{
             display: 'inline-flex',
@@ -53,45 +69,11 @@ export default function SourcingPage() {
             padding: spacing['1'],
             marginBottom: spacing['5']
         }}>
-            <button
-                onClick={() => setActiveTab('auto')}
-                style={{
-                    padding: `${spacing['3']} ${spacing['6']}`,
-                    fontSize: font.size.base,
-                    fontWeight: activeTab === 'auto' ? font.weight.bold : font.weight.medium,
-                    color: activeTab === 'auto' ? colors.text.primary : colors.text.muted,
-                    background: activeTab === 'auto' ? colors.bg.surface : 'transparent',
-                    borderRadius: radius.md,
-                    border: 'none',
-                    boxShadow: activeTab === 'auto' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                }}
-            >
+            <button onClick={() => setActiveTab('auto')} style={tabStyle(activeTab === 'auto')}>
                 <Zap size={16} fill={activeTab === 'auto' ? colors.text.primary : 'none'} color={activeTab === 'auto' ? colors.text.primary : colors.text.muted} />
                 자동 수집
             </button>
-            <button
-                onClick={() => setActiveTab('url')}
-                style={{
-                    padding: `${spacing['3']} ${spacing['6']}`,
-                    fontSize: font.size.base,
-                    fontWeight: activeTab === 'url' ? font.weight.bold : font.weight.medium,
-                    color: activeTab === 'url' ? colors.text.primary : colors.text.muted,
-                    background: activeTab === 'url' ? colors.bg.surface : 'transparent',
-                    borderRadius: radius.md,
-                    border: 'none',
-                    boxShadow: activeTab === 'url' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                }}
-            >
+            <button onClick={() => setActiveTab('url')} style={tabStyle(activeTab === 'url')}>
                 <Link2 size={16} />
                 직접 수집
             </button>
@@ -378,7 +360,7 @@ export default function SourcingPage() {
                                 padding: `${spacing['4']} ${spacing['5']}`,
                                 marginBottom: spacing['6'],
                                 display: 'flex',
-                                alignItems: 'center',
+                                alignItems: 'flex-start',
                                 gap: spacing['4'],
                             }}>
                                 <div style={{
@@ -393,12 +375,12 @@ export default function SourcingPage() {
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.text.tertiary, marginBottom: spacing['1'] }}>
-                                        자동 수집 설정
+                                        자동 수집
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'], marginBottom: spacing['2'], flexWrap: 'wrap' }}>
-                                        <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary }}>
+                                        <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.primary }}>
                                             {schedules.length}건
-                                            <span style={{ fontWeight: font.weight.medium, color: colors.text.muted, fontSize: font.size.sm }}> / 최대 10건</span>
+                                            <span style={{ fontWeight: font.weight.medium, color: colors.text.muted, fontSize: font.size.sm }}> / 최대 3건</span>
                                         </span>
                                         <span style={{
                                             fontSize: font.size['2xs'], fontWeight: font.weight.semibold, color: colors.primary,
@@ -408,8 +390,8 @@ export default function SourcingPage() {
                                             무료 플랜
                                         </span>
                                     </div>
-                                    <div style={{ fontSize: font.size.sm, color: colors.text.tertiary, lineHeight: '1.5', display: 'flex', alignItems: 'flex-start', gap: spacing['1'] }}>
-                                        <Clock size={12} color={colors.text.muted} style={{ flexShrink: 0, marginTop: '2px' }} />
+                                    <div style={{ fontSize: font.size.sm, color: colors.text.tertiary, lineHeight: '1.5', display: 'flex', alignItems: 'center', gap: spacing['1'] }}>
+                                        <Clock size={12} color={colors.text.muted} style={{ flexShrink: 0 }} />
                                         설정한 시간에 매일 자동으로 상품을 수집해요.
                                     </div>
                                 </div>

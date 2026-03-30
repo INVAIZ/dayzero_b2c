@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronDown, FileText } from 'lucide-react';
 import OnboardingLayout from '../../components/onboarding/OnboardingLayout';
 import { useOnboardingTransition } from '../../components/onboarding/useOnboardingTransition';
 import { colors, font, radius, spacing, shadow } from '../../design/tokens';
@@ -37,6 +37,20 @@ const PRESETS: ForwarderPreset[] = [
         addressLine2: '国際エキスプレス 福岡保税倉庫',
     },
     {
+        id: 'enterround',
+        label: '엔터라운드 (Enter Round)',
+        zipCode: '121-0836',
+        addressLine1: '東京都足立区入谷9-27-1',
+        addressLine2: 'エンターラウンド 東京物流センター',
+    },
+    {
+        id: 'hanjin',
+        label: '한진 원클릭 (Hanjin Express)',
+        zipCode: '230-0054',
+        addressLine1: '神奈川県横浜市鶴見区大黒ふ頭15-1',
+        addressLine2: '韓進エクスプレス 横浜デポ',
+    },
+    {
         id: 'other',
         label: '직접 입력하기 (기타)',
         zipCode: '',
@@ -49,6 +63,10 @@ export default function BasicInfoPage() {
     const { state, setState } = useOnboarding();
     const { exiting, transitionTo } = useOnboardingTransition();
     const [step, setStep] = useState(1);
+    const isRevisit = (state.visitedPages ?? []).includes('basic-info');
+    const [showIntro, setShowIntro] = useState(!isRevisit);
+    const [introFading, setIntroFading] = useState(false);
+    const [introLine, setIntroLine] = useState(isRevisit ? 3 : 0);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +84,25 @@ export default function BasicInfoPage() {
 
     const updateState = (updates: Partial<typeof state>) => {
         setState(prev => ({ ...prev, ...updates }));
+    };
+
+    const [introReady, setIntroReady] = useState(isRevisit);
+
+    useEffect(() => {
+        if (isRevisit) return;
+        const t1 = setTimeout(() => setIntroLine(1), 300);
+        const t2 = setTimeout(() => setIntroLine(2), 1300);
+        const t3 = setTimeout(() => setIntroLine(3), 2300);
+        const t4 = setTimeout(() => setIntroReady(true), 3100);
+        return () => { [t1, t2, t3, t4].forEach(clearTimeout); };
+    }, [isRevisit]);
+
+    const handleIntroDone = () => {
+        setIntroFading(true);
+        setTimeout(() => setShowIntro(false), 600);
+        if (!isRevisit) {
+            setState(prev => ({ ...prev, visitedPages: [...prev.visitedPages, 'basic-info'] }));
+        }
     };
 
     useEffect(() => {
@@ -144,12 +181,86 @@ export default function BasicInfoPage() {
     return (
         <OnboardingLayout currentStep={2} exiting={exiting} onStepClick={(stepId) => { if (stepId === 1) transitionTo('/qoo10-connect'); if (stepId === 3) transitionTo('/basic-margin'); }}>
             <div style={{ padding: `0 ${spacing['5']}` }}>
+                {showIntro ? (
+                    <div style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        minHeight: '320px', textAlign: 'center',
+                        opacity: introFading ? 0 : 1,
+                        transform: introFading ? 'translateY(-16px)' : 'translateY(0)',
+                        transition: 'opacity 0.6s ease, transform 0.6s ease',
+                    }}>
+                        <p style={{
+                            fontSize: '24px', fontWeight: font.weight.semibold,
+                            color: colors.text.primary, lineHeight: '1.4',
+                            wordBreak: 'keep-all', margin: '0 0 10px', letterSpacing: '-0.5px',
+                            opacity: introLine >= 1 ? 1 : 0,
+                            transform: introLine >= 1 ? 'translateY(0)' : 'translateY(10px)',
+                            transition: 'opacity 0.6s ease, transform 0.6s ease',
+                        }}>
+                            일본에 상품을 보내려면
+                        </p>
+                        <p style={{
+                            fontSize: '24px', fontWeight: font.weight.semibold,
+                            color: colors.text.primary, lineHeight: '1.4',
+                            wordBreak: 'keep-all', margin: '0 0 10px', letterSpacing: '-0.5px',
+                            opacity: introLine >= 2 ? 1 : 0,
+                            transform: introLine >= 2 ? 'translateY(0)' : 'translateY(10px)',
+                            transition: 'opacity 0.6s ease, transform 0.6s ease',
+                        }}>
+                            몇 가지{' '}
+                            <span style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '9px',
+                                padding: '6px 16px', borderRadius: '10px',
+                                border: '2px solid #D9D9D9',
+                                background: '#FFFFFF',
+                                verticalAlign: 'middle',
+                                fontSize: '20px', fontWeight: font.weight.semibold,
+                                margin: '0 4px',
+                                position: 'relative', top: '-2px',
+                            }}>
+                                <FileText size={18} color={colors.primary} style={{ flexShrink: 0 }} />
+                                기본 정보
+                            </span>
+                            가 필요해요.
+                        </p>
+                        <p style={{
+                            fontSize: '24px', fontWeight: font.weight.semibold,
+                            color: colors.text.primary, lineHeight: '1.4',
+                            wordBreak: 'keep-all', margin: '0 0 10px', letterSpacing: '-0.5px',
+                            opacity: introLine >= 3 ? 1 : 0,
+                            transform: introLine >= 3 ? 'translateY(0)' : 'translateY(10px)',
+                            transition: 'opacity 0.6s ease, transform 0.6s ease',
+                        }}>
+                            같이 채워볼까요?
+                        </p>
+                        <button
+                            onClick={handleIntroDone}
+                            style={{
+                                width: '48px', height: '48px',
+                                background: colors.primary, color: colors.bg.surface,
+                                border: 'none', borderRadius: radius.full,
+                                cursor: 'pointer', marginTop: spacing['6'],
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                opacity: introReady ? 1 : 0,
+                                transform: introReady ? 'translateY(0)' : 'translateY(10px)',
+                                transitionProperty: 'opacity, transform',
+                                transitionDuration: '0.5s',
+                                transitionTimingFunction: 'ease',
+                            }}
+                            onMouseDown={e => e.currentTarget.style.transform = 'scale(0.92)'}
+                            onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                        >
+                            <ArrowRight size={22} />
+                        </button>
+                    </div>
+                ) : (
+                <>
                 {/* Step 1: Forwarder + Address + Return Address */}
                 {step === 1 && (
                     <div style={{ animation: 'fadeSlideIn 0.3s ease' }}>
                         <h2 style={{
                             fontSize: '26px',
-                            fontWeight: 800,
+                            fontWeight: font.weight.bold,
                             color: colors.text.primary,
                             textAlign: 'center',
                             margin: `0 0 ${spacing['3']}`,
@@ -389,7 +500,7 @@ export default function BasicInfoPage() {
                     <div style={{ animation: 'fadeSlideIn 0.3s ease' }}>
                         <h2 style={{
                             fontSize: '26px',
-                            fontWeight: 800,
+                            fontWeight: font.weight.bold,
                             color: colors.text.primary,
                             textAlign: 'center',
                             margin: `0 0 ${spacing['3']}`,
@@ -496,11 +607,25 @@ export default function BasicInfoPage() {
                         </button>
                     )}
                 </div>
+                </>
+                )}
 
                 <style>{`
                     @keyframes fadeSlideIn {
                         from { opacity: 0; transform: translateY(8px); }
                         to { opacity: 1; transform: translateY(0); }
+                    }
+                    @keyframes introPopIn {
+                        from { opacity: 0; transform: scale(0.6); }
+                        to { opacity: 1; transform: scale(1); }
+                    }
+                    @keyframes introTextIn {
+                        from { opacity: 0; transform: translateY(12px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                    @keyframes introCardIn {
+                        from { opacity: 0; transform: translateY(16px) scale(0.96); }
+                        to { opacity: 1; transform: translateY(0) scale(1); }
                     }
                 `}</style>
             </div>

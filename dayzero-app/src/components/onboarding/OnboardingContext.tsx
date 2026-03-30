@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, type ReactNode } from 'react';
 
-export type ForwarderValue = 'qx' | 'rincos' | 'kse' | 'other' | '';
+export type ForwarderValue = 'qx' | 'rincos' | 'kse' | 'enterround' | 'hanjin' | 'other' | '';
 
 interface OnboardingState {
     apiKey: string;
@@ -25,6 +25,9 @@ interface OnboardingState {
     domesticShipping: number;
     prepCost: number;
     intlShipping: number;
+
+    // 방문 기록
+    visitedPages: string[];
 }
 
 interface OnboardingContextProps {
@@ -54,6 +57,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         domesticShipping: 0,
         prepCost: 0,
         intlShipping: 0,
+        visitedPages: [],
     });
 
     return (

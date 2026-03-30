@@ -34,11 +34,17 @@ export interface ProductDetail {
 
     // Qoo10 카테고리 (자동 매핑)
     qoo10CategoryId: string;
-    qoo10CategoryPath: string;    // 표시용 "패션 > 여성의류 > 원피스"
-    aiRecommendedCategoryPath: string; // AI가 최초 추천한 카테고리 (변경 추적용)
+    qoo10CategoryPath: string;    // 표시용 "스킨케어 > 기초화장품 > 에센스"
+    aiRecommendedCategoryId: string;   // AI가 최초 추천한 소분류 코드
+    aiRecommendedCategoryPath: string; // AI가 최초 추천한 카테고리 경로 (변경 추적용)
+
+    // 브랜드 (Qoo10 DB 매칭)
+    brand: string;
+    brandMatchStatus: 'matched' | 'unmatched' | 'none'; // matched=Qoo10 DB 등록, unmatched=미등록, none=브랜드없음
+    brandQoo10Code?: string; // Qoo10 브랜드 코드 (현재 선택)
+    aiRecommendedBrandCode?: string; // AI가 최초 추천한 Qoo10 브랜드 코드 (변경 추적용)
 
     // 상품 기본 정보
-    brand: string;
     manufacturer: string;
     productionPlace: string; // 원산지
     sourceCategoryPath: string; // 소싱처 원본 카테고리
@@ -60,6 +66,8 @@ export interface ProductDetail {
     isWeightEstimated: boolean; // deprecated — weightSource 사용
     weightSource: 'crawled' | 'ai' | 'manual';
     priceSource: 'crawled' | 'ai' | 'manual';
+    shippingType: 'standard' | 'sameday' | 'preorder'; // 일반발송 | 당일발송 | 예약발송
+    shippingDays: number; // 발송까지 영업일 수
     isReTranslating?: boolean;
 }
 

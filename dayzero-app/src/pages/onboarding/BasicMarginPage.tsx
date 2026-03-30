@@ -12,17 +12,8 @@ const DAILY_EXCHANGE_RATE = 9.2;
 interface RateRow { maxKg: number; fee: number }
 
 const FORWARDER_RATES: Record<string, { label: string; rows: RateRow[] }> = {
-    kse: {
-        label: 'KSE 국제로지스틱',
-        rows: [
-            { maxKg: 0.10, fee: 490 }, { maxKg: 0.25, fee: 560 }, { maxKg: 0.50, fee: 620 },
-            { maxKg: 0.75, fee: 700 }, { maxKg: 1.00, fee: 750 }, { maxKg: 1.25, fee: 780 },
-            { maxKg: 1.50, fee: 830 }, { maxKg: 1.75, fee: 880 }, { maxKg: 2.00, fee: 940 },
-            { maxKg: 2.50, fee: 1090 },
-        ],
-    },
     qx: {
-        label: '큐익스프레스',
+        label: '큐익스프레스 (Qxpress)',
         rows: [
             { maxKg: 0.10, fee: 433 }, { maxKg: 0.25, fee: 537 }, { maxKg: 0.50, fee: 622 },
             { maxKg: 0.75, fee: 750 }, { maxKg: 1.00, fee: 881 }, { maxKg: 1.25, fee: 975 },
@@ -31,12 +22,39 @@ const FORWARDER_RATES: Record<string, { label: string; rows: RateRow[] }> = {
         ],
     },
     rincos: {
-        label: '링코스',
+        label: '링코스 (Rincos)',
         rows: [
             { maxKg: 0.10, fee: 450 }, { maxKg: 0.25, fee: 545 }, { maxKg: 0.50, fee: 615 },
             { maxKg: 0.75, fee: 690 }, { maxKg: 1.00, fee: 810 }, { maxKg: 1.25, fee: 860 },
             { maxKg: 1.50, fee: 920 }, { maxKg: 1.75, fee: 970 }, { maxKg: 2.00, fee: 1050 },
             { maxKg: 2.50, fee: 1180 },
+        ],
+    },
+    kse: {
+        label: 'KSE 국제로지스틱 (Kokusai Express)',
+        rows: [
+            { maxKg: 0.10, fee: 490 }, { maxKg: 0.25, fee: 560 }, { maxKg: 0.50, fee: 620 },
+            { maxKg: 0.75, fee: 700 }, { maxKg: 1.00, fee: 750 }, { maxKg: 1.25, fee: 780 },
+            { maxKg: 1.50, fee: 830 }, { maxKg: 1.75, fee: 880 }, { maxKg: 2.00, fee: 940 },
+            { maxKg: 2.50, fee: 1090 },
+        ],
+    },
+    enterround: {
+        label: '엔터라운드 (Enter Round)',
+        rows: [
+            { maxKg: 0.10, fee: 410 }, { maxKg: 0.25, fee: 500 }, { maxKg: 0.50, fee: 590 },
+            { maxKg: 0.75, fee: 670 }, { maxKg: 1.00, fee: 760 }, { maxKg: 1.25, fee: 820 },
+            { maxKg: 1.50, fee: 890 }, { maxKg: 1.75, fee: 940 }, { maxKg: 2.00, fee: 1000 },
+            { maxKg: 2.50, fee: 1120 },
+        ],
+    },
+    hanjin: {
+        label: '한진 원클릭 (Hanjin Express)',
+        rows: [
+            { maxKg: 0.10, fee: 380 }, { maxKg: 0.25, fee: 470 }, { maxKg: 0.50, fee: 560 },
+            { maxKg: 0.75, fee: 650 }, { maxKg: 1.00, fee: 740 }, { maxKg: 1.25, fee: 800 },
+            { maxKg: 1.50, fee: 860 }, { maxKg: 1.75, fee: 920 }, { maxKg: 2.00, fee: 980 },
+            { maxKg: 2.50, fee: 1090 },
         ],
     },
 };
@@ -114,6 +132,8 @@ function WeightDropdown({ value, onChange }: { value: number; onChange: (v: numb
     );
 }
 
+/* ── 공통 스타일 ── */
+
 const inputStyles: React.CSSProperties = {
     width: '100%',
     padding: spacing['4'],
@@ -136,55 +156,106 @@ const labelStyles: React.CSSProperties = {
     marginBottom: spacing['2'],
 };
 
+const introLineStyle: React.CSSProperties = {
+    fontSize: '24px',
+    fontWeight: font.weight.semibold,
+    color: colors.text.primary,
+    lineHeight: '1.4',
+    wordBreak: 'keep-all',
+    margin: '0 0 10px',
+    letterSpacing: '-0.5px',
+    transition: 'opacity 0.6s ease, transform 0.6s ease',
+};
+
+const cardStyle: React.CSSProperties = {
+    background: colors.bg.surface,
+    borderRadius: radius.xl,
+    padding: spacing['8'],
+    boxShadow: shadow.sm,
+    border: `1px solid ${colors.bg.subtle}`,
+    animation: 'fadeSlideIn 0.3s ease',
+};
+
+const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.style.borderColor = colors.primary;
+    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(49, 130, 246, 0.1)';
+};
+
+const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.style.borderColor = colors.border.default;
+    e.currentTarget.style.boxShadow = 'none';
+};
+
+const MARGIN_SIGNALS = {
+    danger: { bg: '#FEF2F2', border: '#FECACA', text: '#DC2626', Icon: AlertTriangle },
+    warning: { bg: '#FFF7ED', border: '#FED7AA', text: '#EA580C', Icon: TrendingUp },
+    success: { bg: colors.bg.info, border: colors.primaryLightBorder, text: colors.primary, Icon: CheckCircle },
+} as const;
+
+const STEP_TITLES: Record<number, { title: string; desc: string }> = {
+    1: {
+        title: '작업비를 설정해주세요',
+        desc: '배송대행사에 포장·검수를 맡기고 있다면 해당 비용을 입력해주세요.',
+    },
+    2: {
+        title: '해외 배송비를 설정해주세요',
+        desc: '한국에서 일본 소비자에게 배송할 때 발생하는 국제 배송 비용입니다.',
+    },
+    3: {
+        title: '기본 마진율을 설정해주세요',
+        desc: '설정한 마진율이 모든 상품에 기본 적용됩니다. 상품별로 나중에 변경할 수 있어요.',
+    },
+};
+
+/* ── 메인 컴포넌트 ── */
+
 export default function BasicMarginPage() {
     const { state, setState } = useOnboarding();
     const { exiting, transitionTo } = useOnboardingTransition();
     const [step, setStep] = useState(1);
+    const isRevisit = (state.visitedPages ?? []).includes('basic-margin');
+    const [showIntro, setShowIntro] = useState(!isRevisit);
+    const [introFading, setIntroFading] = useState(false);
+    const [introLine, setIntroLine] = useState(isRevisit ? 3 : 0);
+    const [introReady, setIntroReady] = useState(isRevisit);
+
+    useEffect(() => {
+        if (isRevisit) return;
+        const t1 = setTimeout(() => setIntroLine(1), 300);
+        const t2 = setTimeout(() => setIntroLine(2), 1300);
+        const t3 = setTimeout(() => setIntroLine(3), 2300);
+        const t4 = setTimeout(() => setIntroReady(true), 3100);
+        return () => { [t1, t2, t3, t4].forEach(clearTimeout); };
+    }, [isRevisit]);
+
+    const handleIntroDone = () => {
+        setIntroFading(true);
+        setTimeout(() => setShowIntro(false), 600);
+        if (!isRevisit) {
+            setState(prev => ({ ...prev, visitedPages: [...prev.visitedPages, 'basic-margin'] }));
+        }
+    };
 
     const { marginValue, prepCost, intlShipping, forwarder } = state;
     const updateState = (updates: Partial<typeof state>) => setState(prev => ({ ...prev, ...updates }));
 
     const hasForwarderRate = forwarder !== '' && forwarder !== 'other';
-    const forwarderLabel = hasForwarderRate ? FORWARDER_RATES[forwarder]?.label ?? '' : '';
-
-    // 배송비 계산용 배송대행사 (기본: 앞에서 선택한 것, 이 페이지에서 변경 가능)
-    type ShippingMode = 'auto' | 'manual';
-    const [shippingMode, setShippingMode] = useState<ShippingMode>(hasForwarderRate ? 'auto' : 'manual');
-    const [shippingForwarder, setShippingForwarder] = useState<string>(hasForwarderRate ? forwarder : '');
-    const [isShippingDropdownOpen, setIsShippingDropdownOpen] = useState(false);
-    const shippingDropdownRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        function handleClick(e: MouseEvent) {
-            if (shippingDropdownRef.current && !shippingDropdownRef.current.contains(e.target as Node))
-                setIsShippingDropdownOpen(false);
-        }
-        document.addEventListener('mousedown', handleClick);
-        return () => document.removeEventListener('mousedown', handleClick);
-    }, []);
-
-    const activeForwarder = shippingMode === 'auto' ? shippingForwarder : '';
+    const activeForwarder = hasForwarderRate ? forwarder : '';
 
     const [showComplete, setShowComplete] = useState(false);
-    const [showSimulation, setShowSimulation] = useState(false);
     const [showCalculation, setShowCalculation] = useState(false);
     const [simBaseCost, setSimBaseCost] = useState(15000);
     const [simWeight, setSimWeight] = useState(0.3);
 
     const exchangeRate = DAILY_EXCHANGE_RATE;
 
-    const shippingJpy = shippingMode === 'auto' && activeForwarder
+    const shippingJpy = activeForwarder
         ? lookupShippingFee(activeForwarder as ForwarderValue, simWeight)
         : intlShipping;
 
     const { marginAmount, totalCostKrw, finalPriceJpy, payoutKrw, actualProfitKrw } = useMemo(() => {
-        // 셀러 총 비용 (원가 + 작업비)
         const costKrw = simBaseCost + prepCost;
-        // 셀러가 원하는 수익
         const desiredProfit = Math.round(costKrw * (marginValue / 100));
-        // 역산: 수수료·배송비 감안해서 실제 수익이 마진율%가 되는 판매가 산출
-        // payoutJpy * exchangeRate = costKrw + desiredProfit + shippingJpy * exchangeRate
-        // sellingPrice * (1 - feeRate) = 필요한 payoutJpy
         const shippingCostKrw = Math.round(shippingJpy * exchangeRate);
         const requiredPayoutKrw = costKrw + desiredProfit + shippingCostKrw;
         const requiredPayoutJpy = Math.round(requiredPayoutKrw / exchangeRate);
@@ -219,47 +290,107 @@ export default function BasicMarginPage() {
         { icon: <Package size={14} />, label: `− 원가·작업비·배송비 → 순수익`, value: `₩${actualProfitKrw.toLocaleString()}`, highlight: true },
     ];
 
-    const stepTitles: Record<number, { title: string; desc: string }> = {
-        1: {
-            title: '작업비를 설정해주세요',
-            desc: '배송대행사에 포장·검수를 맡기고 있다면 해당 비용을 입력해주세요.',
-        },
-        2: {
-            title: '해외 배송비를 설정해주세요',
-            desc: '한국에서 일본 소비자에게 배송할 때 발생하는 국제 배송 비용입니다.',
-        },
-        3: {
-            title: '기본 마진율을 설정해주세요',
-            desc: '설정한 마진율이 모든 상품에 기본 적용됩니다. 상품별로 나중에 변경할 수 있어요.',
-        },
-    };
+    // Step 3: 마진 시그널 계산
+    const marginSignal = marginValue < 15
+        ? { text: '마진이 너무 낮아요. 판매해도 수익이 거의 남지 않을 수 있어요.', sliderColor: colors.danger, type: 'danger' as const }
+        : marginValue < 25
+            ? { text: '가격은 경쟁력 있지만, 수익이 많지 않을 수 있어요.', sliderColor: '#E67E22', type: 'warning' as const }
+            : marginValue <= 40
+                ? { text: '적정 마진율이에요. 초보 셀러에게 권장하는 범위입니다.', sliderColor: colors.primary, type: 'success' as const }
+                : marginValue <= 50
+                    ? { text: '경쟁 상품 대비 가격이 높아 판매가 어려울 수 있어요.', sliderColor: '#E67E22', type: 'warning' as const }
+                    : { text: '가격이 너무 높아요. 경쟁 상품 대비 판매가 어려울 수 있어요.', sliderColor: colors.danger, type: 'danger' as const };
+
+    const sliderPct = ((marginValue - 5) / (60 - 5)) * 100;
+    const signalStyles = MARGIN_SIGNALS[marginSignal.type];
 
     return (
         <>
             <OnboardingLayout currentStep={3} exiting={exiting} onStepClick={(stepId) => { if (stepId === 1) transitionTo('/qoo10-connect'); if (stepId === 2) transitionTo('/basic-info'); }}>
                 <div style={{ padding: `0 ${spacing['5']}` }}>
+                    {showIntro ? (
+                        <div style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                            minHeight: '320px', textAlign: 'center',
+                            opacity: introFading ? 0 : 1,
+                            transform: introFading ? 'translateY(-16px)' : 'translateY(0)',
+                            transition: 'opacity 0.6s ease, transform 0.6s ease',
+                        }}>
+                            <p style={{
+                                ...introLineStyle,
+                                opacity: introLine >= 1 ? 1 : 0,
+                                transform: introLine >= 1 ? 'translateY(0)' : 'translateY(10px)',
+                            }}>
+                                판매 가격을 자동으로 계산하려면
+                            </p>
+                            <p style={{
+                                ...introLineStyle,
+                                opacity: introLine >= 2 ? 1 : 0,
+                                transform: introLine >= 2 ? 'translateY(0)' : 'translateY(10px)',
+                            }}>
+                                <span style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: '9px',
+                                    padding: '6px 16px', borderRadius: '10px',
+                                    border: '2px solid #D9D9D9',
+                                    background: '#FFFFFF',
+                                    verticalAlign: 'middle',
+                                    fontSize: '20px', fontWeight: font.weight.semibold,
+                                    marginRight: '4px',
+                                    position: 'relative', top: '-2px',
+                                }}>
+                                    <Calculator size={18} color={colors.primary} style={{ flexShrink: 0 }} />
+                                    배송비/마진
+                                </span>
+                                에 대한 기본 설정이 필요해요.
+                            </p>
+                            <p style={{
+                                ...introLineStyle,
+                                opacity: introLine >= 3 ? 1 : 0,
+                                transform: introLine >= 3 ? 'translateY(0)' : 'translateY(10px)',
+                            }}>
+                                순서대로 설정해볼게요.
+                            </p>
+                            <button
+                                onClick={handleIntroDone}
+                                style={{
+                                    width: '48px', height: '48px',
+                                    background: colors.primary, color: colors.bg.surface,
+                                    border: 'none', borderRadius: radius.full,
+                                    cursor: 'pointer', marginTop: spacing['6'],
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    opacity: introReady ? 1 : 0,
+                                    transform: introReady ? 'translateY(0)' : 'translateY(10px)',
+                                    transitionProperty: 'opacity, transform',
+                                    transitionDuration: '0.5s',
+                                    transitionTimingFunction: 'ease',
+                                }}
+                                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.92)'}
+                                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                                <ArrowRight size={22} />
+                            </button>
+                        </div>
+                    ) : (
+                        <>
                     <h2 style={{
-                        fontSize: '26px', fontWeight: 800, color: colors.text.primary,
+                        fontSize: '26px', fontWeight: font.weight.bold, color: colors.text.primary,
                         textAlign: 'center', margin: `0 0 ${spacing['3']}`, letterSpacing: '-0.5px',
+                        animation: 'fadeSlideIn 0.4s ease both',
                     }}>
-                        {stepTitles[step].title}
+                        {STEP_TITLES[step].title}
                     </h2>
                     <p style={{
                         fontSize: font.size.base, color: colors.text.tertiary,
                         textAlign: 'center', margin: `0 0 ${spacing['8']}`,
                         lineHeight: font.lineHeight.normal, wordBreak: 'keep-all',
+                        animation: 'fadeSlideIn 0.4s ease 0.05s both',
                     }}>
-                        {stepTitles[step].desc}
+                        {STEP_TITLES[step].desc}
                     </p>
 
                     {/* Step 1: 작업비 */}
                     {step === 1 && (
-                        <div style={{
-                            background: colors.bg.surface, borderRadius: radius.xl,
-                            padding: spacing['8'], boxShadow: shadow.sm,
-                            border: `1px solid ${colors.bg.subtle}`,
-                            animation: 'fadeSlideIn 0.3s ease',
-                        }}>
+                        <div style={cardStyle}>
                             <label style={labelStyles}>
                                 작업비 (포장·검수비) <span style={{ color: colors.primary }}>*</span>
                             </label>
@@ -270,14 +401,8 @@ export default function BasicMarginPage() {
                                     onChange={e => updateState({ prepCost: Number(e.target.value) })}
                                     placeholder="0"
                                     style={{ ...inputStyles, paddingLeft: '32px' }}
-                                    onFocus={e => {
-                                        e.currentTarget.style.borderColor = colors.primary;
-                                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(49, 130, 246, 0.1)';
-                                    }}
-                                    onBlur={e => {
-                                        e.currentTarget.style.borderColor = colors.border.default;
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}
+                                    onFocus={handleInputFocus}
+                                    onBlur={handleInputBlur}
                                 />
                                 <span style={{
                                     position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
@@ -285,7 +410,6 @@ export default function BasicMarginPage() {
                                 }}>₩</span>
                             </div>
 
-                            {/* 작업비 설명 카드 */}
                             <div style={{
                                 marginTop: spacing['5'],
                                 padding: spacing['4'],
@@ -306,137 +430,77 @@ export default function BasicMarginPage() {
 
                     {/* Step 2: 해외 배송비 */}
                     {step === 2 && (
-                        <div style={{
-                            background: colors.bg.surface, borderRadius: radius.xl,
-                            padding: spacing['8'], boxShadow: shadow.sm,
-                            border: `1px solid ${colors.bg.subtle}`,
-                            animation: 'fadeSlideIn 0.3s ease',
-                            display: 'flex', flexDirection: 'column', gap: spacing['5'],
-                        }}>
-                            {/* 앞에서 선택한 배송대행사 안내 */}
-                            {/* 배송대행사 드롭다운 (직접 설정 포함) */}
+                        <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', gap: spacing['5'] }}>
                             <div>
-                                <label style={labelStyles}>배송대행사 선택</label>
-                                <div style={{ position: 'relative' }} ref={shippingDropdownRef}>
-                                    <div
-                                        onClick={() => setIsShippingDropdownOpen(!isShippingDropdownOpen)}
-                                        style={{
-                                            ...inputStyles,
-                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                            cursor: 'pointer', userSelect: 'none',
-                                            color: (shippingMode === 'auto' && shippingForwarder) || shippingMode === 'manual' ? colors.text.primary : colors.text.muted,
-                                            borderColor: isShippingDropdownOpen ? colors.primary : colors.border.default,
-                                            boxShadow: isShippingDropdownOpen ? '0 0 0 3px rgba(49, 130, 246, 0.1)' : 'none',
-                                        }}
-                                    >
-                                        <span>
-                                            {shippingMode === 'manual'
-                                                ? '직접 설정'
-                                                : shippingForwarder
-                                                    ? FORWARDER_RATES[shippingForwarder]?.label
-                                                    : '배송대행사를 선택해주세요'}
-                                        </span>
-                                        <ChevronDown size={20} color={isShippingDropdownOpen ? colors.primary : colors.text.muted}
-                                            style={{ transform: isShippingDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
-                                    </div>
-                                    {isShippingDropdownOpen && (
-                                        <div style={{
-                                            position: 'absolute', top: 'calc(100% + 8px)', left: 0, width: '100%',
-                                            background: colors.bg.surface, border: `1px solid ${colors.border.default}`,
-                                            borderRadius: radius.lg, boxShadow: shadow.md, overflow: 'hidden', zIndex: 10,
+                                <label style={labelStyles}>배송대행사</label>
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                    padding: spacing['4'], borderRadius: radius.lg,
+                                    border: `1px solid ${colors.border.default}`,
+                                    background: colors.bg.subtle,
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                                        <Truck size={16} color={hasForwarderRate ? colors.primary : colors.text.muted} />
+                                        <span style={{
+                                            fontSize: font.size.base, fontWeight: font.weight.semibold,
+                                            color: hasForwarderRate ? colors.text.primary : colors.text.muted,
                                         }}>
-                                            {Object.entries(FORWARDER_RATES).map(([key, val]) => (
-                                                <div key={key}
-                                                    onClick={() => {
-                                                        setShippingForwarder(key);
-                                                        setShippingMode('auto');
-                                                        setIsShippingDropdownOpen(false);
-                                                    }}
-                                                    style={{
-                                                        padding: spacing['4'], fontSize: font.size.base, cursor: 'pointer',
-                                                        transition: 'background 0.2s',
-                                                        background: shippingMode === 'auto' && shippingForwarder === key ? colors.primaryLight : colors.bg.surface,
-                                                        color: shippingMode === 'auto' && shippingForwarder === key ? colors.primary : colors.text.primary,
-                                                        fontWeight: shippingMode === 'auto' && shippingForwarder === key ? font.weight.semibold : font.weight.regular,
-                                                    }}
-                                                    onMouseEnter={e => { if (!(shippingMode === 'auto' && shippingForwarder === key)) e.currentTarget.style.background = colors.bg.page; }}
-                                                    onMouseLeave={e => { if (!(shippingMode === 'auto' && shippingForwarder === key)) e.currentTarget.style.background = colors.bg.surface; }}
-                                                >
-                                                    {val.label}
-                                                </div>
-                                            ))}
-                                            {/* 요율표 없이 직접 설정 옵션 */}
-                                            <div
-                                                onClick={() => {
-                                                    setShippingMode('manual');
-                                                    setShippingForwarder('');
-                                                    setIsShippingDropdownOpen(false);
-                                                }}
-                                                style={{
-                                                    padding: spacing['4'], fontSize: font.size.base, cursor: 'pointer',
-                                                    transition: 'background 0.2s',
-                                                    borderTop: `1px solid ${colors.bg.subtle}`,
-                                                    background: shippingMode === 'manual' ? colors.primaryLight : colors.bg.surface,
-                                                    color: shippingMode === 'manual' ? colors.primary : colors.text.tertiary,
-                                                    fontWeight: shippingMode === 'manual' ? font.weight.semibold : font.weight.regular,
-                                                }}
-                                                onMouseEnter={e => { if (shippingMode !== 'manual') e.currentTarget.style.background = colors.bg.page; }}
-                                                onMouseLeave={e => { if (shippingMode !== 'manual') e.currentTarget.style.background = colors.bg.surface; }}
-                                            >
-                                                직접 설정
-                                            </div>
-                                        </div>
-                                    )}
+                                            {hasForwarderRate
+                                                ? FORWARDER_RATES[forwarder]?.label
+                                                : forwarder === 'other' ? '직접 입력 (기타)' : '선택된 배송대행사 없음'}
+                                        </span>
+                                    </div>
                                 </div>
-                                {/* 드롭다운 아래 안내 */}
-                                {hasForwarderRate && shippingMode === 'auto' && shippingForwarder === forwarder && (
-                                    <p style={{ margin: `${spacing['2']} 0 0`, fontSize: font.size.sm, color: colors.text.muted }}>
-                                        출하지 설정에서 선택한 배송대행사가 적용되어 있어요. 다른 대행사로 변경할 수도 있어요.
-                                    </p>
-                                )}
+                                <p style={{ margin: `${spacing['2']} 0 0`, fontSize: font.size.sm, color: colors.text.muted }}>
+                                    이전 단계(기본 정보)에서 선택한 배송대행사가 적용되어 있습니다.
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => transitionTo('/basic-info')}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '4px',
+                                        fontSize: font.size.sm, fontWeight: font.weight.semibold,
+                                        color: colors.primary, background: 'transparent',
+                                        border: 'none', cursor: 'pointer', padding: `${spacing['1']} 0`, marginTop: spacing['1'],
+                                    }}
+                                >
+                                    다른 배송대행사를 쓰시나요? <ChevronRight size={14} />
+                                </button>
                             </div>
 
-                            {/* 요율표 (auto 모드 + 배송대행사 선택됨) */}
-                            {shippingMode === 'auto' && shippingForwarder && (
+                            {hasForwarderRate && (
                                 <div style={{
                                     background: colors.bg.info, border: `1px solid ${colors.primaryLightBorder}`,
                                     borderRadius: radius.lg, padding: spacing['4'],
                                     display: 'flex', flexDirection: 'column', gap: spacing['2'],
                                     animation: 'fadeSlideIn 0.25s ease',
                                 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                                        <Truck size={14} color={colors.primary} />
-                                        <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary }}>
-                                            {FORWARDER_RATES[shippingForwarder]?.label} 요율표 적용
-                                        </span>
-                                    </div>
                                     <p style={{ margin: 0, fontSize: font.size.sm, color: colors.text.tertiary, lineHeight: font.lineHeight.normal }}>
                                         상품 무게에 따라 배송비가 자동으로 계산됩니다.
                                     </p>
                                     <div style={{
-                                            background: colors.bg.surface, borderRadius: radius.md,
-                                            padding: `${spacing['3']} ${spacing['3']}`,
-                                            border: `1px solid ${colors.border.default}`, fontSize: font.size.xs,
-                                        }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontWeight: font.weight.semibold, color: colors.text.secondary }}>
-                                                <span>무게</span><span>배송비</span>
-                                            </div>
-                                            {FORWARDER_RATES[shippingForwarder]?.rows.map((row, i) => (
-                                                <div key={i} style={{
-                                                    display: 'flex', justifyContent: 'space-between',
-                                                    padding: '3px 0', color: colors.text.tertiary,
-                                                    borderTop: i > 0 ? `1px solid ${colors.bg.subtle}` : 'none',
-                                                }}>
-                                                    <span>~{row.maxKg}kg</span>
-                                                    <span style={{ fontWeight: font.weight.semibold, color: colors.text.primary }}>¥{row.fee.toLocaleString()}</span>
-                                                </div>
-                                            ))}
+                                        background: colors.bg.surface, borderRadius: radius.md,
+                                        padding: `${spacing['3']} ${spacing['3']}`,
+                                        border: `1px solid ${colors.border.default}`, fontSize: font.size.xs,
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontWeight: font.weight.semibold, color: colors.text.secondary }}>
+                                            <span>무게</span><span>배송비</span>
                                         </div>
+                                        {FORWARDER_RATES[forwarder]?.rows.map((row, i) => (
+                                            <div key={i} style={{
+                                                display: 'flex', justifyContent: 'space-between',
+                                                padding: '3px 0', color: colors.text.tertiary,
+                                                borderTop: i > 0 ? `1px solid ${colors.bg.subtle}` : 'none',
+                                            }}>
+                                                <span>~{row.maxKg}kg</span>
+                                                <span style={{ fontWeight: font.weight.semibold, color: colors.text.primary }}>¥{row.fee.toLocaleString()}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
 
-                            {/* 직접 입력 (manual 모드) */}
-                            {shippingMode === 'manual' && (
+                            {!hasForwarderRate && (
                                 <div style={{ animation: 'fadeSlideIn 0.25s ease' }}>
                                     <label style={labelStyles}>
                                         배송비 금액 <span style={{ color: colors.primary }}>*</span>
@@ -448,14 +512,8 @@ export default function BasicMarginPage() {
                                             onChange={e => updateState({ intlShipping: Number(e.target.value) })}
                                             placeholder="0"
                                             style={{ ...inputStyles, paddingLeft: '32px' }}
-                                            onFocus={e => {
-                                                e.currentTarget.style.borderColor = colors.primary;
-                                                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(49, 130, 246, 0.1)';
-                                            }}
-                                            onBlur={e => {
-                                                e.currentTarget.style.borderColor = colors.border.default;
-                                                e.currentTarget.style.boxShadow = 'none';
-                                            }}
+                                            onFocus={handleInputFocus}
+                                            onBlur={handleInputBlur}
                                         />
                                         <span style={{
                                             position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
@@ -471,21 +529,8 @@ export default function BasicMarginPage() {
                     )}
 
                     {/* Step 3: 마진율 + 시뮬레이션 */}
-                    {step === 3 && (() => {
-                        const marginSignal = marginValue < 15
-                                ? { color: colors.danger, text: '마진이 너무 낮아요. 판매해도 수익이 거의 남지 않을 수 있어요.', sliderColor: colors.danger, type: 'danger' as const }
-                                : marginValue < 25
-                                    ? { color: '#E67E22', text: '가격은 경쟁력 있지만, 수익이 많지 않을 수 있어요.', sliderColor: '#E67E22', type: 'warning' as const }
-                                    : marginValue <= 40
-                                        ? { color: colors.success, text: '적정 마진율이에요. 초보 셀러에게 권장하는 범위입니다.', sliderColor: colors.primary, type: 'success' as const }
-                                        : marginValue <= 50
-                                            ? { color: '#E67E22', text: '경쟁 상품 대비 가격이 높아 판매가 어려울 수 있어요.', sliderColor: '#E67E22', type: 'warning' as const }
-                                            : { color: colors.danger, text: '가격이 너무 높아요. 경쟁 상품 대비 판매가 어려울 수 있어요.', sliderColor: colors.danger, type: 'danger' as const };
-
-                        const sliderPct = ((marginValue - 5) / (60 - 5)) * 100;
-
-                        return (
-                        <div style={{ animation: 'fadeSlideIn 0.3s ease', display: 'flex', flexDirection: 'column', gap: spacing['6'] }}>
+                    {step === 3 && (
+                        <div style={{ animation: 'fadeSlideIn 0.3s ease', display: 'flex', flexDirection: 'column', gap: spacing['6'], position: 'relative' }}>
                             {/* 마진 설정 */}
                             <div style={{
                                 background: colors.bg.surface, borderRadius: radius.xl,
@@ -494,7 +539,6 @@ export default function BasicMarginPage() {
                             }}>
                                 <label style={{ ...labelStyles, marginBottom: spacing['3'] }}>기본 마진율</label>
 
-                                {/* 입력 + 슬라이더 한 줄 */}
                                 <div style={{ display: 'flex', alignItems: 'center', gap: spacing['4'] }}>
                                     <div style={{ position: 'relative', flexShrink: 0 }}>
                                         <input
@@ -537,7 +581,6 @@ export default function BasicMarginPage() {
                                                 transition: 'background 0.3s ease',
                                             } as React.CSSProperties}
                                         />
-                                        {/* 구간 레이블 */}
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
                                             <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>5%</span>
                                             <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>60%</span>
@@ -546,67 +589,49 @@ export default function BasicMarginPage() {
                                 </div>
 
                                 {/* 시그널 콜아웃 */}
-                                {marginSignal.text && (() => {
-                                    const t = marginSignal.type;
-                                    const signalStyles = {
-                                        danger: { bg: '#FEF2F2', border: '#FECACA', text: '#DC2626', Icon: AlertTriangle },
-                                        warning: { bg: '#FFF7ED', border: '#FED7AA', text: '#EA580C', Icon: TrendingUp },
-                                        success: { bg: colors.bg.info, border: colors.primaryLightBorder, text: colors.primary, Icon: CheckCircle },
-                                    }[t];
-                                    return (
-                                        <div style={{
-                                            marginTop: spacing['4'],
-                                            padding: `${spacing['3']} ${spacing['4']}`,
-                                            background: signalStyles.bg,
-                                            borderRadius: radius.lg,
-                                            border: `1px solid ${signalStyles.border}`,
-                                            display: 'flex', alignItems: 'center', gap: spacing['2'],
-                                            transition: 'all 0.25s ease',
-                                        }}>
-                                            <signalStyles.Icon size={15} style={{ color: signalStyles.text, flexShrink: 0 }} />
-                                            <span style={{
-                                                fontSize: font.size.sm, color: signalStyles.text,
-                                                fontWeight: font.weight.medium, lineHeight: font.lineHeight.normal,
-                                            }}>
-                                                {marginSignal.text}
-                                            </span>
-                                        </div>
-                                    );
-                                })()}
-
+                                <div style={{
+                                    marginTop: spacing['4'],
+                                    padding: `${spacing['3']} ${spacing['4']}`,
+                                    background: signalStyles.bg,
+                                    borderRadius: radius.lg,
+                                    border: `1px solid ${signalStyles.border}`,
+                                    display: 'flex', alignItems: 'center', gap: spacing['2'],
+                                    transition: 'all 0.25s ease',
+                                }}>
+                                    <signalStyles.Icon size={15} style={{ color: signalStyles.text, flexShrink: 0 }} />
+                                    <span style={{
+                                        fontSize: font.size.sm, color: signalStyles.text,
+                                        fontWeight: font.weight.medium, lineHeight: font.lineHeight.normal,
+                                    }}>
+                                        {marginSignal.text}
+                                    </span>
+                                </div>
                             </div>
 
                             {/* 가격 시뮬레이션 */}
                             <div style={{
+                                position: 'absolute',
+                                left: 'calc(100% + 24px)',
+                                top: 0,
+                                width: '360px',
+                                maxHeight: 'calc(100vh - 200px)',
+                                overflowY: 'auto',
                                 background: colors.bg.subtle, borderRadius: radius.xl,
                                 border: `1px solid ${colors.border.default}`,
-                                overflow: 'hidden',
+                                zIndex: 10,
                             }}>
-                                {/* 헤더 (토글) */}
-                                <button
-                                    onClick={() => setShowSimulation(!showSimulation)}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: spacing['2'],
-                                        width: '100%', padding: `${spacing['4']} ${spacing['6']}`,
-                                        background: 'transparent', border: 'none', cursor: 'pointer',
-                                        color: colors.text.primary, fontSize: font.size.base, fontWeight: font.weight.bold,
-                                        transition: 'background 0.15s',
-                                    }}
-                                    onMouseEnter={e => e.currentTarget.style.background = colors.bg.page}
-                                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                                >
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', gap: spacing['2'],
+                                    padding: `${spacing['4']} ${spacing['6']}`,
+                                    color: colors.text.primary, fontSize: font.size.base, fontWeight: font.weight.bold,
+                                }}>
                                     <Calculator size={16} color={colors.primary} />
                                     가격 시뮬레이션
-                                    <span style={{ marginLeft: 'auto' }}>
-                                        {showSimulation ? <ChevronDown size={14} color={colors.text.muted} /> : <ChevronRight size={14} color={colors.text.muted} />}
-                                    </span>
-                                </button>
+                                </div>
 
-                                {showSimulation && (
                                 <div style={{
                                     padding: `0 ${spacing['6']} ${spacing['6']}`,
                                     display: 'flex', flexDirection: 'column', gap: spacing['5'],
-                                    animation: 'fadeSlideIn 0.2s ease',
                                 }}>
                                     {/* 환율 뱃지 */}
                                     <div style={{
@@ -615,121 +640,116 @@ export default function BasicMarginPage() {
                                         background: colors.bg.info, borderRadius: radius.full,
                                         border: `1px solid ${colors.primaryLightBorder}`,
                                     }}>
-                                        <RefreshCw size={11} color={colors.primary} />
                                         <span style={{ fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.primary }}>
-                                            실시간 환율
+                                            오늘의 환율
                                         </span>
                                         <span style={{ fontSize: font.size.xs, fontWeight: font.weight.bold, color: colors.text.primary }}>
                                             ¥1 = ₩{exchangeRate.toFixed(1)}
                                         </span>
                                     </div>
 
-                                {/* 입력: 원가 + 무게 */}
-                                <div style={{ display: 'flex', gap: spacing['3'] }}>
-                                    <div style={{ flex: 1 }}>
-                                        <label style={{ display: 'block', fontSize: font.size.sm, color: colors.text.tertiary, marginBottom: '6px', fontWeight: font.weight.semibold }}>상품 원가</label>
-                                        <div style={{ position: 'relative' }}>
-                                            <input
-                                                type="text"
-                                                value={simBaseCost.toLocaleString()}
-                                                onChange={e => setSimBaseCost(parseInt(e.target.value.replace(/[^0-9]/g, '')) || 0)}
-                                                style={{ ...inputStyles, padding: `${spacing['3']} ${spacing['3']}`, paddingLeft: '24px', fontSize: font.size.md, fontWeight: font.weight.semibold, fontFamily: font.family.sans }}
-                                            />
-                                            <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: colors.text.muted, fontWeight: font.weight.semibold, fontSize: font.size.sm }}>₩</span>
+                                    {/* 입력: 원가 + 무게 */}
+                                    <div style={{ display: 'flex', gap: spacing['3'] }}>
+                                        <div style={{ flex: 1 }}>
+                                            <label style={{ display: 'block', fontSize: font.size.sm, color: colors.text.tertiary, marginBottom: '6px', fontWeight: font.weight.semibold }}>상품 원가</label>
+                                            <div style={{ position: 'relative' }}>
+                                                <input
+                                                    type="text"
+                                                    value={simBaseCost.toLocaleString()}
+                                                    onChange={e => setSimBaseCost(parseInt(e.target.value.replace(/[^0-9]/g, '')) || 0)}
+                                                    style={{ ...inputStyles, padding: `${spacing['3']} ${spacing['3']}`, paddingLeft: '24px', fontSize: font.size.md, fontWeight: font.weight.semibold, fontFamily: font.family.sans }}
+                                                />
+                                                <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: colors.text.muted, fontWeight: font.weight.semibold, fontSize: font.size.sm }}>₩</span>
+                                            </div>
+                                        </div>
+                                        <WeightDropdown value={simWeight} onChange={setSimWeight} />
+                                    </div>
+
+                                    {/* 결과: 판매가 → 실수령액 → 순수익 */}
+                                    <div style={{
+                                        display: 'flex', flexDirection: 'column', gap: 0,
+                                        background: colors.bg.page, borderRadius: radius.lg,
+                                        border: `1px solid ${colors.border.default}`,
+                                        overflow: 'hidden',
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: `${spacing['3']} ${spacing['4']}` }}>
+                                            <span style={{ fontSize: font.size.sm, color: colors.text.muted, fontWeight: font.weight.medium }}>Qoo10 판매가</span>
+                                            <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.primary, fontFamily: font.family.sans }}>
+                                                ¥{finalPriceJpy.toLocaleString()}
+                                            </span>
+                                        </div>
+                                        <div style={{ height: '1px', background: colors.border.default, margin: `0 ${spacing['4']}` }} />
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: `${spacing['3']} ${spacing['4']}` }}>
+                                            <span style={{ fontSize: font.size.sm, color: colors.text.muted, fontWeight: font.weight.medium }}>실수령액 (수수료 차감 후)</span>
+                                            <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary, fontFamily: font.family.sans }}>
+                                                ₩{payoutKrw.toLocaleString()}
+                                            </span>
+                                        </div>
+                                        <div style={{ height: '1px', background: colors.border.default, margin: `0 ${spacing['4']}` }} />
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: `${spacing['3']} ${spacing['4']}`, background: actualProfitKrw > 0 ? '#F0FFF4' : '#FEF2F2' }}>
+                                            <span style={{ fontSize: font.size.sm, color: actualProfitKrw > 0 ? colors.success : colors.danger, fontWeight: font.weight.semibold }}>순수익</span>
+                                            <span style={{
+                                                fontSize: font.size.base, fontWeight: font.weight.bold, fontFamily: font.family.sans,
+                                                color: actualProfitKrw > 0 ? colors.success : colors.danger,
+                                            }}>
+                                                {actualProfitKrw >= 0 ? '+' : ''}₩{actualProfitKrw.toLocaleString()}
+                                            </span>
                                         </div>
                                     </div>
-                                    {shippingMode === 'auto' && activeForwarder && (
-                                        <WeightDropdown value={simWeight} onChange={setSimWeight} />
+
+                                    {/* 계산 과정 토글 */}
+                                    <button
+                                        onClick={() => setShowCalculation(!showCalculation)}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                                            width: '100%', background: 'transparent', border: `1px solid ${colors.border.default}`,
+                                            borderRadius: radius.md, padding: `${spacing['2']} ${spacing['3']}`,
+                                            color: colors.text.tertiary, fontSize: font.size.sm, fontWeight: font.weight.medium,
+                                            cursor: 'pointer', transition: 'background 0.15s',
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.background = colors.bg.page}
+                                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        {showCalculation ? '계산 과정 접기' : '계산 과정 보기'}
+                                        {showCalculation ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+                                    </button>
+                                    {showCalculation && (
+                                        <div style={{
+                                            background: colors.bg.page, borderRadius: radius.md,
+                                            padding: spacing['4'], border: `1px solid ${colors.border.default}`,
+                                            display: 'flex', flexDirection: 'column', gap: spacing['3'],
+                                        }}>
+                                            {calcRows.map((row, i) => (
+                                                <Fragment key={i}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'], color: colors.text.muted, fontSize: font.size.xs }}>
+                                                            {row.icon} {row.label}
+                                                        </div>
+                                                        <div style={{
+                                                            fontSize: row.highlight ? font.size.md : font.size.sm,
+                                                            fontWeight: row.highlight ? 800 : font.weight.bold,
+                                                            color: row.highlight ? colors.primary : colors.text.primary,
+                                                            fontFamily: font.family.sans,
+                                                        }}>
+                                                            {row.value}
+                                                        </div>
+                                                    </div>
+                                                    {i < calcRows.length - 1 && (
+                                                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                            <ArrowRight size={12} color={colors.border.default} style={{ transform: 'rotate(90deg)' }} />
+                                                        </div>
+                                                    )}
+                                                </Fragment>
+                                            ))}
+                                            <div style={{ borderTop: `1px solid ${colors.border.default}`, paddingTop: spacing['3'], fontSize: font.size.xs, color: colors.text.muted }}>
+                                                Qoo10 수수료: 패션/뷰티 10~12% · 기타 6~10% (현재 12% 적용)
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
-
-                                {/* 결과: 판매가 + 수령액 + 순수익 */}
-                                <div style={{
-                                    display: 'flex', gap: spacing['3'],
-                                    background: colors.bg.page, borderRadius: radius.lg,
-                                    padding: spacing['4'], border: `1px solid ${colors.border.default}`,
-                                }}>
-                                    <div style={{ flex: 1, textAlign: 'center' }}>
-                                        <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginBottom: '6px', fontWeight: font.weight.medium }}>Qoo10 판매가</div>
-                                        <div style={{ fontSize: '22px', fontWeight: 800, color: colors.primary, fontFamily: font.family.sans }}>
-                                            ¥{finalPriceJpy.toLocaleString()}
-                                        </div>
-                                    </div>
-                                    <div style={{ width: '1px', background: colors.border.default }} />
-                                    <div style={{ flex: 1, textAlign: 'center' }}>
-                                        <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginBottom: '6px', fontWeight: font.weight.medium }}>수령액</div>
-                                        <div style={{ fontSize: '22px', fontWeight: 800, color: colors.text.primary, fontFamily: font.family.sans }}>
-                                            ₩{payoutKrw.toLocaleString()}
-                                        </div>
-                                    </div>
-                                    <div style={{ width: '1px', background: colors.border.default }} />
-                                    <div style={{ flex: 1, textAlign: 'center' }}>
-                                        <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginBottom: '6px', fontWeight: font.weight.medium }}>순수익</div>
-                                        <div style={{
-                                            fontSize: '22px', fontWeight: 800, fontFamily: font.family.sans,
-                                            color: actualProfitKrw > 0 ? colors.success : colors.danger,
-                                        }}>
-                                            {actualProfitKrw >= 0 ? '+' : ''}₩{actualProfitKrw.toLocaleString()}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* 계산 과정 토글 */}
-                                <button
-                                    onClick={() => setShowCalculation(!showCalculation)}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                                        width: '100%', background: 'transparent', border: `1px solid ${colors.border.default}`,
-                                        borderRadius: radius.md, padding: `${spacing['2']} ${spacing['3']}`,
-                                        color: colors.text.tertiary, fontSize: font.size.sm, fontWeight: font.weight.medium,
-                                        cursor: 'pointer', transition: 'background 0.15s',
-                                    }}
-                                    onMouseEnter={e => e.currentTarget.style.background = colors.bg.page}
-                                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                                >
-                                    {showCalculation ? '계산 과정 접기' : '계산 과정 보기'}
-                                    {showCalculation ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
-                                </button>
-                                {showCalculation && (
-                                    <div style={{
-                                        background: colors.bg.page, borderRadius: radius.md,
-                                        padding: spacing['4'], border: `1px solid ${colors.border.default}`,
-                                        display: 'flex', flexDirection: 'column', gap: spacing['3'],
-                                    }}>
-                                        {calcRows.map((row, i) => (
-                                            <Fragment key={i}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'], color: colors.text.muted, fontSize: font.size.xs }}>
-                                                        {row.icon} {row.label}
-                                                    </div>
-                                                    <div style={{
-                                                        fontSize: row.highlight ? font.size.md : font.size.sm,
-                                                        fontWeight: row.highlight ? 800 : font.weight.bold,
-                                                        color: row.highlight ? colors.primary : colors.text.primary,
-                                                        fontFamily: font.family.sans,
-                                                    }}>
-                                                        {row.value}
-                                                    </div>
-                                                </div>
-                                                {i < calcRows.length - 1 && (
-                                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                                        <ArrowRight size={12} color={colors.border.default} style={{ transform: 'rotate(90deg)' }} />
-                                                    </div>
-                                                )}
-                                            </Fragment>
-                                        ))}
-                                        {/* 수수료 참고 */}
-                                        <div style={{ borderTop: `1px solid ${colors.border.default}`, paddingTop: spacing['3'], fontSize: font.size.xs, color: colors.text.muted }}>
-                                            Qoo10 수수료: 패션/뷰티 10~12% · 기타 6~10% (현재 12% 적용)
-                                        </div>
-                                    </div>
-                                )}
-                                </div>
-                                )}
                             </div>
                         </div>
-                        );
-                    })()}
+                    )}
 
                     {/* Navigation */}
                     <div style={{
@@ -770,6 +790,8 @@ export default function BasicMarginPage() {
                             </button>
                         )}
                     </div>
+                        </>
+                    )}
 
                     <style>{`
                         @keyframes fadeSlideIn {
@@ -849,7 +871,7 @@ export default function BasicMarginPage() {
                             margin: '0 0 40px', lineHeight: font.lineHeight.normal,
                             animation: 'riseUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both',
                         }}>
-                            이제 첫 상품을 수집해볼까요?
+                            아래 설정은 이후에 언제든 변경할 수 있어요.
                         </p>
 
                         <div style={{
@@ -860,7 +882,7 @@ export default function BasicMarginPage() {
                             {[
                                 { label: 'Qoo10 JP 연동', desc: state.storeName || '연동 완료' },
                                 { label: '배송지 및 기본 정보', desc: '출하지 · 반품지 설정 완료' },
-                                { label: '마진 및 비용', desc: hasForwarderRate ? `마진 ${marginValue}% · ${forwarderLabel} 요율 적용` : `마진 ${marginValue}% · 해외배송 ¥${intlShipping.toLocaleString()}` },
+                                { label: '배송비 및 마진', desc: '작업비 · 배송비 · 마진 설정 완료' },
                             ].map((item, i) => (
                                 <div key={i} style={{
                                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -868,14 +890,14 @@ export default function BasicMarginPage() {
                                     borderTop: i > 0 ? `1px solid ${colors.bg.subtle}` : 'none',
                                     background: colors.bg.surface,
                                 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'] }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'], flexShrink: 0 }}>
                                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                             <circle cx="8" cy="8" r="8" fill={colors.primaryLight} />
                                             <polyline points="4.5,8 6.5,10.5 11.5,5.5" stroke={colors.primary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                                         </svg>
-                                        <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary }}>{item.label}</span>
+                                        <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary, whiteSpace: 'nowrap' }}>{item.label}</span>
                                     </div>
-                                    <span style={{ fontSize: font.size.sm, color: colors.text.muted }}>{item.desc}</span>
+                                    <span style={{ fontSize: font.size.sm, color: colors.text.muted, textAlign: 'right', minWidth: 0, wordBreak: 'keep-all' }}>{item.desc}</span>
                                 </div>
                             ))}
                         </div>

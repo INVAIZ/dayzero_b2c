@@ -1,9 +1,10 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { ChevronDown, Plus, Trash2, Search, Check, X, Loader2, PenLine, Languages, Info } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Trash2, Check, Loader2, PenLine, Languages, Info } from 'lucide-react';
 import { AIIcon } from '../../../components/common/AIIcon';
 import type { ProductDetail, ProductOption } from '../../../types/editing';
 import { useEditingStore } from '../../../store/useEditingStore';
-import { QOO10_CATEGORY_KO, toKoCategory, toJaCategory } from '../../../mock/categoryMap';
+import { CategorySelectModal } from '../../../components/common/CategorySelectModal';
+import { BrandSelectModal, QOO10_BRANDS } from '../../../components/common/BrandSelectModal';
 import { PENDING_JA_TITLES } from '../../../mock/editingMock';
 import { colors, font, radius, shadow, spacing, zIndex } from '../../../design/tokens';
 import { stripPrefix, toJaTitle, mockTranslateOption as mockTranslateOpt, hasKorean } from '../../../utils/editing';
@@ -43,6 +44,17 @@ const ghostButtonBase: React.CSSProperties = {
 
 const warningBorderStyle: React.CSSProperties = {
     borderLeftWidth: '3px', borderLeftColor: colors.warningIcon,
+};
+
+const tooltipStyle: React.CSSProperties = {
+    position: 'absolute', top: 'calc(100% + 8px)', left: '50%',
+    transform: 'translateX(-50%)',
+    background: colors.text.primary, color: '#fff',
+    borderRadius: radius.md, padding: `${spacing['2']} ${spacing['3']}`,
+    fontSize: font.size.xs, fontWeight: 500, lineHeight: font.lineHeight.normal,
+    zIndex: zIndex.dropdown, pointerEvents: 'none',
+    animation: 'tooltipFadeIn 0.15s ease',
+    boxShadow: shadow.md,
 };
 
 const handleWarningFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -154,149 +166,179 @@ const StatusTag: React.FC<{
     );
 };
 
-// ── 카테고리 모달 ──────────────────────────────────────────────────────────────
-const CategoryModal: React.FC<{
-    current: string;
-    aiRecommended?: string;
-    onSelect: (jaPath: string) => void;
-    onClose: () => void;
-}> = ({ current, aiRecommended, onSelect, onClose }) => {
-    const [query, setQuery] = useState('');
-    const inputRef = useRef<HTMLInputElement>(null);
+// CategoryModal → CategorySelectModal (공통 컴포넌트로 분리됨)
+
+// ── 발송가능일 셀렉트 ────────────────────────────────────────────────────────
+const SHIPPING_TYPE_OPTIONS = [
+    { value: 'standard', label: '일반발송' },
+    { value: 'sameday', label: '당일발송' },
+    { value: 'preorder', label: '예약발송 (4일 이상)' },
+] as const;
+
+const SHIPPING_DAYS_STANDARD = [
+    { value: 1, label: '1일 이내' },
+    { value: 2, label: '2일 이내' },
+    { value: 3, label: '3일 이내' },
+];
+const SHIPPING_DAYS_PREORDER = [
+    { value: 4, label: '4일 이내' },
+    { value: 5, label: '5일 이내' },
+    { value: 6, label: '6일 이내' },
+    { value: 7, label: '7일 이내' },
+    { value: 8, label: '8일 이내' },
+    { value: 9, label: '9일 이내' },
+    { value: 10, label: '10일 이내' },
+    { value: 11, label: '11일 이내' },
+    { value: 12, label: '12일 이내' },
+    { value: 13, label: '13일 이내' },
+    { value: 14, label: '14일 이내' },
+];
+
+const CustomSelect: React.FC<{
+    label: string;
+    value: string;
+    options: { value: string | number; label: string }[];
+    onChange: (value: string) => void;
+}> = ({ label, value, options, onChange }) => {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const [dropStyle, setDropStyle] = useState<React.CSSProperties>({});
+    const selected = options.find(o => String(o.value) === String(value));
 
     useEffect(() => {
-        inputRef.current?.focus();
-        const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-        window.addEventListener('keydown', onKey);
-        return () => window.removeEventListener('keydown', onKey);
-    }, [onClose]);
+        if (!open) return;
+        const onClickOutside = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+        };
+        document.addEventListener('mousedown', onClickOutside);
+        return () => document.removeEventListener('mousedown', onClickOutside);
+    }, [open]);
 
-    const results = useMemo(() =>
-        Object.entries(QOO10_CATEGORY_KO)
-            .filter(([ja, ko]) => !query || ko.includes(query) || ja.includes(query))
-            .sort((a, b) => {
-                if (a[0] === aiRecommended) return -1;
-                if (b[0] === aiRecommended) return 1;
-                return 0;
-            }),
-        [query, aiRecommended]
-    );
+    // 트리거 위치 기반으로 드롭다운을 fixed 렌더링 (잘림 방지)
+    useEffect(() => {
+        if (!open || !triggerRef.current) return;
+        const rect = triggerRef.current.getBoundingClientRect();
+        setDropStyle({
+            position: 'fixed',
+            top: rect.bottom + 6,
+            left: rect.left,
+            width: rect.width,
+        });
+    }, [open]);
 
     return (
-        <>
-            <div onClick={onClose} style={{
-                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
-                zIndex: zIndex.modal,
-            }} />
-            <div style={{
-                position: 'fixed', top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
-                zIndex: zIndex.modal + 1,
-                background: colors.bg.surface, borderRadius: radius.xl,
-                width: '480px', maxHeight: '580px',
-                display: 'flex', flexDirection: 'column',
-                boxShadow: shadow.lg, overflow: 'hidden',
-                animation: 'modalIn 0.18s ease',
-            }}>
+        <div ref={ref}>
+            <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>
+                {label}
+            </div>
+            <div
+                ref={triggerRef}
+                onClick={() => setOpen(!open)}
+                style={{
+                    width: '100%', boxSizing: 'border-box',
+                    padding: `11px ${spacing['3']}`,
+                    border: `1.5px solid ${open ? colors.primary : colors.border.default}`,
+                    borderRadius: radius.md,
+                    fontSize: font.size.base,
+                    color: selected ? colors.text.primary : colors.text.placeholder,
+                    background: colors.bg.surface,
+                    cursor: 'pointer',
+                    transition: 'border-color 0.15s',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    fontFamily: 'inherit',
+                }}
+            >
+                <span>{selected?.label ?? '선택'}</span>
+                <ChevronDown size={18} color={open ? colors.primary : colors.text.muted} style={{
+                    flexShrink: 0, transition: 'transform 0.2s ease',
+                    transform: open ? 'rotate(180deg)' : 'none',
+                }} />
+            </div>
+            {open && (
                 <div style={{
-                    ...flexBetween,
-                    padding: `${spacing['5']} ${spacing['6']}`,
-                    borderBottom: `1px solid ${colors.border.default}`,
+                    ...dropStyle,
+                    background: colors.bg.surface,
+                    border: `1px solid ${colors.border.default}`,
+                    borderRadius: radius.lg,
+                    boxShadow: shadow.md,
+                    zIndex: zIndex.modal,
+                    maxHeight: '280px', overflowY: 'auto',
                 }}>
-                    <span style={{ fontSize: font.size.lg, fontWeight: 700, color: colors.text.primary }}>
-                        Qoo10 카테고리 변경
-                    </span>
-                    <button onClick={onClose} style={{
-                        ...ghostButtonBase,
-                        color: colors.text.muted, display: 'flex', padding: '4px', borderRadius: radius.sm,
-                    }}>
-                        <X size={20} />
-                    </button>
-                </div>
-                <div style={{ padding: spacing['4'], borderBottom: `1px solid ${colors.border.default}` }}>
-                    <div style={{
-                        display: 'flex', alignItems: 'center', gap: spacing['2'],
-                        padding: `10px ${spacing['3']}`,
-                        border: `1.5px solid ${colors.border.default}`,
-                        borderRadius: radius.md, background: colors.bg.faint,
-                    }}>
-                        <Search size={15} color={colors.text.muted} style={{ flexShrink: 0 }} />
-                        <input
-                            ref={inputRef} value={query}
-                            onChange={e => setQuery(e.target.value)}
-                            placeholder="카테고리 검색 (예: 스킨케어, 주방)"
-                            style={{
-                                flex: 1, border: 'none', outline: 'none',
-                                background: 'transparent',
-                                fontSize: font.size.base, color: colors.text.primary,
-                            }}
-                        />
-                        {query && (
-                            <button onClick={() => setQuery('')} style={{
-                                ...ghostButtonBase, display: 'flex', color: colors.text.muted,
-                            }}>
-                                <X size={14} />
-                            </button>
-                        )}
-                    </div>
-                    {query && (
-                        <div style={{ marginTop: spacing['2'], fontSize: font.size.xs, color: colors.text.muted }}>
-                            {results.length}개 결과
-                        </div>
-                    )}
-                </div>
-                <div style={{ flex: 1, overflowY: 'auto' }}>
-                    {results.length === 0 ? (
-                        <div style={{ padding: `${spacing['8']} ${spacing['6']}`, textAlign: 'center', color: colors.text.muted, fontSize: font.size.sm }}>
-                            검색 결과가 없습니다
-                        </div>
-                    ) : results.map(([ja, ko]) => {
-                        const isSelected = ja === current;
-                        const isAiRec = ja === aiRecommended;
+                    {options.map(opt => {
+                        const isSelected = String(opt.value) === String(value);
                         return (
-                            <button key={ja}
-                                onClick={() => { onSelect(ja); onClose(); }}
+                            <div
+                                key={opt.value}
+                                onClick={() => { onChange(String(opt.value)); setOpen(false); }}
                                 style={{
-                                    ...flexBetween,
-                                    width: '100%', padding: `14px ${spacing['6']}`,
-                                    background: isSelected ? colors.primaryLight : 'transparent',
-                                    border: 'none', cursor: 'pointer', textAlign: 'left',
-                                    borderBottom: `1px solid ${colors.border.default}`,
-                                    transition: 'background 0.12s', gap: spacing['3'],
+                                    padding: `14px ${spacing['4']}`,
+                                    fontSize: font.size.base,
+                                    fontWeight: isSelected ? 600 : 400,
+                                    color: colors.text.primary,
+                                    cursor: 'pointer',
+                                    transition: 'background 0.1s',
                                 }}
-                                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = colors.bg.faint; }}
-                                onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+                                onMouseEnter={e => { e.currentTarget.style.background = colors.bg.faint; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                             >
-                                <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                                        <span style={{
-                                            fontSize: font.size.sm, fontWeight: isSelected ? 700 : 500,
-                                            color: isSelected ? colors.primary : colors.text.primary,
-                                        }}>
-                                            {ko}
-                                        </span>
-                                        {isAiRec && (
-                                            <span style={{
-                                                display: 'inline-flex', alignItems: 'center', gap: '3px',
-                                                fontSize: font.size.xs, fontWeight: 600,
-                                                color: colors.primary, background: colors.primaryLight,
-                                                padding: '1px 6px', borderRadius: radius.full,
-                                            }}>
-                                                <AIIcon size={9} /> AI 추천
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div style={{ fontSize: font.size.xs, color: colors.text.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                        {ja}
-                                    </div>
-                                </div>
-                                {isSelected && <Check size={16} color={colors.primary} style={{ flexShrink: 0 }} />}
-                            </button>
+                                {opt.label}
+                            </div>
                         );
                     })}
                 </div>
+            )}
+        </div>
+    );
+};
+
+const ShippingSelect: React.FC<{
+    shippingType: 'standard' | 'sameday' | 'preorder';
+    shippingDays: number;
+    onChange: (type: 'standard' | 'sameday' | 'preorder', days: number) => void;
+}> = ({ shippingType, shippingDays, onChange }) => {
+    const showDays = shippingType !== 'sameday';
+    return (
+        <div>
+            <div style={{ marginBottom: spacing['2'] }}>
+                <span style={sectionLabelStyle}>발송가능일</span>
+                <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
             </div>
-        </>
+            <CustomSelect
+                label="발송 유형"
+                value={shippingType}
+                options={SHIPPING_TYPE_OPTIONS.map(o => ({ value: o.value, label: o.label }))}
+                onChange={v => {
+                    const t = v as 'standard' | 'sameday' | 'preorder';
+                    onChange(t, t === 'sameday' ? 0 : t === 'preorder' ? 5 : (shippingDays || 3));
+                }}
+            />
+            <div style={{
+                overflow: 'hidden',
+                maxHeight: showDays ? '200px' : '0px',
+                opacity: showDays ? 1 : 0,
+                transition: 'max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease',
+                marginTop: showDays ? spacing['3'] : '0px',
+            }}>
+                <CustomSelect
+                    label="입금일 기준"
+                    value={String(shippingDays)}
+                    options={(shippingType === 'preorder' ? SHIPPING_DAYS_PREORDER : SHIPPING_DAYS_STANDARD).map(o => ({ value: String(o.value), label: o.label }))}
+                    onChange={v => onChange(shippingType, Number(v))}
+                />
+                {shippingType === 'preorder' ? (
+                    <div style={{ fontSize: font.size.xs, color: colors.primary, marginTop: spacing['2'], lineHeight: font.lineHeight.relaxed }}>
+                        ※ 4일~14일 이내는 주말포함 일수로 카운트되며, 예약설정으로 취급됩니다.<br />
+                        ※ 4일~14일은 배송포인트 플러스 점수가 부여되지 않습니다.<br />
+                        ※ 4일~14일은 상품+옵션금액 기준 2% 수수료가 부과됩니다.
+                    </div>
+                ) : (
+                    <div style={{ fontSize: font.size.xs, color: colors.primary, marginTop: spacing['2'] }}>
+                        ※ 1~3일 이내는 영업일수로 카운트 됩니다. (토/일 휴무 제외)
+                    </div>
+                )}
+            </div>
+        </div>
     );
 };
 
@@ -399,6 +441,9 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
     const [descJa, setDescJa] = useState(product.descriptionJa ?? '');
     const [options, setOptions] = useState<ProductOption[]>([...product.options]);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [showBrandModal, setShowBrandModal] = useState(false);
+    const [showBrandInfoTooltip, setShowBrandInfoTooltip] = useState(false);
+    const [showBrandAiTooltip, setShowBrandAiTooltip] = useState(false);
     const [saveSection, setSaveSection] = useState<string | null>(null);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
@@ -602,8 +647,8 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
     const titleTranslateDisabled = hasJaTitle && !titleKoEdited;
 
     // 카테고리가 AI 추천 그대로인지 확인
-    const isAiCategory = !!product.aiRecommendedCategoryPath &&
-        product.qoo10CategoryPath === product.aiRecommendedCategoryPath;
+    const isAiCategory = !!product.aiRecommendedCategoryId &&
+        product.qoo10CategoryId === product.aiRecommendedCategoryId;
 
     const progressItems = useMemo(() => [
         { label: '상품명을 번역하세요', done: hasJaTitle, target: 'section-title' },
@@ -697,6 +742,151 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 );
             })()}
 
+            {/* ── 브랜드 (Qoo10 DB 매칭) ── */}
+            <div>
+                <div style={{ marginBottom: spacing['2'] }}>
+                    <span style={sectionLabelStyle}>브랜드</span>
+                    <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
+                </div>
+
+                {/* 상품 브랜드 (브랜드가 있는 경우만 표시) */}
+                {product.brand && (
+                    <>
+                        <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>상품 브랜드</div>
+                        <div style={{
+                            ...inputBase,
+                            background: colors.bg.faint,
+                            color: colors.text.tertiary,
+                            cursor: 'default',
+                            marginBottom: spacing['3'],
+                        }}>
+                            {product.brand}
+                        </div>
+                    </>
+                )}
+
+                {/* Qoo10에 등록될 브랜드 */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: spacing['1'], marginBottom: spacing['1'], position: 'relative' }}>
+                    <span style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500 }}>Qoo10에 등록될 브랜드</span>
+                    <div
+                        style={{ display: 'flex', alignItems: 'center', cursor: 'help', position: 'relative' }}
+                        onMouseEnter={() => setShowBrandInfoTooltip(true)}
+                        onMouseLeave={() => setShowBrandInfoTooltip(false)}
+                    >
+                        <Info size={13} color={colors.text.muted} />
+                        {showBrandInfoTooltip && (
+                            <div style={{ ...tooltipStyle, width: '220px' }}>
+                                Qoo10에 등록된 브랜드와 매칭해야 상품이 브랜드 검색에 노출돼요. 미등록 브랜드는 "브랜드 없음"으로 등록됩니다.
+                            </div>
+                        )}
+                    </div>
+                </div>
+                {product.brandMatchStatus === 'matched' ? (
+                    /* 매칭됨: AI 아이콘 + 브랜드명 — 클릭하면 모달 */
+                    <div
+                        onClick={() => setShowBrandModal(true)}
+                        style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: `11px ${spacing['3']}`,
+                            border: `1.5px solid ${colors.primaryBorder}`,
+                            borderRadius: radius.md,
+                            background: colors.bg.surface,
+                            cursor: 'pointer', transition: 'border-color 0.15s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = colors.primary; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = colors.primaryBorder; }}
+                    >
+                        <div
+                            style={{ display: 'flex', alignItems: 'center', gap: spacing['2'], position: 'relative' }}
+                            onMouseEnter={() => setShowBrandAiTooltip(true)}
+                            onMouseLeave={() => setShowBrandAiTooltip(false)}
+                        >
+                            <div style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: colors.primary, borderRadius: radius.xs,
+                                padding: '3px 5px', lineHeight: 1,
+                            }}>
+                                <AIIcon size={12} color="#fff" />
+                            </div>
+                            <span style={{ fontSize: font.size.base, fontWeight: 600, color: colors.text.primary }}>
+                                {product.brand}
+                            </span>
+                            {showBrandAiTooltip && (
+                                <div style={{ ...tooltipStyle, whiteSpace: 'nowrap' }}>
+                                    AI가 자동으로 매칭한 브랜드예요
+                                </div>
+                            )}
+                        </div>
+                        <ChevronRight size={15} color={colors.text.muted} style={{ flexShrink: 0 }} />
+                    </div>
+                ) : product.brandMatchStatus === 'unmatched' ? (
+                    /* 미매칭: 브랜드 없음 — 클릭하면 모달로 직접 검색 가능 */
+                    <>
+                        <div
+                            onClick={() => setShowBrandModal(true)}
+                            style={{
+                                ...inputBase,
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                background: colors.bg.surface,
+                                cursor: 'pointer', transition: 'border-color 0.15s',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = colors.primary; }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = colors.border.default; }}
+                        >
+                            <span style={{ fontSize: font.size.base, color: colors.text.muted }}>브랜드 없음</span>
+                            <ChevronRight size={15} color={colors.text.muted} style={{ flexShrink: 0 }} />
+                        </div>
+                        <div style={{ fontSize: font.size.xs, color: colors.primary, marginTop: spacing['1'], lineHeight: font.lineHeight.normal }}>
+                            * Qoo10에 등록되지 않은 브랜드라 "브랜드 없음"으로 설정됐어요. 직접 검색해서 변경할 수 있어요.
+                        </div>
+                    </>
+                ) : (
+                    /* 브랜드 없음 — 클릭하면 모달로 검색 가능 */
+                    <div
+                        onClick={() => setShowBrandModal(true)}
+                        style={{
+                            ...inputBase,
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            background: colors.bg.surface,
+                            cursor: 'pointer', transition: 'border-color 0.15s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = colors.primary; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = colors.border.default; }}
+                    >
+                        <span style={{ fontSize: font.size.base, color: colors.text.muted }}>브랜드 없음</span>
+                        <ChevronRight size={15} color={colors.text.muted} style={{ flexShrink: 0 }} />
+                    </div>
+                )}
+            </div>
+
+            {showBrandModal && (() => {
+                const fallbackCode = QOO10_BRANDS.find(b => b.name === product.brand)?.code;
+                return <BrandSelectModal
+                    currentCode={product.brandMatchStatus === 'matched'
+                        ? (product.brandQoo10Code || fallbackCode)
+                        : undefined}
+                    aiMatchedCode={product.aiRecommendedBrandCode
+                        || product.brandQoo10Code
+                        || fallbackCode}
+                    onSelect={(brand) => {
+                        if (brand) {
+                            updateProduct(product.id, {
+                                brandMatchStatus: 'matched',
+                                brandQoo10Code: brand.code,
+                            });
+                        } else {
+                            updateProduct(product.id, {
+                                brandMatchStatus: 'none',
+                                brandQoo10Code: undefined,
+                            });
+                        }
+                    }}
+                    onClose={() => setShowBrandModal(false)}
+                />;
+            })()}
+
+            <Divider />
+
             {/* ── 상품명 ── */}
             <div id="section-title">
                 <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
@@ -783,7 +973,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                     {!hasJaTitle && (
                         <p style={{ margin: `${spacing['1']} 0 0`, display: 'flex', alignItems: 'center', gap: '4px', fontSize: font.size.xs, color: colors.warningIcon }}>
                             <Info size={12} style={{ flexShrink: 0 }} />
-                            현재 한국어 원본이에요. 우측 AI 번역 버튼을 누르면 일본어로 번역해 드려요.
+                            현재 한국어 원본이에요. AI 번역 버튼을 누르면 일본어로 번역하고, Qoo10 가이드라인에 맞게 자동 수정해 드려요.
                         </p>
                     )}
                 </div>
@@ -894,7 +1084,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
             {/* ── 상세설명 ── */}
             <div id="section-desc">
                 <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span style={sectionLabelStyle}>상세설명</span>
                         <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
                         {isDescDone
@@ -1044,73 +1234,50 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                     style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                         padding: `11px ${spacing['3']}`,
-                        border: `1.5px solid ${colors.border.default}`,
+                        border: `1.5px solid ${isAiCategory ? colors.primaryBorder : colors.border.default}`,
                         borderRadius: radius.md,
                         background: colors.bg.surface,
                         cursor: 'pointer', transition: 'border-color 0.15s',
-                        position: 'relative',
                     }}
-                    onMouseEnter={e => {
-                        e.currentTarget.style.borderColor = colors.primary;
-                        if (isAiCategory) (e.currentTarget.querySelector('[data-cat-tip]') as HTMLElement)?.style.setProperty('display', 'flex');
-                    }}
-                    onMouseLeave={e => {
-                        e.currentTarget.style.borderColor = colors.border.default;
-                        if (isAiCategory) (e.currentTarget.querySelector('[data-cat-tip]') as HTMLElement)?.style.setProperty('display', 'none');
-                    }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = colors.primary; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = isAiCategory ? colors.primaryBorder : colors.border.default; }}
                 >
                     {isAiCategory && (
-                        <>
-                            <div style={{
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                background: colors.primary,
-                                borderRadius: radius.xs,
-                                padding: '3px 5px',
-                                marginRight: spacing['2'],
-                                flexShrink: 0,
-                                lineHeight: 1,
-                            }}>
-                                <AIIcon size={12} color="#fff" />
-                            </div>
-                            <div data-cat-tip="" style={{
-                                display: 'none',
-                                alignItems: 'center', gap: '6px',
-                                position: 'absolute', top: 'calc(100% + 8px)', left: '0',
-                                background: colors.text.primary, color: '#fff',
-                                fontSize: font.size.sm, fontWeight: 500,
-                                padding: `${spacing['2']} ${spacing['3']}`, borderRadius: radius.md,
-                                whiteSpace: 'nowrap', pointerEvents: 'none',
-                                zIndex: zIndex.dropdown,
-                            }}>
-                                <div style={{
-                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                    background: colors.primary,
-                                    padding: '3px 5px', borderRadius: radius.xs, lineHeight: 1,
-                                }}>
-                                    <AIIcon size={10} color="#fff" />
-                                </div>
-                                AI가 쇼핑몰 카테고리를 분석해 자동 매칭했어요
-                            </div>
-                        </>
+                        <div style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: colors.primary,
+                            borderRadius: radius.xs,
+                            padding: '3px 5px',
+                            marginRight: spacing['2'],
+                            flexShrink: 0,
+                            lineHeight: 1,
+                        }}>
+                            <AIIcon size={12} color="#fff" />
+                        </div>
                     )}
                     <div style={{ minWidth: 0, flex: 1 }}>
                         <div style={{ fontSize: font.size.base, color: colors.text.primary }}>
-                            {toKoCategory(product.qoo10CategoryPath)}
-                        </div>
-                        <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginTop: '2px' }}>
-                            {toJaCategory(product.qoo10CategoryPath)}
+                            {product.qoo10CategoryPath}
                         </div>
                     </div>
-                    <ChevronDown size={15} color={colors.text.muted} style={{ flexShrink: 0 }} />
+                    <ChevronRight size={15} color={colors.text.muted} style={{ flexShrink: 0 }} />
                 </div>
             </div>
 
             <Divider />
 
-            {/* ── 브랜드 / 제조사 / 원산지 ── */}
+            {/* ── 발송가능일 ── */}
+            <ShippingSelect
+                shippingType={product.shippingType ?? 'standard'}
+                shippingDays={product.shippingDays ?? 3}
+                onChange={(type, days) => updateProduct(product.id, { shippingType: type, shippingDays: days })}
+            />
+
+            <Divider />
+
+            {/* ── 제조사 / 원산지 ── */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['4'] }}>
                 {([
-                    { label: '브랜드', field: 'brand' as const, placeholder: '브랜드명을 입력하세요' },
                     { label: '제조사', field: 'manufacturer' as const, placeholder: '제조사를 입력하세요' },
                     { label: '원산지', field: 'productionPlace' as const, placeholder: '원산지를 입력하세요 (예: 대한민국)' },
                 ] as const).map(({ label, field, placeholder }) => (
@@ -1131,6 +1298,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 ))}
             </div>
 
+
             <ConfirmModal
                 isOpen={showWriteConfirm}
                 onClose={() => setShowWriteConfirm(false)}
@@ -1143,12 +1311,13 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
             />
 
             {showCategoryModal && (
-                <CategoryModal
-                    current={product.qoo10CategoryPath}
-                    aiRecommended={product.aiRecommendedCategoryPath}
-                    onSelect={(jaPath) => updateProduct(product.id, {
-                        qoo10CategoryPath: jaPath,
-                        qoo10CategoryId: `cat-${jaPath.replace(/[^\w]/g, '-')}`,
+                <CategorySelectModal
+                    currentCode={product.qoo10CategoryId}
+                    currentPath={product.qoo10CategoryPath}
+                    aiRecommendedCode={product.aiRecommendedCategoryId || undefined}
+                    onSelect={(item) => updateProduct(product.id, {
+                        qoo10CategoryPath: item.path,
+                        qoo10CategoryId: item.smallCode,
                     })}
                     onClose={() => setShowCategoryModal(false)}
                 />

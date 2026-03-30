@@ -17,7 +17,7 @@ interface OnboardingLayoutProps {
 const STEPS: StepItem[] = [
     { id: 1, label: '계정 연동' },
     { id: 2, label: '기본 정보' },
-    { id: 3, label: '마진/배송비' },
+    { id: 3, label: '배송비/마진' },
 ];
 
 const MAX_STEP_KEY = 'onboarding_max_step';
@@ -47,6 +47,7 @@ export default function OnboardingLayout({ children, currentStep, onStepClick, e
     }, [currentStep, maxVisited]);
 
     useEffect(() => {
+        setContentVisible(false);
         const needsTransition = prevStepRef.current !== currentStep;
         // 프로그레스 바 먼저 전환
         const stepTimer = setTimeout(() => {

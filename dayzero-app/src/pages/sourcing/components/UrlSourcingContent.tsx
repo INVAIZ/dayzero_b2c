@@ -146,21 +146,33 @@ export const UrlSourcingContent = () => {
                 const salePriceKrw = costKrw + margin;
                 const salePriceJpy = Math.round(salePriceKrw * 0.11);
 
-                // Realistic category mapping
+                // 상품명 키워드 기반 카테고리 자동 매칭
                 const providerName = typeof current.provider === 'string' ? current.provider : (current.provider as any)?.name || '기타';
-                let catId = '100000001';
-                let catPath = 'ビューティー > スキンケア > クリーム';
-                let sourceCatPath = '뷰티 > 스킨케어 > 크림';
+                const titleLower = realTitle.toLowerCase();
 
-                if (isKpop || providerName.includes('알라딘') || providerName.includes('케이타운') || providerName.includes('Weverse')) {
-                    catId = '200000001';
-                    catPath = 'エンターテインメント > CD・音楽 > K-POP';
-                    sourceCatPath = '엔터테인먼트 > 음반 > K-POP';
-                } else if (providerName.includes('쿠팡') || providerName.includes('다이소')) {
-                    catId = '300000001';
-                    catPath = '日用品・生活雑貨 > 洗剤・クリーナー > 台所用洗剤';
-                    sourceCatPath = '생활용품 > 세제/세정 > 주방세제';
-                }
+                const categoryRules: { match: (t: string) => boolean; catId: string; catPath: string; sourceCatPath: string }[] = [
+                    // K-POP
+                    { match: () => isKpop, catId: '320001783', catPath: 'KPOP > 세트 > 세트', sourceCatPath: '엔터테인먼트 > 음반 > K-POP' },
+                    // 스킨케어
+                    { match: t => /크림|cream/i.test(t), catId: '320001621', catPath: '스킨케어 > 기초화장품 > 크림', sourceCatPath: '올리브영 > 스킨케어 > 크림' },
+                    { match: t => /토너|스킨|toner/i.test(t), catId: '320001619', catPath: '스킨케어 > 기초화장품 > 토너', sourceCatPath: '올리브영 > 스킨케어 > 토너' },
+                    { match: t => /세럼|에센스|앰플|serum/i.test(t), catId: '320001623', catPath: '스킨케어 > 기초화장품 > 에센스', sourceCatPath: '올리브영 > 스킨케어 > 에센스' },
+                    { match: t => /마스크|팩|패드|pad|mask/i.test(t), catId: '320001628', catPath: '스킨케어 > 팩 > 마스크 팩', sourceCatPath: '올리브영 > 스킨케어 > 마스크/팩' },
+                    { match: t => /쿠션|파운데이션|파운웨어/i.test(t), catId: '320001657', catPath: '베이스 메이크업 > 파운데이션 > 쿠션 파운데이션', sourceCatPath: '올리브영 > 메이크업 > 쿠션' },
+                    { match: t => /샴푸|shampoo/i.test(t), catId: '320001775', catPath: '헤어 > 헤어케어 > 샴푸', sourceCatPath: '올리브영 > 헤어케어 > 샴푸' },
+                    // 생활용품
+                    { match: t => /세제|세탁|퍼실|다우니/i.test(t), catId: '300003269', catPath: '생활용품・잡화 > 소모품 > 세탁 세제', sourceCatPath: '쿠팡 > 생활용품 > 세탁세제' },
+                    { match: t => /라면|볶음면|면류/i.test(t), catId: '300000554', catPath: '식품 > 라면・면류 > 라면', sourceCatPath: '쿠팡 > 식품 > 라면' },
+                    { match: t => /밀폐|용기|보관/i.test(t), catId: '320000820', catPath: '키친용품 > 키친 잡화 > 보존 용기・밀폐 용기', sourceCatPath: '쿠팡 > 주방용품 > 밀폐용기' },
+                    { match: t => /프라이팬|냄비/i.test(t), catId: '300000501', catPath: '키친용품 > 조리용품 > 프라이팬', sourceCatPath: '쿠팡 > 주방용품 > 프라이팬' },
+                    { match: t => /선풍기|팬/i.test(t), catId: '320002065', catPath: '계절가전 > 선풍기・서큘레이터 > 서큘레이터', sourceCatPath: '다이소 > 가전 > 선풍기' },
+                    { match: t => /쓰레기통|분리수거/i.test(t), catId: '300002942', catPath: '가구・인테리어 > 인테리어・장식 > 쓰레기통', sourceCatPath: '다이소 > 생활 > 쓰레기통' },
+                ];
+
+                const matched = categoryRules.find(r => r.match(titleLower));
+                let catId = matched?.catId ?? '320001621';
+                let catPath = matched?.catPath ?? '스킨케어 > 기초화장품 > 크림';
+                let sourceCatPath = matched?.sourceCatPath ?? (providerName + ' > 기타');
 
                 // 무게 시뮬레이션 (수집된 무게 vs AI 예측 무게)
                 const isAlbum = realTitle.includes('Album') || realTitle.includes('음반');
@@ -191,7 +203,7 @@ export const UrlSourcingContent = () => {
                         [{ nameKo: '소', stock: 800 }, { nameKo: '중', stock: 600 }, { nameKo: '대', stock: 400 }],
                         [{ nameKo: '화이트', stock: 500 }, { nameKo: '블랙', stock: 500 }],
                     ];
-                    const optSet = catPath.includes('생활용품') ? dailyOptions : beautyOptions;
+                    const optSet = catPath.includes('생활용품') || catPath.includes('소모품') ? dailyOptions : beautyOptions;
                     const chosen = optSet[i % optSet.length];
                     return chosen.map((o, vi) => ({
                         id: `opt-${pid}-${vi}`, nameKo: o.nameKo, nameJa: null, stock: o.stock,
@@ -209,7 +221,7 @@ export const UrlSourcingContent = () => {
                         ];
                         return labels[i % labels.length];
                     }
-                    if (catPath.includes('生活雑貨') || catPath.includes('洗剤')) {
+                    if (catPath.includes('생활용품') || catPath.includes('소모품')) {
                         const labels = [
                             { brand: 'LG생활건강', manufacturer: 'LG생활건강(주)', productionPlace: '대한민국' },
                             { brand: '아모레퍼시픽', manufacturer: '(주)아모레퍼시픽', productionPlace: '대한민국' },
@@ -239,9 +251,11 @@ export const UrlSourcingContent = () => {
                     salePriceJpy,
                     qoo10CategoryId: catId,
                     qoo10CategoryPath: catPath,
+                    aiRecommendedCategoryId: catId,
                     aiRecommendedCategoryPath: catPath,
                     sourceCategoryPath: sourceCatPath,
                     brand: productMeta.brand,
+                    brandMatchStatus: 'matched' as const,
                     manufacturer: productMeta.manufacturer,
                     productionPlace: productMeta.productionPlace,
                     provider: mockProduct.provider,
@@ -258,6 +272,8 @@ export const UrlSourcingContent = () => {
                     isWeightEstimated: isAIPredicted,
                     weightSource: isAIPredicted ? 'ai' as const : 'crawled' as const,
                     priceSource: 'crawled' as const,
+                    shippingType: 'standard' as const,
+                    shippingDays: 3,
                 });
 
                 addProduct(mockProduct);

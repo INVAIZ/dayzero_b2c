@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ProductDetail, TranslationJob, EditTabFilter, TranslationBatch, RegistrationBatch } from '../types/editing';
 import { PENDING_JA_TITLES, getProductMeta } from '../mock/editingMock';
-import { toJaCategory } from '../mock/categoryMap';
+import { getCategoryByCode, CATEGORY_FLAT } from '../mock/qoo10Categories';
 import { toJaTitle, mockTranslateOption, MOCK_DESC_JA } from '../utils/editing';
 
 interface EditingState {
@@ -342,6 +342,14 @@ export const useEditingStore = create<EditingState>()(
   }),
   {
       name: 'dayzero-editing-products',
+      version: 3, // v3: 브랜드 매칭 + 발송가능일 필드 추가
+      migrate: (_persisted, version) => {
+          if (version < 3) {
+              // v1→v2: 일본어 카테고리 경로 → 한국어 + 실제 코드. 상품 데이터 초기화해서 새 mock 데이터 사용
+              return { products: [] };
+          }
+          return _persisted as Record<string, unknown>;
+      },
       partialize: (state) => ({ products: state.products }),
       onRehydrateStorage: () => (state) => {
           if (!state) return;
@@ -381,19 +389,43 @@ export const useEditingStore = create<EditingState>()(
                       sourceCategoryPath: updated.sourceCategoryPath || meta.sourceCategoryPath,
                   };
               }
-              // qoo10CategoryPath가 한국어로 저장된 경우 일본어로 변환
-              const jaPath = toJaCategory(updated.qoo10CategoryPath);
-              if (jaPath !== updated.qoo10CategoryPath) {
-                  updated = { ...updated, qoo10CategoryPath: jaPath };
+              // 구 데이터 마이그레이션: 일본어 경로 또는 가짜 catId → 실제 코드로 변환
+              const isOldCatId = !updated.qoo10CategoryId || updated.qoo10CategoryId.startsWith('qoo10-') || updated.qoo10CategoryId.startsWith('cat-');
+              const hasJaPath = /[\u3000-\u9FFF]/.test(updated.qoo10CategoryPath ?? '');
+              if (isOldCatId || hasJaPath) {
+                  // 실제 코드가 있으면 경로를 복원, 없으면 FLAT에서 이름 매칭 시도
+                  const byCode = !isOldCatId ? getCategoryByCode(updated.qoo10CategoryId) : undefined;
+                  if (byCode) {
+                      updated = { ...updated, qoo10CategoryPath: byCode.path };
+                  } else {
+                      // 경로 내 소분류 이름으로 매칭 시도
+                      const pathParts = (updated.qoo10CategoryPath ?? '').split('>').map((s: string) => s.trim());
+                      const lastPart = pathParts[pathParts.length - 1];
+                      const match = lastPart ? CATEGORY_FLAT.find(c => c.smallName === lastPart || c.path === updated.qoo10CategoryPath) : undefined;
+                      if (match) {
+                          updated = { ...updated, qoo10CategoryId: match.smallCode, qoo10CategoryPath: match.path };
+                      }
+                      // 매칭 안 되면 기존 값 유지 (수동 변경 필요)
+                  }
               }
-              // aiRecommendedCategoryPath 기본값 (일본어 변환 후 설정)
+              // 브랜드 매칭 상태 기본값
+              if (!updated.brandMatchStatus) {
+                  updated = { ...updated, brandMatchStatus: updated.brand && updated.brand !== '-' && updated.brand !== '' ? 'matched' as const : 'none' as const };
+              }
+              // 발송가능일 기본값
+              if (!updated.shippingType) {
+                  updated = { ...updated, shippingType: 'standard' as const, shippingDays: 3 };
+              }
+              // aiRecommended 기본값
               if (!updated.aiRecommendedCategoryPath) {
                   updated = { ...updated, aiRecommendedCategoryPath: updated.qoo10CategoryPath };
-              } else {
-                  const jaAiPath = toJaCategory(updated.aiRecommendedCategoryPath);
-                  if (jaAiPath !== updated.aiRecommendedCategoryPath) {
-                      updated = { ...updated, aiRecommendedCategoryPath: jaAiPath };
-                  }
+              }
+              if (!updated.aiRecommendedCategoryId) {
+                  updated = { ...updated, aiRecommendedCategoryId: updated.qoo10CategoryId };
+              }
+              // AI 추천 브랜드 코드 기본값
+              if (!updated.aiRecommendedBrandCode && updated.brandQoo10Code) {
+                  updated = { ...updated, aiRecommendedBrandCode: updated.brandQoo10Code };
               }
               return updated;
           });
