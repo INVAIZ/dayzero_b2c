@@ -460,6 +460,11 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
     const [showDescManual, setShowDescManual] = useState(false);
     const [showTranslateTooltip, setShowTranslateTooltip] = useState(false);
     const [translatingOptionIds, setTranslatingOptionIds] = useState<Set<string>>(new Set());
+    const [isBatchTranslating, setIsBatchTranslating] = useState(false);
+    const [batchStepLabel, setBatchStepLabel] = useState('');
+    const [batchStep, setBatchStep] = useState(0);
+    const [batchTotal, setBatchTotal] = useState(0);
+    const batchAbortRef = useRef(false);
 
     const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -488,6 +493,11 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
         setShowTranslateTooltip(false);
         setTranslatingOptionIds(new Set());
         setTitleKoEdited(false);
+        setIsBatchTranslating(false);
+        setBatchStepLabel('');
+        setBatchStep(0);
+        setBatchTotal(0);
+        batchAbortRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product.id]);
 
@@ -611,6 +621,122 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 }
             }, delay);
         });
+    };
+
+    const handleBatchTranslate = async () => {
+        if (isBatchTranslating || isTranslatingTitle || isTranslatingAnyOption || isWritingDesc || isTranslatingDesc) return;
+        setIsBatchTranslating(true);
+        batchAbortRef.current = false;
+
+        const wait = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
+
+        const currentHasJaTitle = !!titleRef.current && titleRef.current !== stripPrefix(product.titleKo) && !hasKorean(titleRef.current);
+        const currentOptions = optionsRef.current;
+        const currentAllOptionsDone = currentOptions.length === 0 || currentOptions.every(o => !!o.nameJa || !hasKorean(o.nameKo));
+        const currentDescJa = descRef.current;
+        const currentIsDescDone = !!currentDescJa && !hasKorean(currentDescJa);
+        const total = [!currentHasJaTitle, !currentAllOptionsDone && currentOptions.length > 0, !currentIsDescDone].filter(Boolean).length;
+        setBatchTotal(total);
+        let step = 0;
+
+        // Step 1: 상품명 번역
+        if (!currentHasJaTitle && !batchAbortRef.current) {
+            step++;
+            setBatchStep(step);
+            setBatchStepLabel('상품명을 번역하고 있어요...');
+            await new Promise<void>(resolve => {
+                setIsTranslatingTitle(true);
+                setTimeout(() => {
+                    const raw = PENDING_JA_TITLES[product.id] ?? toJaTitle(product.titleKo);
+                    const translatedTitle = stripPrefix(raw);
+                    setTitleJa(translatedTitle);
+                    setIsTranslatingTitle(false);
+                    setTitleKoEdited(false);
+                    updateProduct(product.id, { titleJa: translatedTitle });
+                    resolve();
+                }, 2500 + Math.random() * 1000);
+            });
+            await wait(500);
+        }
+
+        // Step 2: 옵션 번역
+        if (!currentAllOptionsDone && currentOptions.length > 0 && !batchAbortRef.current) {
+            step++;
+            setBatchStep(step);
+            setBatchStepLabel('상품 옵션을 번역하고 있어요...');
+            await new Promise<void>(resolve => {
+                const ids = new Set(currentOptions.map(o => o.id));
+                setTranslatingOptionIds(ids);
+                const snapshot = [...currentOptions];
+                let cumulativeDelay = 0;
+                snapshot.forEach((opt, i) => {
+                    cumulativeDelay += 1200 + Math.random() * 600;
+                    const delay = cumulativeDelay;
+                    setTimeout(() => {
+                        const jaName = mockTranslateOpt(opt.nameKo);
+                        setOptions(prev => prev.map(o => o.id === opt.id ? { ...o, nameJa: jaName } : o));
+                        setTranslatingOptionIds(prev => {
+                            const next = new Set(prev);
+                            next.delete(opt.id);
+                            return next;
+                        });
+                        if (i === snapshot.length - 1) {
+                            const translatedOptions = snapshot.map(o => ({
+                                ...o,
+                                nameJa: mockTranslateOpt(o.nameKo),
+                            }));
+                            updateProduct(product.id, { options: translatedOptions });
+                            resolve();
+                        }
+                    }, delay);
+                });
+            });
+            await wait(500);
+        }
+
+        // Step 3: 상세설명 작성 + 번역
+        if (!currentIsDescDone && !batchAbortRef.current) {
+            step++;
+            setBatchStep(step);
+            // 3a: 한국어 초안이 없으면 AI 작성
+            if (!descKo.trim()) {
+                setBatchStepLabel('상세설명을 작성하고 있어요...');
+                await new Promise<void>(resolve => {
+                    setIsWritingDesc(true);
+                    setTimeout(() => {
+                        const newKo = '이 제품은 피부 타입에 맞는 순한 성분으로 만들어진 스킨케어 제품입니다. 자극 없이 촉촉하게 피부를 정돈해 드립니다.\n\n【특징】\n・민감한 피부에도 부드러운 저자극 처방\n・오래 지속되는 보습을 유지하는 히알루론산 함유\n・한국 코스메틱 브랜드의 인기 상품\n\n【사용 방법】\n세안 후 적당량을 피부에 부드럽게 발라주세요.';
+                        setDescKo(newKo);
+                        setDescMode('ko');
+                        setIsWritingDesc(false);
+                        updateProduct(product.id, { descriptionKo: newKo });
+                        resolve();
+                    }, 3500 + Math.random() * 1500);
+                });
+                await wait(500);
+            }
+
+            // 3b: 일본어 번역
+            if (!batchAbortRef.current) {
+                setBatchStepLabel('작성된 상세설명을 번역하고 있어요...');
+                await new Promise<void>(resolve => {
+                    setIsTranslatingDesc(true);
+                    setTimeout(() => {
+                        const newJa = '肌タイプに合わせた優しい成分で作られたスキンケア製品です。刺激なくしっとりと肌を整えます。\n\n【特徴】\n・敏感肌にも優しい低刺激処方\n・長時間保湿をキープするヒアルロン酸配合\n・韓国コスメブランドの人気商品\n\n【使用方法】\n洗顔後、適量をお肌に優しく馴染ませてください。';
+                        setDescJa(newJa);
+                        setDescMode('ja');
+                        setIsTranslatingDesc(false);
+                        updateProduct(product.id, {
+                            descriptionJa: newJa,
+                            translationStatus: 'completed',
+                        });
+                        resolve();
+                    }, 2500 + Math.random() * 1000);
+                });
+            }
+        }
+
+        setIsBatchTranslating(false);
+        setBatchStepLabel('');
     };
 
     const updateOption = (id: string, field: keyof ProductOption, value: string | number) => {
@@ -738,6 +864,50 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                 </div>
                             ))}
                         </div>
+                        {/* 일괄 번역 버튼 */}
+                        {(() => {
+                            if (allDone) return null;
+                            const isAnyRunning = isTranslatingTitle || isTranslatingAnyOption || isWritingDesc || isTranslatingDesc;
+                            const isIdle = !isBatchTranslating;
+                            const remaining = progressItems.length - progressDoneCount;
+
+                            return (
+                                <button
+                                    onClick={isIdle ? handleBatchTranslate : undefined}
+                                    disabled={isIdle && isAnyRunning}
+                                    style={{
+                                        width: '100%',
+                                        marginTop: spacing['3'],
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                                        padding: `${spacing['3']} ${spacing['4']}`,
+                                        background: colors.primary,
+                                        border: 'none',
+                                        borderRadius: radius.md,
+                                        fontSize: font.size.sm, fontWeight: 600,
+                                        color: '#fff',
+                                        cursor: (isIdle && !isAnyRunning) ? 'pointer' : 'default',
+                                        transition: 'all 0.25s',
+                                        opacity: (isIdle && isAnyRunning) ? 0.5 : 1,
+                                    }}
+                                    onMouseEnter={e => { if (isIdle && !isAnyRunning) e.currentTarget.style.opacity = '0.85'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.opacity = (isIdle && isAnyRunning) ? '0.5' : '1'; }}
+                                >
+                                    {isBatchTranslating ? (
+                                        <>
+                                            <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
+                                            {`${batchStepLabel} (${batchStep}/${batchTotal})`}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <AIIcon size={14} color="#fff" />
+                                            {remaining === progressItems.length
+                                                ? '한 번에 번역 및 작성하기'
+                                                : `남은 ${remaining}개 항목 번역 및 작성하기`}
+                                        </>
+                                    )}
+                                </button>
+                            );
+                        })()}
                     </div>
                 );
             })()}
