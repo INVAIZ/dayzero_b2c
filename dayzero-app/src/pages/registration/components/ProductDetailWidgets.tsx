@@ -163,10 +163,13 @@ export const AlertCard: React.FC<{
 
     const getDescription = () => {
         if (isOutOfStock && isPaused && isMonitored) {
-            return '현재 판매가 일시 중지된 상태예요. 쇼핑몰에서 재입고되면 가격·재고 자동 확인으로 알려드릴게요.';
+            return '현재 판매가 일시 중지된 상태예요. 재입고되면 자동으로 판매를 재개해드릴게요.';
         }
         if (isOutOfStock && isPaused && !isMonitored) {
-            return '현재 판매가 일시 중지된 상태예요. 가격·재고 자동 확인을 켜면 재입고 시 바로 알려드릴게요.';
+            return '현재 판매가 일시 중지된 상태예요. 가격·재고 자동 확인을 켜면 재입고 시 자동으로 재개해드릴게요.';
+        }
+        if (isOutOfStock && !isPaused) {
+            return '판매를 일시중지하거나, 국내 쇼핑몰에서 재고 상태를 확인해주세요.';
         }
         return description;
     };

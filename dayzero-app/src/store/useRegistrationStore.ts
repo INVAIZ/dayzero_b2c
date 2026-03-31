@@ -359,36 +359,50 @@ export const useRegistrationStore = create<RegistrationState>()(
 
             seedDemoIssues: () => {
                 const now = new Date();
-                const checkTime = new Date(now);
-                checkTime.setHours(7, 0, 0, 0);
-                const nextCheck = new Date(checkTime);
+                const nextCheck = new Date(now);
                 nextCheck.setDate(nextCheck.getDate() + 1);
+                nextCheck.setHours(7, 0, 0, 0);
+
+                // 다양한 감지 시간 (시간대별로 분산)
+                const hoursAgo = [1, 2, 3, 5, 9, 14, 22];
+                // 이슈 유형 패턴: 품절, 역마진, 재입고 혼합 (재입고를 2번째에 배치)
+                const issuePattern: Array<'out_of_stock' | 'negative_margin' | 'restocked'> = [
+                    'out_of_stock', 'restocked', 'negative_margin',
+                    'out_of_stock', 'negative_margin', 'out_of_stock', 'negative_margin',
+                ];
 
                 set((state) => {
-                    // 성공 결과 중 모니터링 가능한 상품 찾기
                     const allResults = state.jobs.flatMap(j => j.results.filter(r => r.status === 'success'));
-                    // 모니터링 안 된 상품이면 먼저 활성화
-                    const targets = allResults.slice(0, 2);
-                    if (targets.length < 2) return state;
+                    const targets = allResults.slice(0, Math.min(allResults.length, 7));
+                    if (targets.length === 0) return state;
 
-                    const issueTypes: Array<'out_of_stock' | 'negative_margin'> = ['out_of_stock', 'negative_margin'];
-                    const targetIds = new Map(targets.map((t, i) => [t.id, issueTypes[i]]));
+                    const targetMap = new Map(
+                        targets.map((t, i) => [t.id, { issueType: issuePattern[i % issuePattern.length], hoursAgo: hoursAgo[i % hoursAgo.length], idx: i }])
+                    );
 
                     return {
                         jobs: state.jobs.map(j => ({
                             ...j,
                             results: j.results.map(r => {
-                                const issueType = targetIds.get(r.id);
-                                if (!issueType) return r;
+                                const config = targetMap.get(r.id);
+                                if (!config) return r;
 
-                                const simulated = issueType === 'out_of_stock'
+                                const checkTime = new Date(now.getTime() - config.hoursAgo * 60 * 60 * 1000);
+
+                                const simulated = config.issueType === 'out_of_stock'
                                     ? {
                                         result: 'out_of_stock' as const,
                                         currentPrice: r.product.originalPriceKrw,
-                                        issueDescription: '쇼핑몰에서 해당 상품이 품절됐어요. Qoo10 판매를 일시 중지하거나, 다른 쇼핑몰을 찾아주세요.',
+                                        issueDescription: '해당 상품이 품절됐어요.',
+                                    }
+                                    : config.issueType === 'restocked'
+                                    ? {
+                                        result: 'restocked' as const,
+                                        currentPrice: r.product.originalPriceKrw,
+                                        issueDescription: '재입고가 확인돼 자동으로 판매가 재개됐어요.',
                                     }
                                     : (() => {
-                                        const increase = Math.round(r.product.originalPriceKrw * 0.6);
+                                        const increase = Math.round(r.product.originalPriceKrw * (0.4 + Math.random() * 0.3));
                                         const newPrice = r.product.originalPriceKrw + increase;
                                         const saleInKrw = r.product.salePriceJpy / 0.11;
                                         const marginPct = ((saleInKrw - newPrice) / saleInKrw * 100).toFixed(1);
@@ -396,7 +410,7 @@ export const useRegistrationStore = create<RegistrationState>()(
                                         return {
                                             result: 'negative_margin' as const,
                                             currentPrice: newPrice,
-                                            issueDescription: `쇼핑몰 구매가가 ₩${r.product.originalPriceKrw.toLocaleString()} → ₩${newPrice.toLocaleString()}로 올라 현재 판매가(¥${r.product.salePriceJpy.toLocaleString()}) 기준 마진율이 ${marginPct}%예요. 판매가를 ¥${recommendedJpy.toLocaleString()} 이상으로 조정하거나, 다른 쇼핑몰을 검토해주세요.`,
+                                            issueDescription: `구매가가 ₩${r.product.originalPriceKrw.toLocaleString()} → ₩${newPrice.toLocaleString()}로 올라 마진율이 ${marginPct}%예요. 판매가를 ¥${recommendedJpy.toLocaleString()} 이상으로 조정해주세요.`,
                                         };
                                     })();
 
@@ -407,8 +421,36 @@ export const useRegistrationStore = create<RegistrationState>()(
                                     simulated.currentPrice,
                                 );
 
+                                const idx = config.idx;
+
+                                // 재입고: 판매 재개 상태
+                                if (simulated.result === 'restocked') {
+                                    return {
+                                        ...r,
+                                        salesStatus: 'active' as const,
+                                        pauseReason: undefined,
+                                        monitoring: {
+                                            status: 'active' as const,
+                                            lastCheckResult: simulated.result,
+                                            lastCheckAt: checkTime.toISOString(),
+                                            nextCheckAt: nextCheck.toISOString(),
+                                            currentSourcePriceKrw: simulated.currentPrice,
+                                            priceHistory: history,
+                                            issueDescription: simulated.issueDescription,
+                                        },
+                                    };
+                                }
+
+                                // 대부분 자동 처리, idx===5 (6번째)만 자동중지 안 됨 → 빨간 품절
+                                const shouldAutoPause = idx !== 5;
+                                const autoPause = shouldAutoPause && (
+                                    (state.autoPauseOnOutOfStock && simulated.result === 'out_of_stock') ||
+                                    (state.autoPauseOnNegativeMargin && simulated.result === 'negative_margin')
+                                );
+
                                 return {
                                     ...r,
+                                    ...(autoPause ? { salesStatus: 'paused' as const, pauseReason: 'auto' as const } : {}),
                                     monitoring: {
                                         status: 'active' as const,
                                         lastCheckResult: simulated.result,

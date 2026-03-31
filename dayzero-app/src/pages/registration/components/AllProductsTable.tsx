@@ -98,6 +98,7 @@ const MONITORING_LABELS: Record<MonitoringCheckResult, { label: string; color: s
     price_changed: { label: '가격 변동', color: colors.warningIcon, bg: colors.warningLight, icon: <TrendingDown size={12} /> },
     negative_margin: { label: '역마진', color: colors.danger, bg: colors.dangerLight, icon: <AlertTriangle size={12} /> },
     out_of_stock: { label: '품절', color: colors.danger, bg: colors.dangerLight, icon: <PackageX size={12} /> },
+    restocked: { label: '정상', color: colors.success, bg: colors.successLight, icon: <Shield size={12} /> },
 };
 
 export const AllProductsTable: React.FC<Props> = ({
@@ -187,7 +188,7 @@ export const AllProductsTable: React.FC<Props> = ({
                     </span>
                 </div>
                 <div style={{ width: '36px', flexShrink: 0, ...colHeader, textAlign: 'center' }}>판매처</div>
-                <div style={{ width: '36px', flexShrink: 0, ...colHeader, textAlign: 'center' }}>수집처</div>
+                <div style={{ width: '70px', flexShrink: 0, ...colHeader, textAlign: 'center' }}>국내 쇼핑몰</div>
             </div>
 
             {/* 상품 목록 */}
@@ -271,7 +272,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                         whiteSpace: 'nowrap',
                                     }}>
                                         <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: colors.warningIcon, flexShrink: 0 }} />
-                                        {r.pauseReason === 'auto' ? '자동 중지' : '일시 중지'}
+                                        일시 중지
                                     </span>
                                 ) : (
                                     <span style={{
@@ -406,14 +407,14 @@ export const AllProductsTable: React.FC<Props> = ({
                                 )}
                             </div>
 
-                            {/* 수집처 링크 */}
-                            <div style={{ width: '36px', flexShrink: 0, textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+                            {/* 국내 쇼핑몰 링크 */}
+                            <div style={{ width: '70px', flexShrink: 0, textAlign: 'center' }} onClick={e => e.stopPropagation()}>
                                 {r.product.sourceUrl ? (
                                     <a
                                         href={r.product.sourceUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        title="수집처에서 보기"
+                                        title="국내 쇼핑몰에서 보기"
                                         style={{ color: colors.primary, display: 'inline-flex', alignItems: 'center' }}
                                     >
                                         <ExternalLink size={14} />

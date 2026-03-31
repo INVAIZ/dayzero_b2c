@@ -79,7 +79,8 @@ export type MonitoringCheckResult =
     | 'normal'            // 🟢 정상
     | 'price_changed'     // 🟡 가격 변동 (마진 유지)
     | 'negative_margin'   // 🔴 역마진
-    | 'out_of_stock';     // ⚫ 품절
+    | 'out_of_stock'      // ⚫ 품절
+    | 'restocked';        // 🟢 재입고 (품절 → 정상)
 
 /** 가격/재고 변동 이력 항목 */
 export interface PriceHistoryEntry {

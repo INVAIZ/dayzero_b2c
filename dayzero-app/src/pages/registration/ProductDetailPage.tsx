@@ -382,14 +382,14 @@ export const ProductDetailPage: React.FC = () => {
                     ) : (
                         <StatusHelper
                             type="watching"
-                            title="매일 확인하고 있어요"
+                            title="매일 가격·재고를 확인하고 있어요"
                             description={autoPauseOnOutOfStock && autoPauseOnNegativeMargin
-                                ? '매일 쇼핑몰의 가격과 재고를 확인하고 있어요. 품절되면 자동으로 판매를 일시중지하고, 원가가 변동되면 판매가를 자동으로 조정해드릴게요.'
+                                ? '품절되면 자동으로 판매를 일시중지하고, 원가가 변동되면 판매가를 자동으로 조정해드릴게요.'
                             : autoPauseOnOutOfStock
-                                ? '매일 쇼핑몰의 가격과 재고를 확인하고 있어요. 품절되면 자동으로 판매를 일시중지해드릴게요. 가격이 변동되면 바로 알려드릴게요.'
+                                ? '품절되면 자동으로 판매를 일시중지해드릴게요. 가격이 변동되면 바로 알려드릴게요.'
                             : autoPauseOnNegativeMargin
-                                ? '매일 쇼핑몰의 가격과 재고를 확인하고 있어요. 원가가 변동되면 판매가를 자동으로 조정해드릴게요. 품절되면 바로 알려드릴게요.'
-                                : '매일 쇼핑몰의 가격과 재고를 확인하고 있어요. 가격이 변동되거나 품절이 발생하면 바로 알려드릴게요.'
+                                ? '원가가 변동되면 판매가를 자동으로 조정해드릴게요. 품절되면 바로 알려드릴게요.'
+                                : '가격이 변동되거나 품절이 발생하면 바로 알려드릴게요.'
                             }
                         />
                     )
@@ -462,11 +462,11 @@ export const ProductDetailPage: React.FC = () => {
                         <InfoRow label="등록일" value={formatFullDate(result.registeredAt)} />
                     </InfoCard>
 
-                    {/* 원본 쇼핑몰 정보 */}
+                    {/* 국내 쇼핑몰 정보 */}
                     <InfoCard
                         title={
                             <span style={{ display: 'inline-flex', alignItems: 'center', gap: spacing['2'] }}>
-                                원본 쇼핑몰 정보
+                                국내 쇼핑몰 정보
                                 <a
                                     href={product.sourceUrl}
                                     target="_blank"

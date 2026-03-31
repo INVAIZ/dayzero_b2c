@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, LayoutList, PackageOpen, ChevronRight } from 'lucide-react';
+import { Search, LayoutList, PackageOpen, ChevronRight, Settings } from 'lucide-react';
 import { useSourcingStore } from '../../store/useSourcingStore';
+import { useToastStore } from '../../store/useToastStore';
+import { colors, font, radius, spacing } from '../../design/tokens';
 
 type NavItem = '수집하기' | '수집된 상품' | '판매 중인 상품';
 
@@ -164,6 +166,35 @@ export const Sidebar: React.FC = () => {
                     {isRegistrationActive && <ChevronRight size={16} color="#B0B8C1" style={{ marginLeft: 'auto' }} />}
                 </button>
             </nav>
+
+            {/* Spacer to push settings to bottom */}
+            <div style={{ flex: 1 }} />
+
+            <div style={{ borderTop: `1px solid ${colors.border.default}`, paddingTop: spacing['4'] }}>
+                <button
+                    onClick={() => useToastStore.getState().addToast('준비 중이에요')}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: spacing['3'],
+                        width: '100%',
+                        padding: `${spacing['3']} ${spacing['3']}`,
+                        background: 'transparent',
+                        border: 'none',
+                        borderRadius: radius.lg,
+                        cursor: 'pointer',
+                        color: colors.text.tertiary,
+                        fontWeight: font.weight.medium,
+                        fontSize: font.size.base,
+                        transition: 'all 0.2s',
+                    }}
+                    onMouseOver={(e) => { e.currentTarget.style.background = colors.bg.subtle; }}
+                    onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                >
+                    <Settings size={20} color={colors.text.muted} />
+                    설정
+                </button>
+            </div>
 
             {/* Preparation Toast */}
             {showToast && (
