@@ -238,13 +238,19 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
 
     // ── 로컬 상태 ─────────────────────────────────────────────────────────
     const [originalPrice, setOriginalPrice] = useState(product.originalPriceKrw);
-    const [marginRate, setMarginRate] = useState(defaultMarginRate);
+    const initCostJpy = (product.originalPriceKrw + initDomestic + initPrep) / EXCHANGE_RATE + initIntl;
+    const hasExistingPrice = product.salePriceJpy > 0;
+    const initMarginRate = hasExistingPrice
+        ? Math.round(((product.salePriceJpy / initCostJpy) - 1) * 100 * 10) / 10
+        : defaultMarginRate;
+
+    const [marginRate, setMarginRate] = useState(initMarginRate);
     const [domesticShipping, setDomesticShipping] = useState(initDomestic);
     const [prepCost, setPrepCost] = useState(initPrep);
     const [intlShipping, setIntlShipping] = useState(initIntl);
     const [weight, setWeight] = useState(product.weightKg);
     const [salePriceJpy, setSalePriceJpy] = useState(
-        calcPrice(product.originalPriceKrw, defaultMarginRate, initDomestic, initPrep, initIntl)
+        hasExistingPrice ? product.salePriceJpy : calcPrice(product.originalPriceKrw, defaultMarginRate, initDomestic, initPrep, initIntl)
     );
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
@@ -286,8 +292,17 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
         setDomesticShipping(newDomestic);
         setPrepCost(newPrep);
         setIntlShipping(newIntl);
-        setMarginRate(defaultMarginRate);
-        setSalePriceJpy(calcPrice(product.originalPriceKrw, defaultMarginRate, newDomestic, newPrep, newIntl));
+        // 등록된 상품(salePriceJpy가 이미 설정됨)은 기존 판매가 유지 + 마진율 역산
+        if (product.salePriceJpy > 0) {
+            const existingPrice = product.salePriceJpy;
+            const costJpy = (product.originalPriceKrw + newDomestic + newPrep) / EXCHANGE_RATE + newIntl;
+            const reverseMargin = costJpy > 0 ? ((existingPrice / costJpy) - 1) * 100 : 0;
+            setSalePriceJpy(existingPrice);
+            setMarginRate(Math.round(reverseMargin * 10) / 10);
+        } else {
+            setMarginRate(defaultMarginRate);
+            setSalePriceJpy(calcPrice(product.originalPriceKrw, defaultMarginRate, newDomestic, newPrep, newIntl));
+        }
         setWeight(product.weightKg);
         setIsPriceUserEdited(false);
         setIsDomesticUserEdited(false);

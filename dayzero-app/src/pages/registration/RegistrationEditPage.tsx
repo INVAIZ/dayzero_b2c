@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { Sidebar } from '../../components/layout/Sidebar';
-import { ToastContainer } from '../../components/common/ToastContainer';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { useRegistrationStore } from '../../store/useRegistrationStore';
 import { useEditingStore } from '../../store/useEditingStore';
-import { useToastStore } from '../../store/useToastStore';
 import { EditingTabBar, type DetailTab } from '../editing/components/EditingTabBar';
 import { BasicEditTab } from '../editing/tabs/BasicEditTab';
 import { PriceEditTab } from '../editing/tabs/PriceEditTab';
@@ -22,14 +20,15 @@ const TEMP_ID_PREFIX = '__reg_edit__';
 export default function RegistrationEditPage() {
     const { resultId } = useParams<{ resultId: string }>();
     const navigate = useNavigate();
-    const addToast = useToastStore(s => s.addToast);
 
     const { jobs, updateRegisteredProduct } = useRegistrationStore();
     const addProduct = useEditingStore(s => s.addProduct);
     const removeProduct = useEditingStore(s => s.removeProduct);
     const setCurrentEditProduct = useEditingStore(s => s.setCurrentEditProduct);
 
-    const [activeTab, setActiveTab] = useState<DetailTab>('basic');
+    const [searchParams] = useSearchParams();
+    const initialTab = (searchParams.get('tab') as DetailTab) || 'basic';
+    const [activeTab, setActiveTab] = useState<DetailTab>(initialTab);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
     const [pendingLeave, setPendingLeave] = useState<(() => void) | null>(null);
@@ -54,7 +53,12 @@ export default function RegistrationEditPage() {
         // 이미 존재하면 추가하지 않음
         const existing = useEditingStore.getState().products.find(p => p.id === tempProductId);
         if (!existing) {
-            addProduct({ ...result.product, id: tempProductId });
+            const updatedPrice = result.monitoring?.currentSourcePriceKrw;
+            addProduct({
+                ...result.product,
+                id: tempProductId,
+                ...(updatedPrice != null ? { originalPriceKrw: updatedPrice } : {}),
+            });
         }
         setCurrentEditProduct(tempProductId);
 
@@ -98,7 +102,6 @@ export default function RegistrationEditPage() {
         updateRegisteredProduct(resultId, savedProduct);
         isDirtyRef.current = false;
         setIsSaveModalOpen(false);
-        addToast('Qoo10에 반영되었습니다', stripPrefix(product.titleJa ?? product.titleKo));
         navigate(`/registration/${resultId}`);
     };
 
@@ -145,7 +148,6 @@ export default function RegistrationEditPage() {
             fontFamily: "'Pretendard', -apple-system, sans-serif",
         }}>
             <Sidebar />
-            <ToastContainer />
 
             <main style={{
                 flex: 1,
@@ -159,55 +161,60 @@ export default function RegistrationEditPage() {
                     position: 'sticky', top: 0, zIndex: 10,
                     background: colors.bg.surface,
                     borderBottom: `1px solid ${colors.border.default}`,
-                    padding: `${spacing['3']} ${spacing['6']}`,
-                    display: 'flex', alignItems: 'center', gap: spacing['4'],
+                    padding: `${spacing['4']} ${spacing['6']}`,
                     boxShadow: shadow.sm,
+                }}>
+                <div style={{
+                    display: 'flex', alignItems: 'center', gap: spacing['4'],
+                    maxWidth: '1200px', margin: '0 auto',
                 }}>
                     {/* 돌아가기 */}
                     <button
                         onClick={handleBack}
                         style={{
-                            display: 'flex', alignItems: 'center', gap: spacing['2'],
+                            display: 'flex', alignItems: 'center', gap: spacing['1'],
                             background: 'none', border: 'none', cursor: 'pointer',
-                            fontSize: font.size.sm, fontWeight: 500, color: colors.text.tertiary,
+                            fontSize: font.size.sm, color: colors.text.tertiary,
                             padding: `${spacing['1']} ${spacing['2']}`,
                             borderRadius: radius.md,
+                            whiteSpace: 'nowrap', flexShrink: 0,
                             transition: 'color 0.15s',
                         }}
                         onMouseEnter={e => { e.currentTarget.style.color = colors.text.primary; }}
                         onMouseLeave={e => { e.currentTarget.style.color = colors.text.tertiary; }}
                     >
-                        <ArrowLeft size={16} />
+                        <ArrowLeft size={14} />
                         돌아가기
                     </button>
 
-                    <div style={{ width: '1px', height: '24px', background: colors.border.default }} />
+                    <div style={{ width: '1px', height: '32px', background: colors.border.default, flexShrink: 0 }} />
 
-                    {/* 상품 요약 */}
-                    <img
-                        src={product.thumbnailUrl}
-                        alt=""
-                        onError={handleImgError}
-                        style={{
-                            width: '36px', height: '36px',
-                            borderRadius: radius.img,
-                            objectFit: 'cover',
-                            border: `1px solid ${colors.border.default}`,
-                            flexShrink: 0,
-                        }}
-                    />
-                    <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                    {/* 썸네일 + 상품 정보 */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'], flex: 1, minWidth: 0, maxWidth: '600px' }}>
                         <img
-                            src={getProviderLogo(product.provider)}
-                            alt={product.provider}
-                            style={{ width: '16px', height: '16px', borderRadius: '3px', objectFit: 'cover', flexShrink: 0 }}
+                            src={product.thumbnailUrl}
+                            alt=""
+                            onError={handleImgError}
+                            style={{
+                                width: '40px', height: '40px',
+                                borderRadius: radius.md,
+                                objectFit: 'cover', flexShrink: 0,
+                                border: `1px solid ${colors.border.default}`,
+                            }}
                         />
-                        <span style={{
-                            fontSize: font.size.base, fontWeight: 600, color: colors.text.primary,
-                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                        }}>
-                            {displayTitle}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'], minWidth: 0 }}>
+                            <img
+                                src={getProviderLogo(product.provider)}
+                                alt={product.provider}
+                                style={{ width: '18px', height: '18px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
+                            />
+                            <span style={{
+                                fontSize: font.size.base, fontWeight: 700, color: colors.text.primary,
+                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            }}>
+                                {displayTitle}
+                            </span>
+                        </div>
                     </div>
 
                     {/* 저장하기 */}
@@ -215,19 +222,19 @@ export default function RegistrationEditPage() {
                         onClick={() => setIsSaveModalOpen(true)}
                         style={{
                             display: 'flex', alignItems: 'center', gap: spacing['2'],
-                            padding: `${spacing['2']} ${spacing['5']}`,
-                            background: colors.primary, color: '#fff',
+                            padding: `${spacing['2']} ${spacing['4']}`,
+                            background: colors.primary, color: colors.bg.surface,
                             border: 'none', borderRadius: radius.md,
-                            fontSize: font.size.base, fontWeight: 600,
+                            fontSize: font.size.sm, fontWeight: 600,
                             cursor: 'pointer', flexShrink: 0,
-                            transition: 'background 0.15s',
+                            transition: 'background 0.2s',
                         }}
                         onMouseEnter={e => { e.currentTarget.style.background = colors.primaryHover; }}
                         onMouseLeave={e => { e.currentTarget.style.background = colors.primary; }}
                     >
-                        <Save size={16} />
                         저장하기
                     </button>
+                </div>
                 </div>
 
                 {/* 탭 + 콘텐츠 */}

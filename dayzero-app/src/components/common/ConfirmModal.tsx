@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertCircle, X } from 'lucide-react';
 import { colors, font, radius, shadow, zIndex } from '../../design/tokens';
+import { ANIM } from '../../design/animations';
 
 interface ConfirmModalProps {
     isOpen: boolean;
@@ -51,7 +52,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             <div style={{
                 position: 'relative',
                 width: '100%',
-                maxWidth: '400px',
+                maxWidth: '440px',
                 background: colors.bg.surface,
                 borderRadius: radius.xl,
                 boxShadow: shadow.lg,
@@ -102,6 +103,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                     fontWeight: 700,
                     color: colors.text.primary,
                     marginBottom: '12px',
+                    wordBreak: 'keep-all',
                 }}>
                     {title}
                 </h3>
@@ -112,6 +114,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                     lineHeight: '1.6',
                     marginBottom: '32px',
                     whiteSpace: 'pre-wrap',
+                    wordBreak: 'keep-all',
                 }}>
                     {description}
                 </p>
@@ -165,10 +168,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                 </div>
             </div>
 
-            <style>{`
-                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-                @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-            `}</style>
+            <style>{ANIM.fadeIn + ANIM.slideUp}</style>
         </div>
     );
 };

@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Sidebar } from '../../components/layout/Sidebar';
 
-import { ToastContainer } from '../../components/common/ToastContainer';
+import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { useEditingStore } from '../../store/useEditingStore';
 import { useRegistrationStore } from '../../store/useRegistrationStore';
-import { useToastStore } from '../../store/useToastStore';
 import { EditingHeader } from './components/EditingHeader';
 import { EditingTabBar, type DetailTab } from './components/EditingTabBar';
 import { BasicEditTab } from './tabs/BasicEditTab';
@@ -18,10 +17,12 @@ export default function EditingDetailPage() {
     const { productId } = useParams<{ productId: string }>();
     const navigate = useNavigate();
 
-    const { products, setCurrentEditProduct } = useEditingStore();
-    const addToast = useToastStore((s) => s.addToast);
+    const { products, setCurrentEditProduct, deleteProducts } = useEditingStore();
 
-    const [activeTab, setActiveTab] = useState<DetailTab>('basic');
+    const [searchParams] = useSearchParams();
+    const initialTab = (searchParams.get('tab') as DetailTab) || 'basic';
+    const [activeTab, setActiveTab] = useState<DetailTab>(initialTab);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const productIndex = products.findIndex((p) => p.id === productId);
     const product = products[productIndex];
@@ -68,7 +69,6 @@ export default function EditingDetailPage() {
 
     const handleRegister = () => {
         useRegistrationStore.getState().startJob([product.id], [product]);
-        addToast('Qoo10 등록을 시작했습니다', product.titleJa ?? product.titleKo);
         navigate('/registration');
     };
 
@@ -81,7 +81,20 @@ export default function EditingDetailPage() {
         }}>
             <Sidebar />
 
-            <ToastContainer />
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={() => {
+                    if (productId) {
+                        deleteProducts([productId]);
+                        navigate('/editing');
+                    }
+                }}
+                title="이 상품을 삭제할까요?"
+                description="수집 목록에서 제거되고, 편집 내용도 함께 삭제돼요. 이 작업은 되돌릴 수 없어요."
+                confirmText="삭제"
+                cancelText="취소"
+            />
 
             <main style={{
                 flex: 1,
@@ -100,6 +113,7 @@ export default function EditingDetailPage() {
                     onPrev={handlePrev}
                     onNext={handleNext}
                     onRegister={handleRegister}
+                    onDelete={() => setIsDeleteModalOpen(true)}
                 />
 
                 <div style={{

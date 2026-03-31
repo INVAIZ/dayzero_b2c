@@ -1,13 +1,15 @@
 import { useState, useCallback } from 'react';
 import { colors, font, spacing, radius, shadow } from '../../../design/tokens';
+import { ANIM } from '../../../design/animations';
 import { formatShortDate, formatTooltipDate } from '../../../utils/formatDate';
 import type { RegistrationResult } from '../../../types/registration';
 
 interface Props {
     history: NonNullable<RegistrationResult['monitoring']>['priceHistory'];
+    hideHeader?: boolean;
 }
 
-export const PriceHistorySection: React.FC<Props> = ({ history }) => {
+export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
         if (!history) return;
@@ -72,24 +74,8 @@ export const PriceHistorySection: React.FC<Props> = ({ history }) => {
         return v.toLocaleString();
     };
 
-    return (
-        <div style={{
-            background: colors.bg.surface,
-            border: `1px solid ${colors.border.default}`,
-            borderRadius: radius.lg,
-            padding: spacing['5'],
-            marginBottom: spacing['5'],
-        }}>
-            <div style={{
-                fontSize: font.size.sm,
-                fontWeight: 700,
-                color: colors.text.tertiary,
-                marginBottom: spacing['4'],
-                letterSpacing: '0.3px',
-            }}>
-                가격 변동 이력 (최근 14일)
-            </div>
-
+    const chartAndTimeline = (
+        <>
             <div style={{ position: 'relative', marginBottom: spacing['4'] }}>
                 <svg
                     viewBox={`0 0 ${svgW} ${svgH}`}
@@ -261,24 +247,45 @@ export const PriceHistorySection: React.FC<Props> = ({ history }) => {
                                 {formatShortDate(entry.date)}
                             </span>
                             <span style={{
-                                fontSize: font.size.base,
-                                fontWeight: 700,
-                                color: colors.text.primary,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: spacing['2'],
                                 flex: 1,
                             }}>
-                                ₩{entry.sourcePriceKrw.toLocaleString()}
+                                <span style={{
+                                    fontSize: font.size.base,
+                                    fontWeight: 700,
+                                    color: colors.text.primary,
+                                }}>
+                                    ₩{entry.sourcePriceKrw.toLocaleString()}
+                                </span>
+                                {entry.stockStatus === 'out_of_stock' && (
+                                    <span style={{
+                                        fontSize: font.size.xs,
+                                        fontWeight: 600,
+                                        color: colors.text.primary,
+                                        background: colors.bg.subtle,
+                                        padding: '1px 6px',
+                                        borderRadius: radius.xs,
+                                    }}>
+                                        품절
+                                    </span>
+                                )}
                             </span>
                             <span style={{
                                 fontSize: font.size.base,
                                 fontWeight: 700,
-                                color: priceChangeFromBase !== 0 ? changeColor : colors.text.muted,
+                                color: entry.stockStatus === 'out_of_stock' ? colors.text.muted
+                                    : priceChangeFromBase !== 0 ? changeColor : colors.text.muted,
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '3px',
                                 width: '100px',
                                 flexShrink: 0,
                             }}>
-                                {priceChangeFromBase !== 0 ? (
+                                {entry.stockStatus === 'out_of_stock' ? (
+                                    <span style={{ fontSize: font.size.sm, fontWeight: 500 }}>–</span>
+                                ) : priceChangeFromBase !== 0 ? (
                                     <>
                                         <svg width="10" height="10" viewBox="0 0 10 10" fill={changeColor} style={{ flexShrink: 0 }}>
                                             {priceChangeFromBase > 0
@@ -289,44 +296,51 @@ export const PriceHistorySection: React.FC<Props> = ({ history }) => {
                                         ₩{Math.abs(priceChangeFromBase).toLocaleString()}
                                     </>
                                 ) : (
-                                    <span style={{ fontSize: font.size.sm, fontWeight: 500 }}>—</span>
+                                    <span style={{ fontSize: font.size.sm, fontWeight: 500 }}>–</span>
                                 )}
                             </span>
                             <span style={{
                                 fontSize: font.size.base,
-                                fontWeight: 700,
-                                color: entry.marginPercent < 0 ? colors.danger
-                                    : entry.marginPercent < 10 ? colors.warningIcon
-                                        : colors.success,
+                                fontWeight: entry.stockStatus === 'out_of_stock' ? 500 : 700,
+                                color: entry.stockStatus === 'out_of_stock' ? colors.text.muted
+                                    : entry.marginPercent < 0 ? colors.danger
+                                        : entry.marginPercent < 10 ? colors.warningIcon
+                                            : colors.success,
                                 width: '56px',
                                 textAlign: 'left',
                                 flexShrink: 0,
                             }}>
-                                {entry.marginPercent.toFixed(1)}%
+                                {entry.stockStatus === 'out_of_stock' ? '–' : `${entry.marginPercent.toFixed(1)}%`}
                             </span>
-                            {entry.stockStatus === 'out_of_stock' && (
-                                <span style={{
-                                    fontSize: font.size.xs,
-                                    fontWeight: 600,
-                                    color: colors.text.primary,
-                                    background: colors.bg.subtle,
-                                    padding: '1px 6px',
-                                    borderRadius: radius.xs,
-                                }}>
-                                    품절
-                                </span>
-                            )}
                         </div>
                     );
                 })}
             </div>
 
-            <style>{`
-                @keyframes tooltipPop {
-                    from { opacity: 0; transform: translate(-50%, -100%) scale(0.95); }
-                    to { opacity: 1; transform: translate(-50%, -100%) scale(1); }
-                }
-            `}</style>
+            <style>{ANIM.tooltipPop}</style>
+        </>
+    );
+
+    if (hideHeader) return chartAndTimeline;
+
+    return (
+        <div style={{
+            background: colors.bg.surface,
+            border: `1px solid ${colors.border.default}`,
+            borderRadius: radius.lg,
+            padding: spacing['5'],
+            marginBottom: spacing['5'],
+        }}>
+            <div style={{
+                fontSize: font.size.sm,
+                fontWeight: 700,
+                color: colors.text.tertiary,
+                marginBottom: spacing['4'],
+                letterSpacing: '0.3px',
+            }}>
+                가격 변동 이력 (최근 14일)
+            </div>
+            {chartAndTimeline}
         </div>
     );
 };

@@ -47,8 +47,8 @@ export const useRegistrationStore = create<RegistrationState>()(
     persist(
         (set, get) => ({
             jobs: [],
-            autoPauseOnOutOfStock: false,
-            autoPauseOnNegativeMargin: false,
+            autoPauseOnOutOfStock: true,
+            autoPauseOnNegativeMargin: true,
 
             setAutoPauseOnOutOfStock: (enabled) => {
                 set({ autoPauseOnOutOfStock: enabled });
@@ -181,9 +181,24 @@ export const useRegistrationStore = create<RegistrationState>()(
                 set((state) => ({
                     jobs: state.jobs.map(j => ({
                         ...j,
-                        results: j.results.map(r =>
-                            r.id === resultId ? { ...r, product } : r
-                        ),
+                        results: j.results.map(r => {
+                            if (r.id !== resultId) return r;
+                            const updated = { ...r, product };
+                            // 가격 수정 후 모니터링 상태 재계산
+                            if (updated.monitoring?.status === 'active' && updated.monitoring.lastCheckResult === 'negative_margin') {
+                                const cost = updated.monitoring.currentSourcePriceKrw ?? product.originalPriceKrw;
+                                const saleInKrw = product.salePriceJpy / 0.11;
+                                const margin = saleInKrw > 0 ? ((saleInKrw - cost) / saleInKrw * 100) : 0;
+                                if (margin > 5) {
+                                    updated.monitoring = {
+                                        ...updated.monitoring,
+                                        lastCheckResult: 'normal',
+                                        issueDescription: undefined,
+                                    };
+                                }
+                            }
+                            return updated;
+                        }),
                     })),
                 }));
             },

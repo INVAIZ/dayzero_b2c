@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Shield, Clock, Bell, CheckCircle2 } from 'lucide-react';
+import { Search, Shield } from 'lucide-react';
 import { colors, font, spacing, radius } from '../../design/tokens';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
@@ -13,12 +13,14 @@ import { AllProductsTable } from './components/AllProductsTable';
 import { BulkActionBar } from './components/FailedBulkActionBar';
 import { MonitoringStatusTabs } from './components/MonitoringStatusTabs';
 import { MonitoringHistoryModal } from './components/MonitoringHistoryModal';
+import { MonitoringInfoCallout } from './components/MonitoringInfoCallout';
+import { MonitoringSettingsModal } from './components/MonitoringSettingsModal';
 
 import { useRegistrationFilters } from './hooks/useRegistrationFilters';
 import { useRegistrationSelection } from './hooks/useRegistrationSelection';
 import { useRegistrationActions } from './hooks/useRegistrationActions';
 
-const FREE_PLAN_LIMIT = 50;
+const FREE_PLAN_LIMIT = 10;
 
 export const RegistrationResultPage: React.FC = () => {
     const navigate = useNavigate();
@@ -144,7 +146,7 @@ export const RegistrationResultPage: React.FC = () => {
                     limit={FREE_PLAN_LIMIT}
                     autoPauseOnOutOfStock={autoPauseOnOutOfStock}
                     autoPauseOnNegativeMargin={autoPauseOnNegativeMargin}
-                    onClick={() => setIsSettingsOpen(true)}
+                    onSettingsClick={() => setIsSettingsOpen(true)}
                 />
 
                 {/* 모니터링 상태 탭 */}
@@ -196,11 +198,11 @@ export const RegistrationResultPage: React.FC = () => {
                     onRowClick={handleRowClick}
                     showMonitoring
                     emptyMessage={
-                        filters.monitoringTab === '변동 알림 중' ? '변동 알림 중인 상품이 없어요' :
-                        filters.monitoringTab === '품절' ? '품절된 상품이 없어요' :
-                        filters.monitoringTab === '역마진' ? '역마진 상품이 없어요' :
-                        filters.monitoringTab === '일시 중지' ? '일시 중지된 상품이 없어요' :
-                        '판매 중인 상품이 없어요'
+                        filters.monitoringTab === '가격·재고 확인 중' ? '가격·재고 자동 확인 중인 상품이 없어요' :
+                            filters.monitoringTab === '품절' ? '품절된 상품이 없어요' :
+                                filters.monitoringTab === '역마진' ? '역마진 상품이 없어요' :
+                                    filters.monitoringTab === '일시 중지' ? '일시 중지된 상품이 없어요' :
+                                        '판매 중인 상품이 없어요'
                     }
                 />
             </div>
@@ -270,24 +272,24 @@ export const RegistrationResultPage: React.FC = () => {
                 type="danger"
             />
 
-            {/* 변동 알림 등록 모달 */}
+            {/* 가격·재고 자동 확인 등록 모달 */}
             <ConfirmModal
                 isOpen={actions.isEnableMonitoringModalOpen}
                 onClose={() => actions.setIsEnableMonitoringModalOpen(false)}
                 onConfirm={actions.handleEnableMonitoring}
-                title={`${selection.selectedMonitoringInfo.unmonitoredCount}건에 변동 알림을 등록할까요?`}
+                title={`${selection.selectedMonitoringInfo.unmonitoredCount}건에 가격·재고 자동 확인을 등록할까요?`}
                 description={`매일 오전 7시에 쇼핑몰의 가격과 재고를 자동으로 확인해서, 역마진이나 품절이 생기면 알려드려요.\n\n현재 등록: ${filters.monitoringCounts.monitoring}건 / 최대 ${FREE_PLAN_LIMIT}건`}
-                confirmText="변동 알림 받기"
+                confirmText="가격·재고 자동 확인 시작"
                 cancelText="취소"
                 type="info"
             />
 
-            {/* 변동 알림 해제 모달 */}
+            {/* 가격·재고 자동 확인 해제 모달 */}
             <ConfirmModal
                 isOpen={actions.isDisableMonitoringModalOpen}
                 onClose={() => actions.setIsDisableMonitoringModalOpen(false)}
                 onConfirm={actions.handleDisableMonitoring}
-                title={`${selection.selectedMonitoringInfo.monitoredCount}건의 변동 알림을 해제할까요?`}
+                title={`${selection.selectedMonitoringInfo.monitoredCount}건의 가격·재고 자동 확인을 해제할까요?`}
                 description="해제하면 쇼핑몰 가격·재고 변동이 더 이상 확인되지 않아요."
                 confirmText="알림 해제"
                 cancelText="취소"
@@ -347,260 +349,3 @@ const HeaderButton: React.FC<{
     </button>
 );
 
-/** 변동 확인 중 콜아웃 — 클릭 시 설정 모달 */
-const MonitoringInfoCallout: React.FC<{
-    monitoringCount: number;
-    limit: number;
-    autoPauseOnOutOfStock: boolean;
-    autoPauseOnNegativeMargin: boolean;
-    onClick: () => void;
-}> = ({ monitoringCount, limit, autoPauseOnOutOfStock, autoPauseOnNegativeMargin, onClick }) => {
-    const infoLineStyle: React.CSSProperties = {
-        fontSize: font.size.sm,
-        color: colors.text.tertiary,
-        lineHeight: '1.6',
-        display: 'flex',
-        alignItems: 'center',
-        gap: spacing['2'],
-    };
-
-    return (
-        <div
-            onClick={onClick}
-            style={{
-                background: colors.bg.info,
-                border: `1px solid ${colors.primaryLightBorder}`,
-                borderRadius: radius.lg,
-                padding: `${spacing['4']} ${spacing['5']}`,
-                marginBottom: spacing['4'],
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: spacing['4'],
-                cursor: 'pointer',
-                transition: 'border-color 0.15s',
-                animation: 'calloutIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = colors.primary; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = colors.primaryLightBorder; }}
-        >
-            <div style={{
-                width: '40px', height: '40px',
-                borderRadius: radius.md,
-                background: colors.bg.surface,
-                border: `1px solid ${colors.primaryLightBorder}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-            }}>
-                <Shield size={20} color={colors.primary} />
-            </div>
-
-            <div style={{ flex: 1 }}>
-                {/* 라벨 */}
-                <div style={{
-                    fontSize: font.size.xs,
-                    fontWeight: 600,
-                    color: colors.text.tertiary,
-                    marginBottom: '4px',
-                }}>
-                    변동 알림 중
-                </div>
-
-                {/* 카운트 + 태그 */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: spacing['2'],
-                    marginBottom: spacing['3'],
-                    flexWrap: 'wrap',
-                }}>
-                    <span style={{ fontSize: font.size.base, fontWeight: 700, color: colors.text.primary }}>
-                        {monitoringCount}건
-                        <span style={{ fontWeight: 500, color: colors.text.muted, fontSize: font.size.sm }}>
-                            {' '}/ 최대 {limit}건
-                        </span>
-                    </span>
-                    <span style={{
-                        fontSize: font.size['2xs'], fontWeight: 600, color: colors.primary,
-                        background: colors.bg.surface, border: `1px solid ${colors.primaryLightBorder}`,
-                        padding: '2px 8px', borderRadius: radius.full,
-                    }}>
-                        무료 플랜
-                    </span>
-                </div>
-
-                {/* 정보 라인들 — 동일 스타일 */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <div style={infoLineStyle}>
-                        <Clock size={13} color={colors.primary} style={{ flexShrink: 0 }} />
-                        매일 오전 7시에 가격·재고 자동 확인
-                    </div>
-                    <div style={infoLineStyle}>
-                        {autoPauseOnOutOfStock
-                            ? <CheckCircle2 size={13} color={colors.primary} style={{ flexShrink: 0 }} />
-                            : <Bell size={13} color={colors.primary} style={{ flexShrink: 0 }} />
-                        }
-                        {autoPauseOnOutOfStock
-                            ? '품절 시 알림 및 자동 판매 일시 중지'
-                            : '품절 시 알림'
-                        }
-                    </div>
-                    <div style={infoLineStyle}>
-                        {autoPauseOnNegativeMargin
-                            ? <CheckCircle2 size={13} color={colors.primary} style={{ flexShrink: 0 }} />
-                            : <Bell size={13} color={colors.primary} style={{ flexShrink: 0 }} />
-                        }
-                        {autoPauseOnNegativeMargin
-                            ? '역마진 시 알림 및 자동 판매 일시 중지'
-                            : '역마진 시 알림'
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <style>{`
-                @keyframes calloutIn {
-                    from { opacity: 0; transform: translateY(-8px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes fadeInUp {
-                    from { opacity: 0; transform: translateY(8px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-            `}</style>
-        </div>
-    );
-};
-
-/** 알림 설정 모달 */
-const MonitoringSettingsModal: React.FC<{
-    isOpen: boolean;
-    onClose: () => void;
-    autoPauseOnOutOfStock: boolean;
-    onToggleOutOfStock: (enabled: boolean) => void;
-    autoPauseOnNegativeMargin: boolean;
-    onToggleNegativeMargin: (enabled: boolean) => void;
-}> = ({ isOpen, onClose, autoPauseOnOutOfStock, onToggleOutOfStock, autoPauseOnNegativeMargin, onToggleNegativeMargin }) => {
-    if (!isOpen) return null;
-    return (
-        <div
-            onClick={onClose}
-            style={{
-                position: 'fixed', inset: 0,
-                background: 'rgba(0,0,0,0.4)',
-                backdropFilter: 'blur(4px)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                zIndex: 1000,
-                animation: 'settingsOverlayIn 0.2s ease',
-            }}
-        >
-            <div
-                onClick={e => e.stopPropagation()}
-                style={{
-                    background: colors.bg.surface,
-                    borderRadius: radius.xl,
-                    width: '420px',
-                    overflow: 'hidden',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-                    animation: 'settingsModalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                }}
-            >
-                <div style={{
-                    padding: `${spacing['5']} ${spacing['6']}`,
-                    borderBottom: `1px solid ${colors.border.default}`,
-                    display: 'flex', alignItems: 'center', gap: spacing['2'],
-                }}>
-                    <Shield size={18} color={colors.primary} />
-                    <span style={{ fontSize: font.size.lg, fontWeight: 700, color: colors.text.primary }}>
-                        변동 알림 설정
-                    </span>
-                </div>
-
-                <div style={{ padding: `${spacing['5']} ${spacing['6']}`, display: 'flex', flexDirection: 'column', gap: spacing['5'] }}>
-                    <SettingsToggleRow
-                        label="품절 시 자동 일시 중지"
-                        description={autoPauseOnOutOfStock
-                            ? '품절이 감지되면 Qoo10 판매를 자동으로 일시 중지해요'
-                            : '품절이 감지되면 알림만 보내드려요'
-                        }
-                        enabled={autoPauseOnOutOfStock}
-                        onToggle={() => onToggleOutOfStock(!autoPauseOnOutOfStock)}
-                    />
-                    <div style={{ height: '1px', background: colors.border.default }} />
-                    <SettingsToggleRow
-                        label="역마진 시 자동 일시 중지"
-                        description={autoPauseOnNegativeMargin
-                            ? '역마진이 감지되면 Qoo10 판매를 자동으로 일시 중지해요'
-                            : '역마진이 감지되면 알림만 보내드려요'
-                        }
-                        enabled={autoPauseOnNegativeMargin}
-                        onToggle={() => onToggleNegativeMargin(!autoPauseOnNegativeMargin)}
-                    />
-                </div>
-
-                <div style={{
-                    padding: `${spacing['4']} ${spacing['6']}`,
-                    borderTop: `1px solid ${colors.border.default}`,
-                    display: 'flex', justifyContent: 'flex-end',
-                }}>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            padding: `${spacing['2']} ${spacing['5']}`,
-                            background: colors.primary,
-                            color: colors.bg.surface,
-                            border: 'none',
-                            borderRadius: radius.md,
-                            fontSize: font.size.base,
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                        }}
-                    >
-                        확인
-                    </button>
-                </div>
-            </div>
-
-            <style>{`
-                @keyframes settingsOverlayIn { from { opacity: 0; } to { opacity: 1; } }
-                @keyframes settingsModalIn { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-            `}</style>
-        </div>
-    );
-};
-
-const SettingsToggleRow: React.FC<{
-    label: string;
-    description: string;
-    enabled: boolean;
-    onToggle: () => void;
-}> = ({ label, description, enabled, onToggle }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['4'] }}>
-        <div style={{ flex: 1 }}>
-            <div style={{ fontSize: font.size.base, fontWeight: 600, color: colors.text.primary, marginBottom: spacing['1'] }}>
-                {label}
-            </div>
-            <div style={{ fontSize: font.size.sm, color: colors.text.tertiary, lineHeight: '1.5' }}>
-                {description}
-            </div>
-        </div>
-        <button
-            onClick={onToggle}
-            style={{
-                width: '48px', height: '28px',
-                borderRadius: radius.full, border: 'none',
-                background: enabled ? colors.primary : colors.bg.subtle,
-                cursor: 'pointer', position: 'relative',
-                transition: 'background 0.2s', flexShrink: 0,
-            }}
-        >
-            <div style={{
-                width: '22px', height: '22px',
-                borderRadius: '50%', background: colors.bg.surface,
-                boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-                position: 'absolute', top: '3px',
-                left: enabled ? '23px' : '3px',
-                transition: 'left 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-            }} />
-        </button>
-    </div>
-);

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, ExternalLink, Trash2 } from 'lucide-react';
 import { colors, font, radius, spacing, shadow, zIndex } from '../../../design/tokens';
+import { ANIM } from '../../../design/animations';
 import { getProviderLogo, SOURCING_PROVIDERS } from '../../../types/sourcing';
 import type { ProductDetail } from '../../../types/editing';
 import { handleImgError } from '../../../utils/image';
@@ -16,11 +17,12 @@ interface Props {
     onPrev: () => void;
     onNext: () => void;
     onRegister: () => void;
+    onDelete?: () => void;
 }
 
 
 export const EditingHeader: React.FC<Props> = ({
-    product, hasPrev, hasNext, currentIndex, totalCount, onBack, onPrev, onNext, onRegister,
+    product, hasPrev, hasNext, currentIndex, totalCount, onBack, onPrev, onNext, onRegister, onDelete,
 }) => {
     const [showRegTooltip, setShowRegTooltip] = useState(false);
 
@@ -35,10 +37,10 @@ export const EditingHeader: React.FC<Props> = ({
             background: colors.bg.surface,
             borderBottom: `1px solid ${colors.border.default}`,
             boxShadow: shadow.sm,
-            padding: `${spacing['4']} 64px`,
+            padding: `${spacing['4']} ${spacing['6']}`,
         }}>
-            <style>{`@keyframes tooltipFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
-            <div style={{ display: 'flex', alignItems: 'center', gap: spacing['4'] }}>
+            <style>{ANIM.tooltipFadeIn}</style>
+            <div style={{ display: 'flex', alignItems: 'center', gap: spacing['4'], maxWidth: '1200px', margin: '0 auto' }}>
 
                 {/* 목록으로 버튼 */}
                 <button
@@ -63,7 +65,7 @@ export const EditingHeader: React.FC<Props> = ({
                 <div style={{ width: '1px', height: '32px', background: colors.border.default, flexShrink: 0 }} />
 
                 {/* 썸네일 + 상품 정보 */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'], flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'], flex: 1, minWidth: 0, maxWidth: '600px' }}>
                     <img
                         src={product.thumbnailUrl}
                         alt=""
@@ -100,7 +102,7 @@ export const EditingHeader: React.FC<Props> = ({
                             onMouseEnter={e => { e.currentTarget.style.color = colors.primary; }}
                             onMouseLeave={e => { e.currentTarget.style.color = colors.text.primary; }}
                         >
-                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '500px' }}>
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {stripPrefix(product.titleKo)}
                             </span>
                             <ExternalLink size={13} style={{ flexShrink: 0, opacity: 0.5 }} />
@@ -211,6 +213,30 @@ export const EditingHeader: React.FC<Props> = ({
                             </div>
                         )}
                     </div>
+
+                    {/* 삭제 */}
+                    {onDelete && (
+                        <>
+                            <div style={{ width: '1px', height: '28px', background: colors.border.default }} />
+                            <button
+                                onClick={onDelete}
+                                title="상품 삭제"
+                                style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    width: '32px', height: '32px',
+                                    background: 'none', border: 'none',
+                                    borderRadius: radius.md,
+                                    cursor: 'pointer',
+                                    color: colors.text.muted,
+                                    transition: 'color 0.15s',
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.color = colors.danger}
+                                onMouseLeave={e => e.currentTarget.style.color = colors.text.muted}
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
 

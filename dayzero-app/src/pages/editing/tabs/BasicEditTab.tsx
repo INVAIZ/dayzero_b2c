@@ -775,8 +775,17 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                     >
                         <Info size={13} color={colors.text.muted} />
                         {showBrandInfoTooltip && (
-                            <div style={{ ...tooltipStyle, width: '220px' }}>
-                                Qoo10에 등록된 브랜드와 매칭해야 상품이 브랜드 검색에 노출돼요. 미등록 브랜드는 "브랜드 없음"으로 등록됩니다.
+                            <div style={{
+                                ...tooltipStyle,
+                                width: 'max-content',
+                                maxWidth: '420px',
+                                left: 0,
+                                transform: 'none',
+                                whiteSpace: 'nowrap',
+                            }}>
+                                <div style={{ marginBottom: '6px', fontWeight: 600 }}>브랜드 매칭이란?</div>
+                                <div style={{ marginBottom: '4px' }}>• Qoo10 등록 브랜드와 매칭하면 브랜드 검색에 노출돼요</div>
+                                <div>• 미등록 브랜드는 <span style={{ fontWeight: 700 }}>"브랜드 없음"</span>으로 등록됩니다</div>
                             </div>
                         )}
                     </div>

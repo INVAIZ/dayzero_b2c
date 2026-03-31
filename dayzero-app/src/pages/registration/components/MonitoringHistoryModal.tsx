@@ -1,5 +1,6 @@
 import { X, Shield, AlertTriangle, PackageX, TrendingDown, Clock, RefreshCw } from 'lucide-react';
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
+import { ANIM } from '../../../design/animations';
 import { formatCheckTime } from '../../../utils/formatDate';
 import type { RegistrationResult } from '../../../types/registration';
 
@@ -147,7 +148,7 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                             color: colors.text.muted,
                             fontSize: font.size.base,
                         }}>
-                            변동 알림이 등록된 상품이 없어요
+                            가격·재고 자동 확인이 등록된 상품이 없어요
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>
@@ -272,16 +273,7 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                 </div>
             </div>
 
-            <style>{`
-                @keyframes overlayIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes modalSlideUp {
-                    from { opacity: 0; transform: translateY(16px) scale(0.98); }
-                    to { opacity: 1; transform: translateY(0) scale(1); }
-                }
-            `}</style>
+            <style>{ANIM.overlayIn + ANIM.modalSlideUp}</style>
         </div>
     );
 };

@@ -1,6 +1,11 @@
 import { useState, useMemo, useCallback } from 'react';
 import type { RegistrationResult } from '../../../types/registration';
 import type { MonitoringTabFilter } from '../components/MonitoringStatusTabs';
+import { isActualNegativeMargin as checkNegativeMargin } from '../../../utils/margin';
+
+function isActualNegativeMargin(r: RegistrationResult): boolean {
+    return checkNegativeMargin(r.monitoring, r.product);
+}
 
 export function useRegistrationFilters(allSuccessResults: RegistrationResult[]) {
     const [monitoringTab, setMonitoringTab] = useState<MonitoringTabFilter>('판매 중');
@@ -19,7 +24,7 @@ export function useRegistrationFilters(allSuccessResults: RegistrationResult[]) 
                     acc.monitoring++;
                     const cr = r.monitoring.lastCheckResult;
                     if (cr === 'out_of_stock') acc.outOfStock++;
-                    if (cr === 'negative_margin') acc.negativeMargin++;
+                    if (cr === 'negative_margin' && isActualNegativeMargin(r)) acc.negativeMargin++;
                 }
                 return acc;
             },
@@ -31,16 +36,14 @@ export function useRegistrationFilters(allSuccessResults: RegistrationResult[]) 
         switch (monitoringTab) {
             case '일시 중지':
                 return allSuccessResults.filter(r => r.salesStatus === 'paused');
-            case '변동 알림 중':
+            case '가격·재고 확인 중':
                 return allSuccessResults.filter(r => r.monitoring?.status === 'active');
             case '품절':
                 return allSuccessResults.filter(r =>
                     r.monitoring?.status === 'active' && r.monitoring.lastCheckResult === 'out_of_stock'
                 );
             case '역마진':
-                return allSuccessResults.filter(r =>
-                    r.monitoring?.status === 'active' && r.monitoring.lastCheckResult === 'negative_margin'
-                );
+                return allSuccessResults.filter(r => isActualNegativeMargin(r));
             default: // '판매 중'
                 return allSuccessResults.filter(r => r.salesStatus !== 'paused');
         }

@@ -413,8 +413,14 @@ export const CategorySelectModal: React.FC<CategorySelectModalProps> = ({
               ))
             )
           ) : step === 'large' ? (
-            /* 대분류 */
-            CATEGORY_LARGE.map(cat => (
+            /* 대분류 — AI 추천 우선 */
+            [...CATEGORY_LARGE]
+              .sort((a, b) => {
+                if (a.code === aiRecFlat?.largeCode) return -1;
+                if (b.code === aiRecFlat?.largeCode) return 1;
+                return 0;
+              })
+              .map(cat => (
               <DrillItem
                 key={cat.code}
                 name={cat.name}
@@ -425,8 +431,14 @@ export const CategorySelectModal: React.FC<CategorySelectModalProps> = ({
               />
             ))
           ) : step === 'medium' && selectedLarge ? (
-            /* 중분류 */
-            (CATEGORY_MEDIUM[selectedLarge] ?? []).map(cat => (
+            /* 중분류 — AI 추천 우선 */
+            [...(CATEGORY_MEDIUM[selectedLarge] ?? [])]
+              .sort((a, b) => {
+                if (a.code === aiRecFlat?.mediumCode) return -1;
+                if (b.code === aiRecFlat?.mediumCode) return 1;
+                return 0;
+              })
+              .map(cat => (
               <DrillItem
                 key={cat.code}
                 name={cat.name}
@@ -437,8 +449,14 @@ export const CategorySelectModal: React.FC<CategorySelectModalProps> = ({
               />
             ))
           ) : step === 'small' && selectedMedium ? (
-            /* 소분류 — 최종 선택 */
-            (CATEGORY_SMALL[selectedMedium] ?? []).map(cat => (
+            /* 소분류 — AI 추천 우선 */
+            [...(CATEGORY_SMALL[selectedMedium] ?? [])]
+              .sort((a, b) => {
+                if (a.code === aiRecommendedCode) return -1;
+                if (b.code === aiRecommendedCode) return 1;
+                return 0;
+              })
+              .map(cat => (
               <DrillItem
                 key={cat.code}
                 name={cat.name}

@@ -391,7 +391,7 @@ export default function SourcingPage() {
                                         </span>
                                     </div>
                                     <div style={{ fontSize: font.size.sm, color: colors.text.tertiary, lineHeight: '1.5', display: 'flex', alignItems: 'center', gap: spacing['1'] }}>
-                                        <Clock size={12} color={colors.text.muted} style={{ flexShrink: 0 }} />
+                                        <Clock size={12} color={colors.primary} style={{ flexShrink: 0 }} />
                                         설정한 시간에 매일 자동으로 상품을 수집해요.
                                     </div>
                                 </div>

@@ -1,5 +1,6 @@
 import { Pause, Play, Trash2, X, Bell, BellOff } from 'lucide-react';
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
+import { ANIM } from '../../../design/animations';
 
 interface Props {
     selectedCount: number;
@@ -7,7 +8,7 @@ interface Props {
     onResume: () => void;
     onDelete: () => void;
     onClear: () => void;
-    // 변동 알림
+    // 가격·재고 자동 확인
     onEnableMonitoring?: () => void;
     onDisableMonitoring?: () => void;
     hasMonitoredSelected?: boolean;
@@ -80,22 +81,22 @@ export const BulkActionBar: React.FC<Props> = ({
 
                 <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.2)' }} />
 
-                {/* 변동 알림 받기 */}
+                {/* 가격·재고 자동 확인 받기 */}
                 {hasUnmonitoredSelected && onEnableMonitoring && (
                     <ActionButton
                         onClick={onEnableMonitoring}
                         icon={<Bell size={14} />}
-                        label="변동 알림 받기"
+                        label="가격·재고 자동 확인 받기"
                         color={colors.primary}
                     />
                 )}
 
-                {/* 변동 알림 해제 */}
+                {/* 가격·재고 자동 확인 해제 */}
                 {hasMonitoredSelected && onDisableMonitoring && (
                     <ActionButton
                         onClick={onDisableMonitoring}
                         icon={<BellOff size={14} />}
-                        label="변동 알림 해제"
+                        label="가격·재고 자동 확인 해제"
                         color="rgba(255,255,255,0.75)"
                     />
                 )}
@@ -129,12 +130,7 @@ export const BulkActionBar: React.FC<Props> = ({
                 />
             </div>
 
-            <style>{`
-                @keyframes fadeInUp {
-                    from { opacity: 0; transform: translateY(8px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-            `}</style>
+            <style>{ANIM.fadeInUp}</style>
         </div>
     );
 };

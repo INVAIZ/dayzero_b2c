@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { ExternalLink, Check, Shield, AlertTriangle, PackageX, TrendingDown, Minus, ShoppingBag, ChevronUp, ChevronDown } from 'lucide-react';
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
+import { ANIM } from '../../../design/animations';
 import { getProviderLogo } from '../../../types/sourcing';
 import { stripPrefix } from '../../../utils/editing';
 import { handleImgError } from '../../../utils/image';
 import type { RegistrationResult, MonitoringCheckResult } from '../../../types/registration';
+import { calcMarginPercent } from '../../../utils/margin';
 
 interface Props {
     results: RegistrationResult[];
@@ -81,10 +83,7 @@ const Checkbox = ({ checked, onClick }: { checked: boolean; onClick: () => void 
 );
 
 function calcMargin(product: { originalPriceKrw: number; salePriceJpy: number }): number {
-    const cost = product.originalPriceKrw;
-    const sale = product.salePriceJpy / 0.11;
-    if (sale <= 0) return 0;
-    return ((sale - cost) / sale) * 100;
+    return calcMarginPercent(product.originalPriceKrw, product.salePriceJpy);
 }
 
 /** yy.mm.dd 형식 등록일 */
@@ -169,7 +168,7 @@ export const AllProductsTable: React.FC<Props> = ({
                 <div style={{ width: '72px', flexShrink: 0, ...colHeader }}>판매가</div>
                 <div style={{ width: '56px', flexShrink: 0, ...colHeader }}>마진율</div>
                 {showMonitoring && (
-                    <div style={{ width: '84px', flexShrink: 0, ...colHeader }}>변동 알림</div>
+                    <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>가격·재고 확인</div>
                 )}
                 <div
                     onClick={toggleDateSort}
@@ -198,13 +197,18 @@ export const AllProductsTable: React.FC<Props> = ({
             }}>
                 {sortedResults.map((r, i) => {
                     const isSelected = selectedIds.includes(r.id);
-                    const margin = calcMargin(r.product);
+                    const actualCost = r.monitoring?.currentSourcePriceKrw ?? r.product.originalPriceKrw;
+                    const margin = calcMargin({ originalPriceKrw: actualCost, salePriceJpy: r.product.salePriceJpy });
                     const isTranslated = !!r.product.titleJa;
                     const displayTitle = r.product.titleJa
                         ? stripPrefix(r.product.titleJa)
                         : stripPrefix(r.product.titleKo);
-                    const monitoringResult = r.monitoring?.lastCheckResult;
                     const isMonitored = r.monitoring?.status === 'active';
+                    const rawMonitoringResult = r.monitoring?.lastCheckResult;
+                    // 역마진은 실제 마진 기준으로 판단
+                    const monitoringResult = (rawMonitoringResult === 'negative_margin' && margin > 5)
+                        ? 'normal' as const
+                        : rawMonitoringResult;
                     const isIssueRow = isMonitored && (monitoringResult === 'negative_margin' || monitoringResult === 'out_of_stock') && r.salesStatus !== 'paused';
 
                     return (
@@ -341,14 +345,14 @@ export const AllProductsTable: React.FC<Props> = ({
                             <div style={{
                                 width: '56px', flexShrink: 0,
                                 fontSize: font.size.base, fontWeight: 600,
-                                color: margin >= 20 ? colors.success : colors.text.secondary,
+                                color: margin <= 5 ? colors.danger : colors.success,
                             }}>
                                 {margin.toFixed(1)}%
                             </div>
 
-                            {/* 변동 알림 상태 */}
+                            {/* 가격·재고 확인 상태 */}
                             {showMonitoring && (
-                                <div style={{ width: '84px', flexShrink: 0 }}>
+                                <div style={{ width: '100px', flexShrink: 0 }}>
                                     {isMonitored && monitoringResult ? (
                                         <span style={{
                                             display: 'inline-flex',
@@ -426,20 +430,7 @@ export const AllProductsTable: React.FC<Props> = ({
             {/* 플로팅 툴팁 */}
             {tooltip && <FloatingTooltip data={tooltip} />}
 
-            <style>{`
-                @keyframes listFadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes rowSlideIn {
-                    from { opacity: 0; transform: translateY(8px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes tooltipFadeIn {
-                    from { opacity: 0; transform: translateY(4px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-            `}</style>
+            <style>{ANIM.listFadeIn + ANIM.rowSlideIn + ANIM.tooltipFadeIn}</style>
         </>
     );
 };
