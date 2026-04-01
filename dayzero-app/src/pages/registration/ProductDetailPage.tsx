@@ -20,7 +20,7 @@ import { NavButton, MonitoringToggle, InfoCard, InfoRow, AlertCard, StatusHelper
 export const ProductDetailPage: React.FC = () => {
     const { resultId } = useParams<{ resultId: string }>();
     const navigate = useNavigate();
-    const { jobs, enableMonitoring, disableMonitoring, updateRegisteredProduct, pauseSales, resumeSales, deleteResults, autoPauseOnOutOfStock, autoPauseOnNegativeMargin } = useRegistrationStore();
+    const { jobs, enableMonitoring, disableMonitoring, pauseSales, resumeSales, deleteResults, autoPauseOnOutOfStock, autoPauseOnNegativeMargin } = useRegistrationStore();
 
     const [isEnableModalOpen, setIsEnableModalOpen] = useState(false);
     const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);

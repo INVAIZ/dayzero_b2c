@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { useRegistrationStore } from '../../store/useRegistrationStore';

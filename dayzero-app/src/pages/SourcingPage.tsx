@@ -58,7 +58,7 @@ export default function SourcingPage() {
         transition: 'all 0.2s',
         display: 'flex',
         alignItems: 'center',
-        gap: spacing['1.5'],
+        gap: spacing['2'],
     });
 
     const renderTabs = () => (

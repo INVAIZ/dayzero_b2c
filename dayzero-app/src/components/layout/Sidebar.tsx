@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, LayoutList, PackageOpen, ChevronRight } from 'lucide-react';
 import { useSourcingStore } from '../../store/useSourcingStore';
 import { SettingsPanel } from '../common/SettingsPanel';
-import { colors, font, radius, spacing } from '../../design/tokens';
+import { colors, spacing } from '../../design/tokens';
 
 type NavItem = '수집하기' | '수집된 상품' | '판매 중인 상품';
 
