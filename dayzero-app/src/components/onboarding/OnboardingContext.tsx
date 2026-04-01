@@ -39,25 +39,25 @@ const OnboardingContext = createContext<OnboardingContextProps | undefined>(unde
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
     const [state, setState] = useState<OnboardingState>({
-        apiKey: 'DZ-a1b2c3d4e5f6',
-        connected: true,
-        storeName: 'DayZero Store',
-        sellerId: 'DAYZERO_JP',
-        forwarder: 'qx',
-        zipCode: '273-0012',
-        addressLine1: '千葉県船橋市浜町2-5-7',
-        addressLine2: 'MFLP船橋1-3階 Qxpress',
+        apiKey: '',
+        connected: false,
+        storeName: null,
+        sellerId: null,
+        forwarder: '',
+        zipCode: '',
+        addressLine1: '',
+        addressLine2: '',
         sameAsShipping: true,
         returnZipCode: '',
         returnAddressLine1: '',
         returnAddressLine2: '',
-        contact: '010-1234-5678',
+        contact: '',
         marginType: '%',
         marginValue: 30,
         domesticShipping: 0,
         prepCost: 500,
         intlShipping: 0,
-        visitedPages: ['qoo10-connect', 'basic-info', 'basic-margin'],
+        visitedPages: [],
     });
 
     return (
