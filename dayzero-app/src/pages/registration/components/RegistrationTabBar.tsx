@@ -50,7 +50,7 @@ export const RegistrationProviderFilter: React.FC<Props> = ({
                     )}
 
                     <div style={{
-                        maxWidth: filter === '전체' || isActive ? '100px' : '0px',
+                        maxWidth: filter === '전체' || isActive ? '160px' : '0px',
                         opacity: filter === '전체' || isActive ? 1 : 0,
                         overflow: 'hidden',
                         transition: 'all 0.3s ease',

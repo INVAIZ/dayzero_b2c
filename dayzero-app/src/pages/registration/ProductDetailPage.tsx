@@ -564,11 +564,6 @@ export const ProductDetailPage: React.FC = () => {
                                 가격 변동 이력 (최근 14일)
                             </span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                                {isPaused && (
-                                    <span style={{ fontSize: font.size.xs, color: colors.text.tertiary }}>
-                                        재입고 시 알려드려요
-                                    </span>
-                                )}
                                 <MonitoringToggle checked onClick={handleToggleMonitoring} />
                             </div>
                         </div>

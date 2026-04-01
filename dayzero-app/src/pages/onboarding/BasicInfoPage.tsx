@@ -5,59 +5,9 @@ import { useOnboardingTransition } from '../../components/onboarding/useOnboardi
 import { colors, font, radius, spacing, shadow } from '../../design/tokens';
 
 import { useOnboarding, type ForwarderValue } from '../../components/onboarding/OnboardingContext';
+import { FORWARDER_PRESETS } from '../../utils/forwarder';
 
-interface ForwarderPreset {
-    id: ForwarderValue;
-    label: string;
-    zipCode: string;
-    addressLine1: string;
-    addressLine2: string;
-}
-
-const PRESETS: ForwarderPreset[] = [
-    {
-        id: 'qx',
-        label: '큐익스프레스 (Qxpress)',
-        zipCode: '273-0012',
-        addressLine1: '千葉県船橋市浜町2-5-7',
-        addressLine2: 'MFLP船橋1-3階 Qxpress',
-    },
-    {
-        id: 'rincos',
-        label: '링코스 (Rincos)',
-        zipCode: '143-0001',
-        addressLine1: '東京都大田区東海4-2-3',
-        addressLine2: 'リンコス東京物流管理センター',
-    },
-    {
-        id: 'kse',
-        label: 'KSE 국제로지스틱 (Kokusai Express)',
-        zipCode: '812-0051',
-        addressLine1: '福岡県福岡市東区箱崎ふ頭4丁目2-39',
-        addressLine2: '国際エキスプレス 福岡保税倉庫',
-    },
-    {
-        id: 'enterround',
-        label: '엔터라운드 (Enter Round)',
-        zipCode: '121-0836',
-        addressLine1: '東京都足立区入谷9-27-1',
-        addressLine2: 'エンターラウンド 東京物流センター',
-    },
-    {
-        id: 'hanjin',
-        label: '한진 원클릭 (Hanjin Express)',
-        zipCode: '230-0054',
-        addressLine1: '神奈川県横浜市鶴見区大黒ふ頭15-1',
-        addressLine2: '韓進エクスプレス 横浜デポ',
-    },
-    {
-        id: 'other',
-        label: '직접 입력하기 (기타)',
-        zipCode: '',
-        addressLine1: '',
-        addressLine2: '',
-    }
-];
+const PRESETS = FORWARDER_PRESETS;
 
 export default function BasicInfoPage() {
     const { state, setState } = useOnboarding();

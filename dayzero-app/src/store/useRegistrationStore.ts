@@ -105,27 +105,38 @@ export const useRegistrationStore = create<RegistrationState>()(
                             qoo10ProductUrl: `https://www.qoo10.jp/item/${itemCode}`,
                         };
 
+                        // 먼저 currentCount를 갱신 (프로그레스 바 100%까지 채움)
                         set((state) => ({
                             jobs: state.jobs.map(j => {
                                 if (j.id !== jobId) return j;
                                 const updatedResults = [...j.results, result];
-                                const isComplete = completedCount >= productIds.length;
                                 return {
                                     ...j,
                                     results: updatedResults,
                                     currentCount: completedCount,
                                     successCount: updatedResults.length,
                                     failedCount: 0,
-                                    ...(isComplete
-                                        ? {
-                                            status: 'completed' as const,
-                                            completedAt: new Date().toISOString(),
-                                            elapsedTime: Date.now() - startTime,
-                                        }
-                                        : {}),
                                 };
                             }),
                         }));
+
+                        // 마지막 상품이면 프로그레스 바 애니메이션 후 completed 처리
+                        const isComplete = completedCount >= productIds.length;
+                        if (isComplete) {
+                            setTimeout(() => {
+                                set((state) => ({
+                                    jobs: state.jobs.map(j => {
+                                        if (j.id !== jobId) return j;
+                                        return {
+                                            ...j,
+                                            status: 'completed' as const,
+                                            completedAt: new Date().toISOString(),
+                                            elapsedTime: Date.now() - startTime,
+                                        };
+                                    }),
+                                }));
+                            }, 900);
+                        }
                     }, delay);
                 });
 

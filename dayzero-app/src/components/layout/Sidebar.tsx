@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, LayoutList, PackageOpen, ChevronRight, Settings } from 'lucide-react';
+import { Search, LayoutList, PackageOpen, ChevronRight } from 'lucide-react';
 import { useSourcingStore } from '../../store/useSourcingStore';
-import { useToastStore } from '../../store/useToastStore';
+import { SettingsPanel } from '../common/SettingsPanel';
 import { colors, font, radius, spacing } from '../../design/tokens';
 
 type NavItem = '수집하기' | '수집된 상품' | '판매 중인 상품';
@@ -10,7 +10,6 @@ type NavItem = '수집하기' | '수집된 상품' | '판매 중인 상품';
 export const Sidebar: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [showToast] = useState(false);
     const [badgeAnimating, setBadgeAnimating] = useState(false);
 
     const { unprocessedProductCount } = useSourcingStore();
@@ -171,52 +170,8 @@ export const Sidebar: React.FC = () => {
             <div style={{ flex: 1 }} />
 
             <div style={{ borderTop: `1px solid ${colors.border.default}`, paddingTop: spacing['4'] }}>
-                <button
-                    onClick={() => useToastStore.getState().addToast('준비 중이에요')}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: spacing['3'],
-                        width: '100%',
-                        padding: `${spacing['3']} ${spacing['3']}`,
-                        background: 'transparent',
-                        border: 'none',
-                        borderRadius: radius.lg,
-                        cursor: 'pointer',
-                        color: colors.text.tertiary,
-                        fontWeight: font.weight.medium,
-                        fontSize: font.size.base,
-                        transition: 'all 0.2s',
-                    }}
-                    onMouseOver={(e) => { e.currentTarget.style.background = colors.bg.subtle; }}
-                    onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                >
-                    <Settings size={20} color={colors.text.muted} />
-                    설정
-                </button>
+                <SettingsPanel />
             </div>
-
-            {/* Preparation Toast */}
-            {showToast && (
-                <div style={{
-                    position: 'absolute',
-                    bottom: '40px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 'max-content',
-                    background: 'rgba(25, 31, 40, 0.9)',
-                    color: '#FFFFFF',
-                    padding: '12px 24px',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    zIndex: 2000,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    animation: 'fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                }}>
-                    준비 중이에요
-                </div>
-            )}
         </aside>
     );
 };

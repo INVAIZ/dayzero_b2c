@@ -10,6 +10,14 @@ interface Props {
 
 export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss }) => {
     const percent = job.totalCount > 0 ? Math.round((job.currentCount / job.totalCount) * 100) : 0;
+    // 마운트 시 0%에서 시작 → 실제 percent로 애니메이션
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        const t = requestAnimationFrame(() => setMounted(true));
+        return () => cancelAnimationFrame(t);
+    }, []);
+    const barPercent = mounted ? percent : 0;
+
     const prevCount = useRef(job.currentCount);
     const [justCompleted, setJustCompleted] = useState<string | null>(null);
     const [phase, setPhase] = useState<'in' | 'done' | 'out'>('in');
@@ -78,7 +86,7 @@ export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss })
                 display: 'flex',
                 alignItems: 'center',
                 gap: spacing['3'],
-                marginBottom: justCompleted ? spacing['3'] : '0',
+                marginBottom: spacing['4'],
                 position: 'relative',
             }}>
                 {/* 로고 아이콘 */}
@@ -131,56 +139,50 @@ export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss })
                     </div>
                 </div>
 
-                {/* 프로그레스 바 + 퍼센트 */}
+                {/* 퍼센트 */}
                 <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: spacing['3'],
+                    fontSize: font.size.lg,
+                    fontWeight: 700,
+                    color: isDone ? colors.success : colors.primary,
+                    fontVariantNumeric: 'tabular-nums',
                     flexShrink: 0,
-                    width: '160px',
+                    lineHeight: 1,
+                    transition: 'color 0.4s',
+                    minWidth: '42px',
+                    textAlign: 'right',
                 }}>
-                    <div style={{
-                        flex: 1,
-                        height: '8px',
-                        background: 'rgba(0,0,0,0.04)',
-                        borderRadius: radius.full,
-                        overflow: 'hidden',
-                    }}>
+                    {percent}
+                    <span style={{ fontSize: font.size.xs, fontWeight: 600, marginLeft: '1px' }}>%</span>
+                </div>
+            </div>
+
+            {/* 프로그레스 바 — 전체 너비 */}
+            <div style={{
+                height: '6px',
+                background: 'rgba(0,0,0,0.04)',
+                borderRadius: radius.full,
+                overflow: 'hidden',
+                marginBottom: justCompleted && !isDone ? spacing['3'] : '0',
+            }}>
+                <div style={{
+                    height: '100%',
+                    width: `${barPercent}%`,
+                    background: isDone
+                        ? `linear-gradient(90deg, ${colors.success}, ${colors.successAlt})`
+                        : `linear-gradient(90deg, ${colors.primary}, #60A5FA)`,
+                    borderRadius: radius.full,
+                    transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s',
+                    position: 'relative',
+                    overflow: 'hidden',
+                }}>
+                    {!isDone && (
                         <div style={{
-                            height: '100%',
-                            width: `${percent}%`,
-                            background: isDone
-                                ? `linear-gradient(90deg, ${colors.success}, ${colors.successAlt})`
-                                : `linear-gradient(90deg, ${colors.primary}, #60A5FA)`,
-                            borderRadius: radius.full,
-                            transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s',
-                            position: 'relative',
-                            overflow: 'hidden',
-                        }}>
-                            {!isDone && (
-                                <div style={{
-                                    position: 'absolute',
-                                    inset: 0,
-                                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
-                                    animation: 'shimmer 1.5s ease-in-out infinite',
-                                }} />
-                            )}
-                        </div>
-                    </div>
-                    <div style={{
-                        fontSize: font.size.lg,
-                        fontWeight: 700,
-                        color: isDone ? colors.success : colors.primary,
-                        fontVariantNumeric: 'tabular-nums',
-                        flexShrink: 0,
-                        lineHeight: 1,
-                        transition: 'color 0.4s',
-                        minWidth: '42px',
-                        textAlign: 'right',
-                    }}>
-                        {percent}
-                        <span style={{ fontSize: font.size.xs, fontWeight: 600, marginLeft: '1px' }}>%</span>
-                    </div>
+                            position: 'absolute',
+                            inset: 0,
+                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                            animation: 'shimmer 1.5s ease-in-out infinite',
+                        }} />
+                    )}
                 </div>
             </div>
 
