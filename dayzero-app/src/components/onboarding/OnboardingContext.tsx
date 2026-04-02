@@ -26,6 +26,10 @@ interface OnboardingState {
     prepCost: number;
     intlShipping: number;
 
+    // 환율 설정
+    exchangeRateMode: 'realtime' | 'fixed';
+    fixedExchangeRate: number;
+
     // 방문 기록
     visitedPages: string[];
 }
@@ -57,6 +61,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         domesticShipping: 0,
         prepCost: 500,
         intlShipping: 0,
+        exchangeRateMode: 'realtime',
+        fixedExchangeRate: 9.2,
         visitedPages: [],
     });
 
