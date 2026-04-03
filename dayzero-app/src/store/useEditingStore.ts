@@ -190,6 +190,12 @@ export const useEditingStore = create<EditingState>()(
                         if (job.targets.includes('description')) {
                             productUpdates.descriptionJa = MOCK_DESC_JA;
                         }
+                        if (job.targets.includes('thumbnail')) {
+                            productUpdates.thumbnailTranslated = true;
+                        }
+                        if (job.targets.includes('detailPage')) {
+                            productUpdates.detailPageTranslated = true;
+                        }
                         return { ...p, ...productUpdates };
                     });
                 }

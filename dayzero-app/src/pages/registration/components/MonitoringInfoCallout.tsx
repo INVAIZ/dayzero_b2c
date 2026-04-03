@@ -62,13 +62,6 @@ export const MonitoringInfoCallout: React.FC<Props> = ({
                             {' '}/ 최대 {limit}건
                         </span>
                     </span>
-                    <span style={{
-                        fontSize: font.size['2xs'], fontWeight: font.weight.semibold, color: colors.primary,
-                        background: colors.bg.surface, border: `1px solid ${colors.primaryLightBorder}`,
-                        padding: '2px 8px', borderRadius: radius.full,
-                    }}>
-                        무료 플랜
-                    </span>
                 </div>
 
                 {/* 안내 문구 */}

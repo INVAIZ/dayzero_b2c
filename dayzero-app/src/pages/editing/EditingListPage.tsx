@@ -13,10 +13,9 @@ import { BulkActionBar } from './components/BulkActionBar';
 import { TranslationModal } from './components/TranslationModal';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { Checkbox } from '../../components/common/Checkbox';
-import { SourcingHistoryModal } from './components/SourcingHistoryModal';
 import { colors, font, radius, spacing } from '../../design/tokens';
 import { calculateIntlShippingKrw } from '../../utils/shipping';
-import { isFullyTranslated } from '../../utils/editing';
+import { isFullyTranslated, isTextTranslated } from '../../utils/editing';
 
 const TAB_LABELS: { key: EditTabFilter; label: string }[] = [
     { key: 'all', label: '전체' },
@@ -85,7 +84,6 @@ export default function EditingListPage() {
 
     const { state: onboardingState } = useOnboarding();
     const { clearUnprocessedCount, notifications: sourcingNotifications, products: sourcingProducts } = useSourcingStore();
-    const [isSourcingHistoryOpen, setIsSourcingHistoryOpen] = useState(false);
 
     useEffect(() => {
         clearUnprocessedCount();
@@ -177,10 +175,19 @@ export default function EditingListPage() {
         return sortDir === 'asc' ? cmp : -cmp;
     }), [filtered, sortKey, sortDir]);
 
+    // 페이지네이션
+    const PAGE_SIZE = 20;
+    const [page, setPage] = useState(0);
+    const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+    const pagedProducts = useMemo(() => sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE), [sorted, page]);
+
+    // 탭/필터 변경 시 페이지 리셋
+    useEffect(() => { setPage(0); }, [activeTab, providerFilter, searchKeyword]);
+
     const selectedIdSet = useMemo(() => new Set(selectedProductIds), [selectedProductIds]);
-    const allFilteredSelected = useMemo(
-        () => filtered.length > 0 && filtered.every((p) => selectedIdSet.has(p.id)),
-        [filtered, selectedIdSet]
+    const allPageSelected = useMemo(
+        () => pagedProducts.length > 0 && pagedProducts.every((p) => selectedIdSet.has(p.id)),
+        [pagedProducts, selectedIdSet]
     );
 
     // 선택된 상품 중 아직 편집 필요한 상품만 카운트 (전부 완료면 번역 버튼 비활성화)
@@ -191,15 +198,34 @@ export default function EditingListPage() {
 
     const selectedTranslatedIds = useMemo(() =>
         products.filter(p =>
-            selectedProductIds.includes(p.id) && isFullyTranslated(p)
+            selectedProductIds.includes(p.id) && isTextTranslated(p)
         ).map(p => p.id),
         [products, selectedProductIds]
     );
     const selectedRegisterCount = selectedTranslatedIds.length;
 
+    // 선택된 상품 전체에서 이미 완료된 편집 타겟 목록
+    const completedTargets = useMemo(() => {
+        const selected = products.filter(p => selectedProductIds.includes(p.id));
+        if (selected.length === 0) return [] as ('title' | 'description' | 'options' | 'thumbnail' | 'detailPage')[];
+        const result: ('title' | 'description' | 'options' | 'thumbnail' | 'detailPage')[] = [];
+        if (selected.every(p => !!p.titleJa && !/[\uAC00-\uD7AF]/.test(p.titleJa))) result.push('title');
+        if (selected.every(p => !!p.descriptionJa && !/[\uAC00-\uD7AF]/.test(p.descriptionJa))) result.push('description');
+        if (selected.every(p => p.options.length === 0 || p.options.every(o => !!o.nameJa || !/[\uAC00-\uD7AF]/.test(o.nameKo)))) result.push('options');
+        if (selected.every(p => p.thumbnailTranslated)) result.push('thumbnail');
+        if (selected.every(p => p.detailPageTranslated)) result.push('detailPage');
+        return result;
+    }, [products, selectedProductIds]);
+
     const handleSelectAll = () => {
-        if (allFilteredSelected) clearSelection();
-        else selectAll(filtered.map((p) => p.id));
+        const pageIds = pagedProducts.map(p => p.id);
+        if (allPageSelected) {
+            // 현재 페이지 선택 해제
+            const pageIdSet = new Set(pageIds);
+            selectAll(selectedProductIds.filter(id => !pageIdSet.has(id)));
+        } else {
+            selectAll([...new Set([...selectedProductIds, ...pageIds])]);
+        }
     };
 
     return (
@@ -213,27 +239,8 @@ export default function EditingListPage() {
 
             {/* 페이지 헤더 */}
             <div style={{ marginBottom: spacing['6'], animation: 'fadeInUp 0.6s ease' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <div style={{ marginBottom: '6px' }}>
                     <h1 style={{ fontSize: font.size['2xl'], fontWeight: 700, color: colors.text.primary }}>수집된 상품</h1>
-                    <button
-                        onClick={() => setIsSourcingHistoryOpen(true)}
-                        style={{
-                            display: 'flex', alignItems: 'center', gap: spacing['2'],
-                            padding: `${spacing['2']} ${spacing['3']}`,
-                            background: colors.bg.surface,
-                            border: `1px solid ${colors.border.default}`,
-                            borderRadius: radius.md,
-                            fontSize: font.size.sm, fontWeight: 500,
-                            color: colors.text.secondary,
-                            cursor: 'pointer',
-                            transition: 'all 0.15s',
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = colors.bg.subtle; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = colors.bg.surface; }}
-                    >
-                        <ClockIcon size={14} />
-                        수집 기록
-                    </button>
                 </div>
                 <p style={{ fontSize: font.size.md, color: colors.text.tertiary }}>
                     번역 후 Qoo10에 등록할 상품을 편집하고 등록하세요.
@@ -335,7 +342,7 @@ export default function EditingListPage() {
                                 )}
 
                                 <div style={{
-                                    maxWidth: filter === '전체' || isActive ? '100px' : '0px',
+                                    maxWidth: filter === '전체' || isActive ? '200px' : '0px',
                                     opacity: filter === '전체' || isActive ? 1 : 0,
                                     overflow: 'hidden',
                                     transition: 'all 0.3s ease',
@@ -354,11 +361,11 @@ export default function EditingListPage() {
                 display: 'flex', alignItems: 'center', gap: spacing['5'],
                 padding: `0 ${spacing['5']}`, marginBottom: spacing['2'],
             }}>
-                <Checkbox checked={allFilteredSelected} onClick={handleSelectAll} />
+                <Checkbox checked={allPageSelected} onClick={handleSelectAll} />
                 <div style={{ width: '48px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600 }}>이미지</div>
                 <SortHeader label="상품명" sortKey="title" active={sortKey} dir={sortDir} onSort={handleSort} style={{ flex: 3 }} />
                 <div style={{ flex: 1.3, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600 }}>카테고리</div>
-                <div style={{ width: '70px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600, paddingLeft: '4px' }}>무게</div>
+                <div style={{ width: '90px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600, paddingLeft: '4px' }}>무게</div>
                 <SortHeader label="판매가" sortKey="salePriceJpy" active={sortKey} dir={sortDir} onSort={handleSort} style={{ width: '90px', flexShrink: 0 }} />
                 <div style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600 }}>원가</div>
                 <SortHeader label="최근 수집일" sortKey="createdAt" active={sortKey} dir={sortDir} onSort={handleSort} style={{ width: '90px', flexShrink: 0 }} />
@@ -370,8 +377,9 @@ export default function EditingListPage() {
                     {searchKeyword || providerFilter !== '전체' ? '검색 조건에 맞는 상품이 없어요.' : '수집된 상품이 없어요.'}
                 </div>
             ) : (
-                <div key={activeTab} style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'], paddingBottom: '100px', animation: 'fadeInUp 0.4s ease' }}>
-                    {sorted.map((product) => (
+                <>
+                <div key={activeTab} style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'], animation: 'fadeInUp 0.4s ease' }}>
+                    {pagedProducts.map((product) => (
                         <ProductListItem
                             key={product.id}
                             product={product}
@@ -382,6 +390,40 @@ export default function EditingListPage() {
                         />
                     ))}
                 </div>
+
+                {/* 페이지네이션 */}
+                {totalPages > 1 && (
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: spacing['1'],
+                        padding: `${spacing['5']} 0`,
+                        paddingBottom: '100px',
+                    }}>
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setPage(i)}
+                                style={{
+                                    width: '32px', height: '32px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    background: page === i ? colors.primary : 'none',
+                                    color: page === i ? colors.bg.surface : colors.text.muted,
+                                    border: page === i ? 'none' : `1px solid ${colors.border.default}`,
+                                    borderRadius: radius.sm,
+                                    fontSize: font.size.sm,
+                                    fontWeight: page === i ? 700 : 500,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.15s',
+                                }}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
+                )}
+                </>
             )}
 
             <BulkActionBar
@@ -430,6 +472,7 @@ export default function EditingListPage() {
                 onClose={closeTranslationModal}
                 selectedCount={selectedProductIds.length}
                 alreadyTranslatedCount={selectedTranslatedIds.length}
+                completedTargets={completedTargets}
                 onStart={(targets) => {
                     startTranslationJobs(selectedProductIds, targets);
                     closeTranslationModal();
@@ -437,18 +480,6 @@ export default function EditingListPage() {
                 }}
             />
 
-            <SourcingHistoryModal
-                isOpen={isSourcingHistoryOpen}
-                onClose={() => setIsSourcingHistoryOpen(false)}
-                notifications={sourcingNotifications}
-                sourcingProducts={sourcingProducts}
-                editingProducts={products}
-                onSelectJob={(notifId) => {
-                    setActiveTab('all');
-                    setProviderFilter('전체');
-                    selectByJobId(notifId);
-                }}
-            />
         </MainLayout>
     );
 }

@@ -380,14 +380,7 @@ export default function SourcingPage() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'], marginBottom: spacing['2'], flexWrap: 'wrap' }}>
                                         <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.primary }}>
                                             {schedules.length}건
-                                            <span style={{ fontWeight: font.weight.medium, color: colors.text.muted, fontSize: font.size.sm }}> / 최대 3건</span>
-                                        </span>
-                                        <span style={{
-                                            fontSize: font.size['2xs'], fontWeight: font.weight.semibold, color: colors.primary,
-                                            background: colors.bg.surface, border: `1px solid ${colors.primaryLightBorder}`,
-                                            padding: '2px 8px', borderRadius: radius.full,
-                                        }}>
-                                            무료 플랜
+                                            <span style={{ fontWeight: font.weight.medium, color: colors.text.muted, fontSize: font.size.sm }}> / 최대 10건</span>
                                         </span>
                                     </div>
                                     <div style={{ fontSize: font.size.sm, color: colors.text.tertiary, lineHeight: '1.5', display: 'flex', alignItems: 'center', gap: spacing['1'] }}>

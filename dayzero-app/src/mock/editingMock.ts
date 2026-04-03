@@ -175,6 +175,8 @@ const pendingProducts: ProductDetail[] = pendingProductsData.map((p) => ({
     options: makeOptions(p.id),
     thumbnails: makeThumbnails(3, p.id),
     detailImages: makeDetailImages(5, p.id),
+    thumbnailTranslated: false,
+    detailPageTranslated: false,
     salePriceJpy: Math.round((p.krw / 10.5) * 1.3 / 10) * 10,
     qoo10CategoryId: p.catId,
     qoo10CategoryPath: p.cat,

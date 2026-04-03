@@ -1,4 +1,4 @@
-import { X, Shield, AlertTriangle, PackageX, TrendingDown, Clock, RefreshCw } from 'lucide-react';
+import { X, Shield, AlertTriangle, PackageX, TrendingDown, TrendingUp, Clock, Play, CheckCircle } from 'lucide-react';
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
 import { ANIM } from '../../../design/animations';
 import { formatCheckTime } from '../../../utils/formatDate';
@@ -36,6 +36,7 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
     return (
         <div
             onClick={onClose}
+            onWheel={e => e.preventDefault()}
             style={{
                 position: 'fixed',
                 inset: 0,
@@ -54,7 +55,7 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                     background: colors.bg.surface,
                     borderRadius: radius.xl,
                     width: '580px',
-                    maxHeight: '80vh',
+                    maxHeight: '70vh',
                     overflow: 'hidden',
                     boxShadow: shadow.lg,
                     animation: 'modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -70,14 +71,27 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                     padding: `${spacing['5']} ${spacing['6']}`,
                     borderBottom: `1px solid ${colors.border.default}`,
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                        <Shield size={18} color={colors.primary} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['1'] }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                            <Shield size={18} color={colors.primary} />
+                            <span style={{
+                                fontSize: font.size.lg,
+                                fontWeight: 700,
+                                color: colors.text.primary,
+                            }}>
+                                가격·품절 확인 기록
+                            </span>
+                        </div>
                         <span style={{
-                            fontSize: font.size.lg,
-                            fontWeight: 700,
-                            color: colors.text.primary,
+                            fontSize: font.size.xs,
+                            color: colors.text.muted,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: spacing['1'],
+                            paddingLeft: '26px',
                         }}>
-                            변동 기록
+                            <Clock size={12} />
+                            매일 오전 7시부터 자동으로 확인돼요
                         </span>
                     </div>
                     <button
@@ -93,53 +107,14 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                     </button>
                 </div>
 
-                {/* 현재 상태 요약 */}
-                {monitored.length > 0 && (
-                    <div style={{
+                <div
+                    onWheel={e => e.stopPropagation()}
+                    style={{
+                        flex: 1,
+                        overflow: 'auto',
                         padding: `${spacing['4']} ${spacing['6']}`,
-                        background: colors.bg.faint,
-                        borderBottom: `1px solid ${colors.border.default}`,
-                    }}>
-                        <div style={{
-                            fontSize: font.size.sm,
-                            fontWeight: 600,
-                            color: colors.text.tertiary,
-                            marginBottom: spacing['2'],
-                        }}>
-                            최근 확인 결과
-                            {lastCheckTime && (
-                                <span style={{ fontWeight: 400, marginLeft: spacing['2'] }}>
-                                    ({formatCheckTime(lastCheckTime)})
-                                </span>
-                            )}
-                        </div>
-                        <div style={{
-                            display: 'flex',
-                            gap: spacing['3'],
-                            flexWrap: 'wrap',
-                        }}>
-                            <ResultBadge icon={<Shield size={12} />} label="정상" count={normal} color={colors.success} />
-                            {priceChanged > 0 && <ResultBadge icon={<TrendingDown size={12} />} label="가격 조정" count={priceChanged} color={colors.primary} />}
-                            {outOfStock > 0 && <ResultBadge icon={<PackageX size={12} />} label="품절" count={outOfStock} color={'#FF9500'} />}
-                        </div>
-                    </div>
-                )}
-
-                {/* 일별 확인 기록 */}
-                <div style={{
-                    flex: 1,
-                    overflow: 'auto',
-                    padding: `${spacing['4']} ${spacing['6']}`,
-                }}>
-                    <div style={{
-                        fontSize: font.size.sm,
-                        fontWeight: 600,
-                        color: colors.text.tertiary,
-                        marginBottom: spacing['3'],
-                    }}>
-                        일별 확인 기록
-                    </div>
-
+                    }}
+                >
                     {monitored.length === 0 ? (
                         <div style={{
                             textAlign: 'center',
@@ -154,11 +129,13 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                             {/* 오늘 (실제 현재 데이터) */}
                             <DailyCheckRow
                                 date="오늘"
-                                time="07:00"
+                                time="07:12"
                                 totalCount={monitored.length}
                                 normalCount={normal}
-                                issueCount={priceChanged + negativeMargin + outOfStock}
-                                isLatest
+                                issueCount={negativeMargin}
+                                outOfStockCount={outOfStock}
+                                priceUpCount={priceChanged}
+                                priceDownCount={0}
                             />
 
                             {/* 과거 더미 기록 */}
@@ -166,110 +143,22 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                                 <DailyCheckRow
                                     key={i}
                                     date={record.dateLabel}
-                                    time="07:00"
+                                    time={record.time}
                                     totalCount={record.totalCount}
                                     normalCount={record.normalCount}
                                     issueCount={record.issueCount}
+                                    outOfStockCount={record.outOfStockCount}
+                                    priceUpCount={record.priceUpCount}
+                                    priceDownCount={record.priceDownCount}
+                                    resumeCount={record.resumeCount}
+                                    isLast={i === checkHistory.length - 1}
                                 />
                             ))}
                         </div>
                     )}
                 </div>
 
-                {/* 하단 */}
-                <div style={{
-                    padding: `${spacing['4']} ${spacing['6']}`,
-                    borderTop: `1px solid ${colors.border.default}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                }}>
-                    <span style={{
-                        fontSize: font.size.xs,
-                        color: colors.text.muted,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: spacing['1'],
-                    }}>
-                        <Clock size={12} />
-                        매일 오전 7시에 자동으로 확인돼요
-                    </span>
-                    {monitored.length > 0 && (
-                        <div style={{ display: 'flex', gap: spacing['2'] }}>
-                            <button
-                                onClick={onForceIssue}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: spacing['1'],
-                                    padding: `${spacing['1']} ${spacing['3']}`,
-                                    background: colors.dangerLight,
-                                    border: 'none',
-                                    borderRadius: radius.md,
-                                    fontSize: font.size.xs,
-                                    fontWeight: 500,
-                                    color: colors.danger,
-                                    cursor: 'pointer',
-                                    transition: 'opacity 0.15s',
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.opacity = '0.75'; }}
-                                onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
-                                title="UT 테스트용: 1건에 이슈 강제 설정"
-                            >
-                                <RefreshCw size={11} />
-                                1건 이슈
-                            </button>
-                            {onSeedDemoIssues && (
-                                <button
-                                    onClick={onSeedDemoIssues}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: spacing['1'],
-                                        padding: `${spacing['1']} ${spacing['3']}`,
-                                        background: colors.warningLight,
-                                        border: 'none',
-                                        borderRadius: radius.md,
-                                        fontSize: font.size.xs,
-                                        fontWeight: 500,
-                                        color: colors.warningIcon,
-                                        cursor: 'pointer',
-                                        transition: 'opacity 0.15s',
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.opacity = '0.75'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
-                                    title="UT 테스트용: 품절 + 가격 조정 강제 생성"
-                                >
-                                    <AlertTriangle size={11} />
-                                    데모 이슈
-                                </button>
-                            )}
-                            <button
-                                onClick={onSimulate}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: spacing['1'],
-                                    padding: `${spacing['1']} ${spacing['3']}`,
-                                    background: colors.bg.subtle,
-                                    border: 'none',
-                                    borderRadius: radius.md,
-                                    fontSize: font.size.xs,
-                                    fontWeight: 500,
-                                    color: colors.text.muted,
-                                    cursor: 'pointer',
-                                    transition: 'color 0.15s',
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.color = colors.text.secondary; }}
-                                onMouseLeave={e => { e.currentTarget.style.color = colors.text.muted; }}
-                                title="UT 테스트용: 하루 경과 시뮬레이션"
-                            >
-                                <RefreshCw size={11} />
-                                전체 시뮬레이션
-                            </button>
-                        </div>
-                    )}
-                </div>
+
             </div>
 
             <style>{ANIM.overlayIn + ANIM.modalSlideUp}</style>
@@ -303,23 +192,25 @@ const DailyCheckRow: React.FC<{
     totalCount: number;
     normalCount: number;
     issueCount: number;
-    isLatest?: boolean;
-}> = ({ date, time, totalCount, normalCount, issueCount, isLatest }) => (
+    outOfStockCount?: number;
+    priceUpCount?: number;
+    priceDownCount?: number;
+    resumeCount?: number;
+    isLast?: boolean;
+}> = ({ date, time, totalCount, normalCount, issueCount, outOfStockCount = 0, priceUpCount = 0, priceDownCount = 0, resumeCount = 0, isLast = false }) => (
     <div style={{
         display: 'flex',
         alignItems: 'center',
         gap: spacing['3'],
-        padding: `${spacing['3']} ${spacing['3']}`,
-        background: isLatest ? colors.bg.info : 'transparent',
-        borderRadius: radius.md,
-        border: isLatest ? `1px solid ${colors.primaryLightBorder}` : `1px solid transparent`,
+        padding: `${spacing['3']} 0`,
+        borderBottom: isLast ? 'none' : `1px solid ${colors.border.default}`,
     }}>
         {/* 날짜 */}
         <div style={{
-            width: '56px',
+            width: '72px',
             fontSize: font.size.sm,
-            fontWeight: isLatest ? 700 : 500,
-            color: isLatest ? colors.primary : colors.text.secondary,
+            fontWeight: 500,
+            color: colors.text.secondary,
             flexShrink: 0,
         }}>
             {date}
@@ -344,58 +235,93 @@ const DailyCheckRow: React.FC<{
             {totalCount}건 확인
         </div>
 
-        {/* 결과 */}
-        <div style={{ display: 'flex', gap: spacing['2'], alignItems: 'center' }}>
-            <span style={{
-                fontSize: font.size.xs,
-                fontWeight: 600,
-                color: colors.success,
-            }}>
-                정상 {normalCount}
-            </span>
+        {/* 결과 태그 */}
+        <div style={{ display: 'flex', gap: spacing['1'], alignItems: 'center', flexWrap: 'wrap' }}>
+            {normalCount > 0 && (
+                <StatusTag icon={<CheckCircle size={10} />} label={`정상 ${normalCount}`} color={colors.primary} bg={colors.bg.info} />
+            )}
+            {priceUpCount > 0 && (
+                <StatusTag icon={<TrendingUp size={10} />} label={`가격 상승 ${priceUpCount}`} color="#E67E22" bg="#FFF3E0" />
+            )}
+            {priceDownCount > 0 && (
+                <StatusTag icon={<TrendingDown size={10} />} label={`가격 하락 ${priceDownCount}`} color="#E67E22" bg="#FFF3E0" />
+            )}
+            {outOfStockCount > 0 && (
+                <StatusTag icon={<PackageX size={10} />} label={`품절 ${outOfStockCount}`} color="#FF9500" bg="#FEF0E0" />
+            )}
             {issueCount > 0 && (
-                <span style={{
-                    fontSize: font.size.xs,
-                    fontWeight: 700,
-                    color: colors.danger,
-                    background: colors.dangerLight,
-                    padding: '1px 6px',
-                    borderRadius: radius.xs,
-                }}>
-                    문제 {issueCount}
-                </span>
+                <StatusTag icon={<AlertTriangle size={10} />} label={`문제 ${issueCount}`} color={colors.danger} bg={colors.dangerLight} />
+            )}
+            {resumeCount > 0 && (
+                <StatusTag icon={<Play size={10} />} label={`판매 재개 ${resumeCount}`} color={colors.success} bg="#E8F5E9" />
             )}
         </div>
     </div>
 );
 
+const StatusTag: React.FC<{
+    icon: React.ReactNode;
+    label: string;
+    color: string;
+    bg: string;
+}> = ({ icon, label, color, bg }) => (
+    <span style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '3px',
+        fontSize: font.size.xs,
+        fontWeight: 700,
+        color,
+        background: bg,
+        padding: '3px 8px',
+        borderRadius: radius.xs,
+    }}>
+        {icon} {label}
+    </span>
+);
+
 // ── 유틸 ──────────────────────────────────────────────────────────────────
 
-/** 과거 7일간 더미 확인 기록 생성 */
+/** 과거 14일간 더미 확인 기록 생성 */
 function generateCheckHistory(totalCount: number): Array<{
     dateLabel: string;
     totalCount: number;
     normalCount: number;
     issueCount: number;
+    outOfStockCount: number;
+    priceUpCount: number;
+    priceDownCount: number;
+    resumeCount: number;
+    time: string;
 }> {
     const records = [];
     const now = new Date();
 
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 30; i++) {
         const date = new Date(now);
         date.setDate(date.getDate() - i);
 
-        const dayName = i === 1 ? '어제' : `${date.getMonth() + 1}/${date.getDate()}`;
+        const dayName = i === 1 ? '어제' : `${String(date.getFullYear()).slice(2)}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
 
-        // 과거에는 문제가 적었던 것으로 설정
-        const issueCount = Math.floor(Math.random() * Math.min(2, Math.ceil(totalCount * 0.1)));
-        const normalCount = totalCount - issueCount;
+        const outOfStockCount = Math.random() < 0.3 ? Math.floor(Math.random() * 2) + 1 : 0;
+        const priceUpCount = Math.random() < 0.2 ? Math.floor(Math.random() * 2) + 1 : 0;
+        const priceDownCount = Math.random() < 0.2 ? Math.floor(Math.random() * 2) + 1 : 0;
+        const issueCount = Math.random() < 0.15 ? 1 : 0;
+        const resumeCount = i > 1 && Math.random() < 0.15 ? 1 : 0;
+        const normalCount = Math.max(0, totalCount - issueCount - outOfStockCount - priceUpCount - priceDownCount);
+        const minutes = Math.floor(Math.random() * 50);
+        const timeStr = `07:${String(minutes).padStart(2, '0')}`;
 
         records.push({
             dateLabel: dayName,
             totalCount,
             normalCount,
             issueCount,
+            outOfStockCount,
+            priceUpCount,
+            priceDownCount,
+            resumeCount,
+            time: timeStr,
         });
     }
     return records;

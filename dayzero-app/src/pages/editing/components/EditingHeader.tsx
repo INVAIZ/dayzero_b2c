@@ -5,7 +5,7 @@ import { ANIM } from '../../../design/animations';
 import { getProviderLogo, SOURCING_PROVIDERS } from '../../../types/sourcing';
 import type { ProductDetail } from '../../../types/editing';
 import { handleImgError } from '../../../utils/image';
-import { stripPrefix, isFullyTranslated } from '../../../utils/editing';
+import { stripPrefix, isTextTranslated } from '../../../utils/editing';
 
 interface Props {
     product: ProductDetail;
@@ -26,7 +26,7 @@ export const EditingHeader: React.FC<Props> = ({
 }) => {
     const [showRegTooltip, setShowRegTooltip] = useState(false);
 
-    const isTranslated = isFullyTranslated(product);
+    const isTranslated = isTextTranslated(product);
     const providerUrl = product.sourceUrl || SOURCING_PROVIDERS.find(p => p.name === product.provider)?.url || 'https://www.coupang.com';
 
     return (

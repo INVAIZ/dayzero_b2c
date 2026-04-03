@@ -145,7 +145,7 @@ export const BulkActionBar: React.FC<Props> = ({
                     gap: spacing['2'],
                     padding: `${spacing['2']} ${spacing['4']}`,
                     background: 'rgba(255,255,255,0.1)',
-                    color: '#FFFFFF',
+                    color: colors.danger,
                     border: '1px solid rgba(255,255,255,0.2)',
                     borderRadius: radius.md,
                     fontSize: font.size.md,

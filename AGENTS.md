@@ -43,6 +43,14 @@ dayzero-app/src/design/tokens.ts
 
 이 파일에 색상, 폰트 크기, 간격, 테두리 반경, 그림자, z-index가 모두 정의되어 있다.
 
+**UI 패턴 참조 문서 (반드시 읽는다):**
+```
+dayzero-app/src/design/DESIGN_SYSTEM.md
+```
+
+이 파일에 기존 컴포넌트 인벤토리, 레이아웃·폼·버튼·모달·리스트·토스트 등 모든 UI 패턴이 정리되어 있다.
+**새 UI를 만들기 전 반드시 이 문서에서 해당 패턴을 확인하고, 있으면 그대로 재사용한다.**
+
 ### 절대 규칙
 
 - **hex 색상 하드코딩 금지.** `colors.primary`, `colors.text.secondary` 등 토큰을 사용한다.

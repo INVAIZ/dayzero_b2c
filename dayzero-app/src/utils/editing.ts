@@ -74,11 +74,19 @@ export const mockTranslateOption = (nameKo: string): string => OPTION_KO_JA[name
 /** 더미 일본어 상세설명 */
 export const MOCK_DESC_JA = `【商品説明】\n韓国から直接仕入れた正規品です。高品質な素材を使用し、使いやすさを追求した商品です。\n\n【使用方法】\nご使用前に必ず使用説明書をお読みください。適量を手に取り、優しくなじませてください。\n\n【注意事項】\n・開封後の返品・交換はお受けできません。\n・商品の色は、モニターの設定により実際と異なる場合があります。\n・お肌に合わない場合はご使用をおやめください。`;
 
+/** 텍스트(상품명·상세설명·옵션) 번역이 완료되었는지 확인 */
+export const isTextTranslated = (p: ProductDetail): boolean =>
+    !!p.titleJa && !hasKorean(p.titleJa) &&
+    !!p.descriptionJa && !hasKorean(p.descriptionJa) &&
+    (p.options.length === 0 || p.options.every(o => !!o.nameJa || !hasKorean(o.nameKo)));
+
 /** 상품의 편집(번역)이 모두 완료되었는지 확인 */
 export const isFullyTranslated = (p: ProductDetail): boolean =>
     !!p.titleJa && !hasKorean(p.titleJa) &&
     !!p.descriptionJa && !hasKorean(p.descriptionJa) &&
-    (p.options.length === 0 || p.options.every(o => !!o.nameJa || !hasKorean(o.nameKo)));
+    (p.options.length === 0 || p.options.every(o => !!o.nameJa || !hasKorean(o.nameKo))) &&
+    p.thumbnailTranslated &&
+    p.detailPageTranslated;
 
 export const hasKorean = (s: string): boolean => /[\uAC00-\uD7AF]/.test(s);
 

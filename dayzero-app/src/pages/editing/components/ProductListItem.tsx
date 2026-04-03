@@ -49,7 +49,7 @@ const WeightSection: React.FC<{
 
     return (
         <div
-            style={{ width: '70px', flexShrink: 0, position: 'relative' }}
+            style={{ width: '90px', flexShrink: 0, position: 'relative' }}
             onClick={(e) => e.stopPropagation()}
         >
             <div
@@ -368,8 +368,28 @@ export const ProductListItem: React.FC<Props> = ({
             </div>
 
             {/* 원가 */}
-            <div style={{ width: '80px', flexShrink: 0, fontSize: font.size.sm, color: colors.text.tertiary }}>
-                ₩{product.originalPriceKrw.toLocaleString()}
+            <div
+                style={{ width: '80px', flexShrink: 0 }}
+                onMouseMove={(e) => showTooltip(e, (
+                    <div>
+                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: 500 }}>
+                            엔화 환산 (₩1 = ¥{(1 / EXCHANGE_RATE).toFixed(4)})
+                        </div>
+                        <div style={{ fontSize: font.size.lg, fontWeight: 700 }}>
+                            약 ¥{Math.round(product.originalPriceKrw / EXCHANGE_RATE).toLocaleString()}
+                        </div>
+                    </div>
+                ))}
+                onMouseLeave={hideTooltip}
+            >
+                <span style={{
+                    fontSize: font.size.base, fontWeight: 700, color: colors.text.primary,
+                    textDecoration: 'underline', textDecorationStyle: 'dotted',
+                    textUnderlineOffset: '3px', textDecorationColor: colors.text.muted,
+                    cursor: 'default',
+                }}>
+                    ₩{product.originalPriceKrw.toLocaleString()}
+                </span>
             </div>
 
             {/* 최근 수집일 */}

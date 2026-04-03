@@ -22,9 +22,11 @@ export function useRegistrationSelection(
                         unmonitoredCount: acc.unmonitoredCount + (!isMonitored ? 1 : 0),
                         hasPaused: acc.hasPaused || isPaused,
                         hasActive: acc.hasActive || !isPaused,
+                        pausedCount: acc.pausedCount + (isPaused ? 1 : 0),
+                        activeCount: acc.activeCount + (!isPaused ? 1 : 0),
                     };
                 },
-                { hasMonitored: false, hasUnmonitored: false, monitoredCount: 0, unmonitoredCount: 0, hasPaused: false, hasActive: false }
+                { hasMonitored: false, hasUnmonitored: false, monitoredCount: 0, unmonitoredCount: 0, hasPaused: false, hasActive: false, pausedCount: 0, activeCount: 0 }
             );
     }, [selectedIds, allSuccessResults]);
 
@@ -43,13 +45,22 @@ export function useRegistrationSelection(
         );
     }, []);
 
-    const handleSelectAll = useCallback(() => {
-        if (selectedIds.length === filteredResults.length) {
-            setSelectedIds([]);
+    const handleSelectAll = useCallback((pageIds?: string[]) => {
+        if (pageIds) {
+            const allPageSelected = pageIds.every(id => selectedIds.includes(id));
+            if (allPageSelected) {
+                setSelectedIds(prev => prev.filter(id => !pageIds.includes(id)));
+            } else {
+                setSelectedIds(prev => [...new Set([...prev, ...pageIds])]);
+            }
         } else {
-            setSelectedIds(filteredResults.map(r => r.id));
+            if (selectedIds.length === filteredResults.length) {
+                setSelectedIds([]);
+            } else {
+                setSelectedIds(filteredResults.map(r => r.id));
+            }
         }
-    }, [selectedIds.length, filteredResults]);
+    }, [selectedIds, filteredResults]);
 
     const clearSelection = useCallback(() => {
         setSelectedIds([]);

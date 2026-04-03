@@ -15,7 +15,7 @@ interface Props {
     results: RegistrationResult[];
     selectedIds?: string[];
     onToggleSelect?: (id: string) => void;
-    onSelectAll?: () => void;
+    onSelectAll?: (pageIds: string[]) => void;
     onRowClick?: (resultId: string) => void;
     showMonitoring?: boolean;
     onToggleMonitoring?: (resultId: string, enable: boolean) => void;
@@ -117,7 +117,7 @@ export const AllProductsTable: React.FC<Props> = ({
                 display: 'flex', alignItems: 'center', gap: spacing['3'],
                 padding: `0 ${spacing['5']}`, marginBottom: spacing['2'],
             }}>
-                {hasSelection && <Checkbox checked={allSelected} onClick={() => onSelectAll?.()} />}
+                {hasSelection && <Checkbox checked={allSelected} onClick={() => onSelectAll?.(pagedResults.map(r => r.id))} />}
                 <div style={{ width: '48px', flexShrink: 0, ...colHeader }}>이미지</div>
                 <div style={{ width: '64px', flexShrink: 0, ...colHeader }}>상태</div>
                 <div style={{ flex: 3, minWidth: 0, ...colHeader }}>

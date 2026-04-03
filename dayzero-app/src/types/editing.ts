@@ -28,6 +28,8 @@ export interface ProductDetail {
     // 이미지
     thumbnails: ProductImage[];   // 최대 10장, [0] = 대표
     detailImages: ProductImage[]; // 최대 30장
+    thumbnailTranslated: boolean;   // 썸네일 이미지 번역 완료 여부
+    detailPageTranslated: boolean;  // 상세페이지 이미지 번역 완료 여부
 
     // 가격 (소싱 단계에서 계산 완료)
     salePriceJpy: number;
@@ -77,7 +79,7 @@ export interface TranslationJob {
     productTitleKo: string;
     status: 'queued' | 'processing' | 'completed' | 'failed';
     errorMessage?: string;
-    targets: ('title' | 'description' | 'options')[];
+    targets: ('title' | 'description' | 'options' | 'thumbnail' | 'detailPage')[];
     isRead?: boolean;
 }
 

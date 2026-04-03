@@ -21,7 +21,7 @@ import { useRegistrationFilters } from './hooks/useRegistrationFilters';
 import { useRegistrationSelection } from './hooks/useRegistrationSelection';
 import { useRegistrationActions } from './hooks/useRegistrationActions';
 
-const FREE_PLAN_LIMIT = 10;
+const FREE_PLAN_LIMIT = 30;
 
 const EMPTY_MESSAGES: Record<MonitoringTabFilter, string> = {
     '전체': '등록된 상품이 없어요',
@@ -84,6 +84,9 @@ export const RegistrationResultPage: React.FC = () => {
         { pauseSales, resumeSales, deleteResults, enableMonitoring, disableMonitoring },
     );
 
+    // 모니터링 한도 초과 모달
+    const [isMonitoringLimitModalOpen, setIsMonitoringLimitModalOpen] = useState(false);
+
     // 개별 토글 모니터링
     const [pendingToggleId, setPendingToggleId] = useState<string | null>(null);
     const [isToggleEnableModalOpen, setIsToggleEnableModalOpen] = useState(false);
@@ -92,11 +95,15 @@ export const RegistrationResultPage: React.FC = () => {
     const handleToggleMonitoring = useCallback((resultId: string, enable: boolean) => {
         setPendingToggleId(resultId);
         if (enable) {
+            if (filters.monitoringCounts.monitoring >= FREE_PLAN_LIMIT) {
+                setIsMonitoringLimitModalOpen(true);
+                return;
+            }
             setIsToggleEnableModalOpen(true);
         } else {
             setIsToggleDisableModalOpen(true);
         }
-    }, []);
+    }, [filters.monitoringCounts.monitoring]);
 
     const handleConfirmToggleEnable = useCallback(() => {
         if (pendingToggleId) {
@@ -259,7 +266,14 @@ export const RegistrationResultPage: React.FC = () => {
                     onDelete={() => actions.setIsDeleteModalOpen(true)}
                     onClear={selection.clearSelection}
                     onEnableMonitoring={selection.selectedMonitoringInfo.hasUnmonitored
-                        ? () => actions.setIsEnableMonitoringModalOpen(true)
+                        ? () => {
+                            const newTotal = filters.monitoringCounts.monitoring + selection.selectedMonitoringInfo.unmonitoredCount;
+                            if (newTotal > FREE_PLAN_LIMIT || filters.monitoringCounts.monitoring >= FREE_PLAN_LIMIT) {
+                                setIsMonitoringLimitModalOpen(true);
+                            } else {
+                                actions.setIsEnableMonitoringModalOpen(true);
+                            }
+                        }
                         : undefined
                     }
                     onDisableMonitoring={selection.selectedMonitoringInfo.hasMonitored
@@ -270,6 +284,10 @@ export const RegistrationResultPage: React.FC = () => {
                     hasUnmonitoredSelected={selection.selectedMonitoringInfo.hasUnmonitored}
                     hasPausedSelected={selection.selectedMonitoringInfo.hasPaused}
                     hasActiveSelected={selection.selectedMonitoringInfo.hasActive}
+                    monitoredCount={selection.selectedMonitoringInfo.monitoredCount}
+                    unmonitoredCount={selection.selectedMonitoringInfo.unmonitoredCount}
+                    pausedCount={selection.selectedMonitoringInfo.pausedCount}
+                    activeCount={selection.selectedMonitoringInfo.activeCount}
                 />
             )}
 
@@ -322,6 +340,16 @@ export const RegistrationResultPage: React.FC = () => {
                 confirmText="가격·품절 확인 시작"
                 cancelText="취소"
                 type="info"
+            />
+
+            {/* 모니터링 한도 초과 모달 */}
+            <ConfirmModal
+                isOpen={isMonitoringLimitModalOpen}
+                onClose={() => setIsMonitoringLimitModalOpen(false)}
+                onConfirm={() => setIsMonitoringLimitModalOpen(false)}
+                title="가격·품절 확인 한도 초과"
+                description={`최대 ${FREE_PLAN_LIMIT}건까지 가격·품절 확인이 가능해요.\n기존 제품을 해제하거나 플랜을 업그레이드해 주세요.`}
+                confirmText="확인"
             />
 
             {/* 가격·재고 자동 확인 해제 모달 */}

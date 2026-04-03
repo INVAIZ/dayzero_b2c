@@ -1,21 +1,32 @@
 import { X, Check, AlertCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { colors, font, radius, shadow, spacing, zIndex } from '../../../design/tokens';
+
+type Target = 'title' | 'description' | 'options' | 'thumbnail' | 'detailPage';
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
-    onStart: (targets: ('title' | 'description' | 'options' | 'thumbnail' | 'detailPage')[]) => void;
+    onStart: (targets: Target[]) => void;
     selectedCount: number;
     alreadyTranslatedCount: number;
+    completedTargets?: Target[];
 }
 
-export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, selectedCount, alreadyTranslatedCount }) => {
-    const [targets, setTargets] = useState<('title' | 'description' | 'options' | 'thumbnail' | 'detailPage')[]>(['title', 'options', 'description']);
+export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, selectedCount, alreadyTranslatedCount, completedTargets = [] }) => {
+    const [targets, setTargets] = useState<Target[]>([]);
+
+    useEffect(() => {
+        if (isOpen) {
+            const defaults: Target[] = ['title', 'options', 'description'];
+            setTargets(defaults.filter(t => !completedTargets.includes(t)));
+        }
+    }, [isOpen, completedTargets]);
 
     if (!isOpen) return null;
 
-    const toggleTarget = (t: 'title' | 'description' | 'options' | 'thumbnail' | 'detailPage') => {
+    const toggleTarget = (t: Target) => {
+        if (completedTargets.includes(t)) return;
         setTargets(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
     };
 
@@ -38,7 +49,7 @@ export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, se
                     <h2 style={{ fontSize: font.size.lg, fontWeight: 700, marginBottom: 0 }}>AI 편집 설정</h2>
                 </div>
 
-                {alreadyTranslatedCount > 0 && (
+                {alreadyTranslatedCount > 0 && selectedCount > 1 && (
                     <div style={{
                         display: 'flex', alignItems: 'flex-start', gap: spacing['2'],
                         padding: spacing['3'], borderRadius: radius.md,
@@ -53,31 +64,45 @@ export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, se
                 )}
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['3'], marginBottom: spacing['6'] }}>
-                    {(['title', 'options', 'description', 'thumbnail', 'detailPage'] as const).map(t => (
-                        <div
-                            key={t}
-                            onClick={() => toggleTarget(t)}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: spacing['3'],
-                                padding: spacing['4'], borderRadius: radius.lg,
-                                border: `1px solid ${targets.includes(t) ? colors.primary : colors.border.default}`,
-                                background: targets.includes(t) ? colors.bg.faint : colors.bg.surface,
-                                cursor: 'pointer', transition: 'all 0.2s',
-                            }}
-                        >
-                            <div style={{
-                                width: '20px', height: '20px', borderRadius: radius.xs,
-                                border: `1px solid ${targets.includes(t) ? colors.primary : colors.border.light}`,
-                                background: targets.includes(t) ? colors.primary : 'transparent',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>
-                                {targets.includes(t) && <Check size={14} color="#fff" />}
+                    {(['title', 'options', 'description', 'thumbnail', 'detailPage'] as const).map(t => {
+                        const isCompleted = completedTargets.includes(t);
+                        const isSelected = targets.includes(t);
+                        return (
+                            <div
+                                key={t}
+                                onClick={() => toggleTarget(t)}
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: spacing['3'],
+                                    padding: spacing['4'], borderRadius: radius.lg,
+                                    border: `1px solid ${isCompleted ? colors.border.default : isSelected ? colors.primary : colors.border.default}`,
+                                    background: isCompleted ? colors.bg.subtle : isSelected ? colors.bg.faint : colors.bg.surface,
+                                    cursor: isCompleted ? 'default' : 'pointer',
+                                    transition: 'all 0.2s',
+                                    opacity: isCompleted ? 0.6 : 1,
+                                }}
+                            >
+                                <div style={{
+                                    width: '20px', height: '20px', borderRadius: radius.xs,
+                                    border: `1px solid ${isCompleted ? colors.primary : isSelected ? colors.primary : colors.border.light}`,
+                                    background: isCompleted ? colors.primary : isSelected ? colors.primary : 'transparent',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}>
+                                    {(isCompleted || isSelected) && <Check size={14} color="#fff" />}
+                                </div>
+                                <span style={{ fontSize: font.size.md, fontWeight: 600, color: isCompleted ? colors.text.tertiary : colors.text.primary, display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                                    {(t === 'title' || t === 'options' || t === 'description') && (
+                                        <span style={{
+                                            fontSize: font.size.xs, fontWeight: 700,
+                                            color: colors.primary, background: colors.primaryLight,
+                                            padding: '2px 6px', borderRadius: radius.xs,
+                                        }}>필수</span>
+                                    )}
+                                    {t === 'title' ? '상품명 번역' : t === 'description' ? '상세설명 작성 및 번역' : t === 'options' ? '옵션 번역' : t === 'thumbnail' ? '썸네일 번역' : '상세페이지 번역'}
+                                    {isCompleted && <span style={{ fontSize: font.size.sm, fontWeight: 400, marginLeft: spacing['2'] }}>이미 완료되었어요</span>}
+                                </span>
                             </div>
-                            <span style={{ fontSize: font.size.md, fontWeight: 600 }}>
-                                {t === 'title' ? '상품명 번역' : t === 'description' ? '상세설명 작성 및 번역' : t === 'options' ? '옵션 번역' : t === 'thumbnail' ? '썸네일 번역' : '상세페이지 번역'}
-                            </span>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 <button
