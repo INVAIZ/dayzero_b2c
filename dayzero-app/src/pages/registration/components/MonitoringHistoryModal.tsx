@@ -1,20 +1,16 @@
 import { X, Shield, AlertTriangle, PackageX, TrendingDown, TrendingUp, Clock, Play, CheckCircle } from 'lucide-react';
 import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
 import { ANIM } from '../../../design/animations';
-import { formatCheckTime } from '../../../utils/formatDate';
 import type { RegistrationResult } from '../../../types/registration';
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
     results: RegistrationResult[];
-    onSimulate: () => void;
-    onForceIssue: () => void;
-    onSeedDemoIssues?: () => void;
 }
 
-/** 변동 기록 모달 — 매일 오전 7시 자동 확인 이력 */
-export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, results, onSimulate, onForceIssue, onSeedDemoIssues }) => {
+/** 가격·품절 확인 기록 모달 — 매일 오전 7시 자동 확인 이력 */
+export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, results }) => {
     if (!isOpen) return null;
 
     const monitored = results.filter(r => r.monitoring?.status === 'active');
@@ -25,13 +21,6 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
 
     // 더미 과거 기록 생성 (최근 7일)
     const checkHistory = generateCheckHistory(monitored.length);
-
-    // 마지막 확인 시간
-    const lastCheckTime = monitored
-        .map(r => r.monitoring?.lastCheckAt)
-        .filter(Boolean)
-        .sort()
-        .pop();
 
     return (
         <div
@@ -168,23 +157,6 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
 
 // ── 하위 컴포넌트 ─────────────────────────────────────────────────────────
 
-const ResultBadge: React.FC<{
-    icon: React.ReactNode;
-    label: string;
-    count: number;
-    color: string;
-}> = ({ icon, label, count, color }) => (
-    <span style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '4px',
-        fontSize: font.size.sm,
-        fontWeight: 600,
-        color,
-    }}>
-        {icon} {label} {count}건
-    </span>
-);
 
 const DailyCheckRow: React.FC<{
     date: string;

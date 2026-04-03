@@ -34,7 +34,7 @@ const EMPTY_MESSAGES: Record<MonitoringTabFilter, string> = {
 
 export const RegistrationResultPage: React.FC = () => {
     const navigate = useNavigate();
-    const { jobs, deleteResults, pauseSales, resumeSales, enableMonitoring, disableMonitoring, runMonitoringCheck, forceIssueOnOne, seedDemoIssues } = useRegistrationStore();
+    const { jobs, deleteResults, pauseSales, resumeSales, enableMonitoring, disableMonitoring } = useRegistrationStore();
 
     // 모든 성공 결과 통합
     const allSuccessResults = useMemo(
@@ -368,9 +368,6 @@ export const RegistrationResultPage: React.FC = () => {
                 isOpen={actions.isMonitoringHistoryOpen}
                 onClose={() => actions.setIsMonitoringHistoryOpen(false)}
                 results={allSuccessResults}
-                onSimulate={runMonitoringCheck}
-                onForceIssue={forceIssueOnOne}
-                onSeedDemoIssues={seedDemoIssues}
             />
             {/* 자동확인 토글 ON 안내 모달 */}
             <ConfirmModal

@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, Check, ChevronUp, ChevronDown, ClockIcon } from 'lucide-react';
+import { Search, Check, ChevronUp, ChevronDown } from 'lucide-react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { useEditingStore } from '../../store/useEditingStore';
 import { useRegistrationStore } from '../../store/useRegistrationStore';
@@ -83,7 +83,7 @@ export default function EditingListPage() {
     }, [markProductsRead]);
 
     const { state: onboardingState } = useOnboarding();
-    const { clearUnprocessedCount, notifications: sourcingNotifications, products: sourcingProducts } = useSourcingStore();
+    const { clearUnprocessedCount } = useSourcingStore();
 
     useEffect(() => {
         clearUnprocessedCount();

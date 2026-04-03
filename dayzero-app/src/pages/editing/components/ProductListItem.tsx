@@ -6,7 +6,7 @@ import { getProviderLogo } from '../../../types/sourcing';
 import { Checkbox } from '../../../components/common/Checkbox';
 import { SOURCE_TAG_STYLES } from '../../../components/common/SourceTag';
 import { toKoCategory, shortKoCategory, EXCHANGE_RATE } from '../../../mock/categoryMap';
-import { colors, font, radius, shadow, spacing } from '../../../design/tokens';
+import { colors, font, radius, spacing } from '../../../design/tokens';
 import { stripPrefix, hasKorean } from '../../../utils/editing';
 import { FloatingTooltip, type TooltipData } from '../../../components/common/FloatingTooltip';
 import { formatShortDate } from '../../../utils/formatDate';

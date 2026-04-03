@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-    ArrowLeft, ExternalLink, Shield, AlertTriangle, PackageX, AlertCircle,
+    ArrowLeft, ExternalLink, Shield, AlertTriangle, AlertCircle,
     TrendingDown, TrendingUp, ChevronLeft, ChevronRight, PenLine, Trash2,
     PackageCheck, PauseCircle, Play,
 } from 'lucide-react';
@@ -18,7 +18,7 @@ import { useRegistrationStore } from '../../store/useRegistrationStore';
 import { PriceHistorySection } from './components/PriceHistorySection';
 import { NavButton, MonitoringToggle, InfoCard, InfoRow, AlertCard, StatusHelper } from './components/ProductDetailWidgets';
 import { MonitoringEnableDescription, MonitoringDisableDescription } from './components/MonitoringModalDescriptions';
-import type { MonitoringActivityLog } from '../../types/registration';
+import type { MonitoringActivityLog, MonitoringEventType } from '../../types/registration';
 
 export const ProductDetailPage: React.FC = () => {
     const { resultId } = useParams<{ resultId: string }>();

@@ -262,6 +262,8 @@ export const UrlSourcingContent = () => {
                     sourceUrl: mockProduct.sourceUrl,
                     thumbnailUrl: mockProduct.thumbnailUrl,
                     originalPriceKrw: mockProduct.originalPriceKrw,
+                    thumbnailTranslated: false,
+                    detailPageTranslated: false,
                     translationStatus: 'pending',
                     editStatus: 'pending',
                     lastSavedAt: null,

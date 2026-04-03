@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ExternalLink, Check, Shield, AlertTriangle, PackageX, TrendingDown, ShoppingBag, ChevronUp, ChevronDown } from 'lucide-react';
-import { colors, font, spacing, radius, shadow } from '../../../design/tokens';
+import { useState, useEffect, useMemo } from 'react';
+import { ExternalLink, Check, Shield, AlertTriangle, PackageX, ShoppingBag, ChevronUp, ChevronDown } from 'lucide-react';
+import { colors, font, spacing, radius } from '../../../design/tokens';
 import { ANIM } from '../../../design/animations';
 import { getProviderLogo } from '../../../types/sourcing';
 import { stripPrefix } from '../../../utils/editing';
 import { handleImgError } from '../../../utils/image';
-import type { RegistrationResult, MonitoringCheckResult } from '../../../types/registration';
+import type { RegistrationResult } from '../../../types/registration';
 import { FloatingTooltip, type TooltipData } from '../../../components/common/FloatingTooltip';
 import { calcMarginPercent } from '../../../utils/margin';
 import { formatShortDate } from '../../../utils/formatDate';
@@ -41,13 +41,6 @@ const Checkbox = ({ checked, onClick }: { checked: boolean; onClick: () => void 
 );
 
 
-const MONITORING_LABELS: Record<MonitoringCheckResult, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
-    normal: { label: '정상', color: colors.success, bg: colors.successLight, icon: <Shield size={12} /> },
-    price_changed: { label: '가격 변동', color: colors.warningIcon, bg: colors.warningLight, icon: <TrendingDown size={12} /> },
-    negative_margin: { label: '역마진', color: colors.danger, bg: colors.dangerLight, icon: <AlertTriangle size={12} /> },
-    out_of_stock: { label: '품절', color: colors.danger, bg: colors.dangerLight, icon: <PackageX size={12} /> },
-    restocked: { label: '정상', color: colors.success, bg: colors.successLight, icon: <Shield size={12} /> },
-};
 
 export const AllProductsTable: React.FC<Props> = ({
     results,
