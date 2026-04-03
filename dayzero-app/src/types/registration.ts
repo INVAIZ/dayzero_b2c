@@ -90,6 +90,29 @@ export interface PriceHistoryEntry {
     marginPercent: number;     // 판매가 대비 마진율
 }
 
+/** 활동 로그 이벤트 유형 */
+export type MonitoringEventType =
+    | 'monitoring_started'    // 자동확인 시작
+    | 'price_changed'         // 원가 변동 + 판매가 자동 조정
+    | 'out_of_stock'          // 품절 → 자동 일시중지
+    | 'restocked'             // 재입고 → 자동 재개
+    | 'negative_margin'       // 역마진 발생
+    | 'error';                // 소싱처 접근 불가 등 오류
+
+/** 활동 로그 항목 */
+export interface MonitoringActivityLog {
+    date: string;             // ISO date
+    type: MonitoringEventType;
+    description: string;      // 사용자에게 표시할 설명
+    details?: {
+        prevPrice?: number;
+        newPrice?: number;
+        prevSalePrice?: number;
+        newSalePrice?: number;
+        marginPercent?: number;
+    };
+}
+
 /** 변동 확인 상세 정보 (RegistrationResult에 추가) */
 export interface MonitoringInfo {
     status: MonitoringStatus;
@@ -99,4 +122,5 @@ export interface MonitoringInfo {
     currentSourcePriceKrw?: number;          // 최근 확인 원가
     priceHistory?: PriceHistoryEntry[];      // 최근 30일 이력
     issueDescription?: string;               // 문제 상세 설명
+    activityLog?: MonitoringActivityLog[];   // 활동 타임라인
 }

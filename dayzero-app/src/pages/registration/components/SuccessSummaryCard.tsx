@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Package, TrendingUp, Coins, AlertTriangle } from 'lucide-react';
+import { Package, TrendingUp, Coins } from 'lucide-react';
 import { colors, font, spacing, radius } from '../../../design/tokens';
 import type { RegistrationResult } from '../../../types/registration';
 
@@ -30,7 +30,7 @@ export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
         return { ...acc, avgMargin };
     }, [results]);
 
-    const { count, totalRevenue, avgMargin, negativeMarginCount, outOfStockCount } = stats;
+    const { count, totalRevenue, avgMargin } = stats;
 
     // 더미: 지난 달 대비 변동 (프로토타입용, 상품 없을 때는 표시 안 함)
     const hasDiff = count > 0;
@@ -45,7 +45,7 @@ export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
     return (
         <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: spacing['4'],
             marginBottom: spacing['6'],
             animation: 'summaryFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -71,11 +71,6 @@ export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
                 subValue={`₩${Math.round(totalRevenue / 0.11).toLocaleString()}`}
                 diffText={hasDiff ? `${revenuePct >= 0 ? '+' : ''}${revenuePct}%` : undefined}
                 diffPositive={revenuePct >= 0}
-            />
-            <IssueStatCard
-                negativeMarginCount={negativeMarginCount}
-                outOfStockCount={outOfStockCount}
-                hasProducts={hasDiff}
             />
             <style>{`
                 @keyframes summaryFadeIn {
@@ -179,77 +174,3 @@ const StatCard = ({
     </div>
 );
 
-const IssueStatCard: React.FC<{
-    negativeMarginCount: number;
-    outOfStockCount: number;
-    hasProducts: boolean;
-}> = ({ negativeMarginCount, outOfStockCount, hasProducts }) => {
-    const total = negativeMarginCount + outOfStockCount;
-    return (
-        <div style={{
-            background: colors.bg.surface,
-            border: `1px solid ${colors.border.default}`,
-            borderRadius: radius.lg,
-            padding: spacing['5'],
-        }}>
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: spacing['4'],
-            }}>
-                <span style={{ fontSize: font.size.sm, fontWeight: 500, color: colors.text.tertiary }}>
-                    미처리 품절·역마진
-                </span>
-                <AlertTriangle size={18} color={total > 0 ? colors.warningIcon : colors.text.muted} />
-            </div>
-
-            <div style={{
-                fontSize: '32px',
-                fontWeight: 700,
-                color: colors.text.primary,
-                lineHeight: 1,
-                letterSpacing: '-0.5px',
-                marginBottom: spacing['3'],
-            }}>
-                {total}
-                <span style={{ fontSize: font.size.base, fontWeight: 500, color: colors.text.muted, marginLeft: '4px' }}>건</span>
-            </div>
-
-            <div style={{ display: 'flex', gap: spacing['2'], flexWrap: 'wrap' }}>
-                {!hasProducts ? null : total === 0 ? (
-                    <span style={{ fontSize: font.size.xs, color: colors.success, fontWeight: 600 }}>
-                        모든 상품 정상
-                    </span>
-                ) : (
-                    <>
-                        {outOfStockCount > 0 && (
-                            <span style={{
-                                fontSize: font.size.xs,
-                                fontWeight: 600,
-                                color: colors.danger,
-                                background: colors.dangerLight,
-                                borderRadius: radius.full,
-                                padding: '2px 8px',
-                            }}>
-                                품절 {outOfStockCount}
-                            </span>
-                        )}
-                        {negativeMarginCount > 0 && (
-                            <span style={{
-                                fontSize: font.size.xs,
-                                fontWeight: 600,
-                                color: colors.danger,
-                                background: colors.dangerLight,
-                                borderRadius: radius.full,
-                                padding: '2px 8px',
-                            }}>
-                                역마진 {negativeMarginCount}
-                            </span>
-                        )}
-                    </>
-                )}
-            </div>
-        </div>
-    );
-};

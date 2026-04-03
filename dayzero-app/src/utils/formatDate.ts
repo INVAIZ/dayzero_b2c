@@ -53,7 +53,8 @@ export function formatCheckTime(iso: string): string {
 /** m/d (간략 날짜) */
 export function formatShortDate(iso: string): string {
     const d = new Date(iso);
-    return `${d.getMonth() + 1}/${d.getDate()}`;
+    const yy = String(d.getFullYear()).slice(2);
+    return `${yy}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 }
 
 /** yyyy년 m월 d일 */

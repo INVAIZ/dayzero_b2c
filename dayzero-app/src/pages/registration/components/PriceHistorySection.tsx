@@ -29,7 +29,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
     const dataMin = Math.min(...prices);
     const dataMax = Math.max(...prices);
 
-    const rawRange = dataMax - dataMin || 1000;
+    const rawRange = dataMax - dataMin || Math.round(dataMin * 0.1) || 1000;
     const step = (() => {
         const raw = rawRange / 4;
         const mag = Math.pow(10, Math.floor(Math.log10(raw)));
@@ -48,7 +48,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
     const plotW = svgW - padL - padR;
     const plotH = svgH - padTop - padBot;
 
-    const toX = (i: number) => padL + (i / (history.length - 1)) * plotW;
+    const toX = (i: number) => history.length <= 1 ? padL + plotW / 2 : padL + (i / (history.length - 1)) * plotW;
     const toY = (price: number) => padTop + plotH - ((price - yMin) / yRange) * plotH;
 
     const points = history.map((h, i) => ({ x: toX(i), y: toY(h.sourcePriceKrw) }));
@@ -59,10 +59,12 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
     const yTicks = Array.from({ length: 6 }, (_, i) => yMin + step * i).filter(v => v <= yMax);
 
     const xLabelCount = Math.min(5, history.length);
-    const xLabels = Array.from({ length: xLabelCount }, (_, i) => {
-        const idx = Math.round((i / (xLabelCount - 1)) * (history.length - 1));
-        return { x: toX(idx), label: formatShortDate(history[idx].date) };
-    });
+    const xLabels = xLabelCount <= 1
+        ? [{ x: toX(0), label: formatShortDate(history[0].date) }]
+        : Array.from({ length: xLabelCount }, (_, i) => {
+            const idx = Math.round((i / (xLabelCount - 1)) * (history.length - 1));
+            return { x: toX(idx), label: formatShortDate(history[idx].date) };
+        });
 
     const hEntry = hoveredIndex !== null ? history[hoveredIndex] : null;
     const hPoint = hoveredIndex !== null ? points[hoveredIndex] : null;
@@ -135,7 +137,15 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
                         strokeLinecap="round"
                     />
 
-                    {hPoint && hEntry && (
+                    {/* 1건일 때 항상 점 표시 */}
+                    {history.length === 1 && (
+                        <circle cx={points[0].x} cy={points[0].y} r="6"
+                            fill={colors.bg.surface}
+                            stroke={colors.primary}
+                            strokeWidth="2.5"
+                        />
+                    )}
+                    {hPoint && hEntry && history.length > 1 && (
                         <circle cx={hPoint.x} cy={hPoint.y} r="6"
                             fill={colors.bg.surface}
                             stroke={hEntry.marginPercent < 0 || hEntry.stockStatus === 'out_of_stock'
@@ -215,6 +225,21 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
 
             {/* 타임라인 리스트 (최근 5일) */}
             <div>
+                {/* 칼럼 헤더 */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: spacing['2'],
+                    padding: `${spacing['2']} 0`,
+                    borderBottom: `1px solid ${colors.border.default}`,
+                    marginBottom: spacing['1'],
+                }}>
+                    <span style={{ width: '8px', flexShrink: 0 }} />
+                    <span style={{ flex: 1, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left' }}>원가</span>
+                    <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left' }}>변동</span>
+                    <span style={{ width: '60px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left' }}>마진율</span>
+                    <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left', paddingLeft: '8px' }}>날짜</span>
+                </div>
                 {history.slice(-5).reverse().map((entry, i) => {
                     const isIssue = entry.marginPercent < 0 || entry.stockStatus === 'out_of_stock';
                     const priceChangeFromBase = entry.sourcePriceKrw - history[0].sourcePriceKrw;
@@ -225,7 +250,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: spacing['3'],
+                                gap: spacing['2'],
                                 padding: `${spacing['3']} 0`,
                                 borderBottom: i < 4 ? `1px solid ${colors.bg.subtle}` : 'none',
                             }}
@@ -238,14 +263,6 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
                                     : isIssue ? colors.danger : colors.success,
                                 flexShrink: 0,
                             }} />
-                            <span style={{
-                                fontSize: font.size.sm,
-                                color: colors.text.muted,
-                                width: '56px',
-                                flexShrink: 0,
-                            }}>
-                                {formatShortDate(entry.date)}
-                            </span>
                             <span style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -280,7 +297,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '3px',
-                                width: '100px',
+                                width: '80px',
                                 flexShrink: 0,
                             }}>
                                 {entry.stockStatus === 'out_of_stock' ? (
@@ -306,11 +323,22 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
                                     : entry.marginPercent < 0 ? colors.danger
                                         : entry.marginPercent < 10 ? colors.warningIcon
                                             : colors.success,
-                                width: '56px',
+                                width: '60px',
                                 textAlign: 'left',
                                 flexShrink: 0,
                             }}>
                                 {entry.stockStatus === 'out_of_stock' ? '–' : `${entry.marginPercent.toFixed(1)}%`}
+                            </span>
+                            <span style={{
+                                fontSize: font.size.sm,
+                                color: colors.text.muted,
+                                width: '80px',
+                                flexShrink: 0,
+                                whiteSpace: 'nowrap',
+                                textAlign: 'left',
+                                paddingLeft: '8px',
+                            }}>
+                                {formatShortDate(entry.date)}
                             </span>
                         </div>
                     );

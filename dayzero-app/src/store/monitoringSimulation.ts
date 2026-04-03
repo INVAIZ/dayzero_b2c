@@ -18,45 +18,37 @@ export function generateSimulatedCheckResult(originalPrice: number, salePriceJpy
     const rand = Math.random();
     if (rand < 0.45) {
         return { result: 'normal', currentPrice: originalPrice };
-    } else if (rand < 0.65) {
-        const change = Math.round(originalPrice * (0.05 + Math.random() * 0.1));
-        const newPrice = originalPrice + change;
+    } else if (rand < 0.75) {
+        // 원가 변동 → 판매가 자동 조정 (역마진 발생하지 않음)
+        const change = Math.round(originalPrice * (0.05 + Math.random() * 0.15));
+        const adjustedPrice = Math.max(originalPrice + (Math.random() < 0.5 ? change : -Math.round(change * 0.5)), Math.round(originalPrice * 0.7));
+        const newSaleJpy = Math.ceil((adjustedPrice * 1.2) * 0.11);
         return {
             result: 'price_changed',
-            currentPrice: newPrice,
-            issueDescription: `쇼핑몰 구매가가 ₩${originalPrice.toLocaleString()} → ₩${newPrice.toLocaleString()}로 변동됐어요. 현재 마진율은 유지되고 있어요.`,
-        };
-    } else if (rand < 0.85) {
-        const increase = Math.round(originalPrice * (0.4 + Math.random() * 0.3));
-        const newPrice = originalPrice + increase;
-        const saleInKrw = salePriceJpy / 0.11;
-        const marginPct = ((saleInKrw - newPrice) / saleInKrw * 100).toFixed(1);
-        const recommendedJpy = Math.ceil((newPrice * 1.2) * 0.11);
-        return {
-            result: 'negative_margin',
-            currentPrice: newPrice,
-            issueDescription: `쇼핑몰 구매가가 ₩${originalPrice.toLocaleString()} → ₩${newPrice.toLocaleString()}로 올라 현재 판매가(¥${salePriceJpy.toLocaleString()}) 기준 마진율이 ${marginPct}%예요. 판매가를 ¥${recommendedJpy.toLocaleString()} 이상으로 조정하거나, 다른 쇼핑몰을 검토해주세요.`,
+            currentPrice: adjustedPrice,
+            issueDescription: `원가 ₩${originalPrice.toLocaleString()} → ₩${adjustedPrice.toLocaleString()}로 변동, 판매가를 ¥${salePriceJpy.toLocaleString()} → ¥${newSaleJpy.toLocaleString()}로 자동 조정했어요.`,
         };
     } else {
         return {
             result: 'out_of_stock',
             currentPrice: originalPrice,
-            issueDescription: `쇼핑몰에서 해당 상품이 품절됐어요. Qoo10 판매를 일시 중지하거나, 다른 쇼핑몰을 찾아주세요.`,
+            issueDescription: '쇼핑몰에서 해당 상품이 품절됐어요. 판매를 자동 일시중지했어요.',
         };
     }
 }
 
-/** 더미 가격 이력 생성 (최근 14일) */
+/** 더미 가격 이력 생성 (days일치, 기본 14일) */
 export function generateDummyPriceHistory(
     basePrice: number,
     salePriceJpy: number,
     checkResult: MonitoringCheckResult,
     currentPrice: number,
+    days: number = 14,
 ): PriceHistoryEntry[] {
     const entries: PriceHistoryEntry[] = [];
     const now = new Date();
 
-    for (let i = 13; i >= 0; i--) {
+    for (let i = days - 1; i >= 0; i--) {
         const date = new Date(now);
         date.setDate(date.getDate() - i);
 

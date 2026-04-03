@@ -8,13 +8,14 @@ function isActualNegativeMargin(r: RegistrationResult): boolean {
 }
 
 export function useRegistrationFilters(allSuccessResults: RegistrationResult[]) {
-    const [monitoringTab, setMonitoringTab] = useState<MonitoringTabFilter>('판매 중');
+    const [monitoringTab, setMonitoringTab] = useState<MonitoringTabFilter>('전체');
     const [providerFilter, setProviderFilter] = useState('전체');
     const [searchKeyword, setSearchKeyword] = useState('');
 
     const monitoringCounts = useMemo(() => {
         return allSuccessResults.reduce(
             (acc, r) => {
+                acc.total++;
                 if (r.salesStatus === 'paused') {
                     acc.paused++;
                 } else {
@@ -28,7 +29,7 @@ export function useRegistrationFilters(allSuccessResults: RegistrationResult[]) 
                 }
                 return acc;
             },
-            { active: 0, monitoring: 0, outOfStock: 0, negativeMargin: 0, paused: 0 }
+            { total: 0, active: 0, monitoring: 0, outOfStock: 0, negativeMargin: 0, paused: 0 }
         );
     }, [allSuccessResults]);
 
@@ -36,16 +37,18 @@ export function useRegistrationFilters(allSuccessResults: RegistrationResult[]) 
         switch (monitoringTab) {
             case '일시 중지':
                 return allSuccessResults.filter(r => r.salesStatus === 'paused');
-            case '가격·재고 확인 중':
+            case '가격·품절 확인 중':
                 return allSuccessResults.filter(r => r.monitoring?.status === 'active');
             case '품절':
                 return allSuccessResults.filter(r =>
                     r.monitoring?.status === 'active' && r.monitoring.lastCheckResult === 'out_of_stock'
                 );
-            case '역마진':
+            case '문제 발생':
                 return allSuccessResults.filter(r => isActualNegativeMargin(r));
-            default: // '판매 중'
+            case '판매 중':
                 return allSuccessResults.filter(r => r.salesStatus !== 'paused');
+            default: // '전체'
+                return allSuccessResults;
         }
     }, [monitoringTab, allSuccessResults]);
 

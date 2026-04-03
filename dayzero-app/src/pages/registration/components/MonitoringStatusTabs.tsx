@@ -1,11 +1,12 @@
 import { colors, font, spacing, radius } from '../../../design/tokens';
 
-export type MonitoringTabFilter = '판매 중' | '가격·재고 확인 중' | '품절' | '역마진' | '일시 중지';
+export type MonitoringTabFilter = '전체' | '판매 중' | '가격·품절 확인 중' | '품절' | '문제 발생' | '일시 중지';
 
 interface Props {
     activeTab: MonitoringTabFilter;
     onChange: (tab: MonitoringTabFilter) => void;
     counts: {
+        total: number;
         active: number;
         monitoring: number;
         outOfStock: number;
@@ -24,6 +25,20 @@ export const MonitoringStatusTabs: React.FC<Props> = ({ activeTab, onChange, cou
             paddingBottom: '0',
         }}>
             <TabButton
+                label="전체"
+                isActive={activeTab === '전체'}
+                onClick={() => onChange('전체')}
+            >
+                {counts.total > 0 && (
+                    <CountBadge
+                        count={counts.total}
+                        isActive={activeTab === '전체'}
+                        variant="blue"
+                    />
+                )}
+            </TabButton>
+
+            <TabButton
                 label="판매 중"
                 isActive={activeTab === '판매 중'}
                 onClick={() => onChange('판매 중')}
@@ -38,14 +53,14 @@ export const MonitoringStatusTabs: React.FC<Props> = ({ activeTab, onChange, cou
             </TabButton>
 
             <TabButton
-                label="가격·재고 확인 중"
-                isActive={activeTab === '가격·재고 확인 중'}
-                onClick={() => onChange('가격·재고 확인 중')}
+                label="가격·품절 확인 중"
+                isActive={activeTab === '가격·품절 확인 중'}
+                onClick={() => onChange('가격·품절 확인 중')}
             >
                 {counts.monitoring > 0 && (
                     <CountBadge
                         count={counts.monitoring}
-                        isActive={activeTab === '가격·재고 확인 중'}
+                        isActive={activeTab === '가격·품절 확인 중'}
                         variant="blue"
                     />
                 )}
@@ -66,15 +81,15 @@ export const MonitoringStatusTabs: React.FC<Props> = ({ activeTab, onChange, cou
             </TabButton>
 
             <TabButton
-                label="역마진"
-                isActive={activeTab === '역마진'}
-                onClick={() => onChange('역마진')}
+                label="문제 발생"
+                isActive={activeTab === '문제 발생'}
+                onClick={() => onChange('문제 발생')}
             >
                 {counts.negativeMargin > 0 && (
                     <CountBadge
                         count={counts.negativeMargin}
-                        isActive={activeTab === '역마진'}
-                        variant="blue"
+                        isActive={activeTab === '문제 발생'}
+                        variant="red"
                     />
                 )}
             </TabButton>

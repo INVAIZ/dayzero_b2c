@@ -227,6 +227,7 @@ export default function RegistrationEditPage() {
                             border: 'none', borderRadius: radius.md,
                             fontSize: font.size.sm, fontWeight: 600,
                             cursor: 'pointer', flexShrink: 0,
+                            marginLeft: spacing['3'],
                             transition: 'background 0.2s',
                         }}
                         onMouseEnter={e => { e.currentTarget.style.background = colors.primaryHover; }}

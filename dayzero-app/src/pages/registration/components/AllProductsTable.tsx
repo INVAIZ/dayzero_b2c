@@ -1,12 +1,15 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
-import { ExternalLink, Check, Shield, AlertTriangle, PackageX, TrendingDown, Minus, ShoppingBag, ChevronUp, ChevronDown } from 'lucide-react';
-import { colors, font, spacing, radius, shadow, zIndex } from '../../../design/tokens';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { ExternalLink, Check, Shield, AlertTriangle, PackageX, TrendingDown, ShoppingBag, ChevronUp, ChevronDown } from 'lucide-react';
+import { colors, font, spacing, radius, shadow } from '../../../design/tokens';
 import { ANIM } from '../../../design/animations';
 import { getProviderLogo } from '../../../types/sourcing';
 import { stripPrefix } from '../../../utils/editing';
 import { handleImgError } from '../../../utils/image';
 import type { RegistrationResult, MonitoringCheckResult } from '../../../types/registration';
+import { FloatingTooltip, type TooltipData } from '../../../components/common/FloatingTooltip';
 import { calcMarginPercent } from '../../../utils/margin';
+import { formatShortDate } from '../../../utils/formatDate';
+import { EXCHANGE_RATE } from '../../../mock/categoryMap';
 
 interface Props {
     results: RegistrationResult[];
@@ -15,54 +18,9 @@ interface Props {
     onSelectAll?: () => void;
     onRowClick?: (resultId: string) => void;
     showMonitoring?: boolean;
+    onToggleMonitoring?: (resultId: string, enable: boolean) => void;
     emptyMessage?: string;
 }
-
-// --- 툴팁 (편집 목록과 동일) ---
-interface TooltipData { x: number; y: number; content: React.ReactNode; }
-
-const FloatingTooltip: React.FC<{ data: TooltipData }> = ({ data }) => {
-    const ref = useRef<HTMLDivElement>(null);
-    const [pos, setPos] = useState({ x: data.x, y: data.y });
-
-    useEffect(() => {
-        if (!ref.current) return;
-        const { width, height } = ref.current.getBoundingClientRect();
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        let x = data.x;
-        let y = data.y + 12;
-        if (x + width > vw - 16) x = vw - width - 16;
-        if (y + height > vh - 16) y = data.y - height - 12;
-        setPos({ x, y });
-    }, [data.x, data.y]);
-
-    return (
-        <div
-            ref={ref}
-            style={{
-                position: 'fixed',
-                left: pos.x,
-                top: pos.y,
-                zIndex: zIndex.toast,
-                background: colors.text.primary,
-                color: '#fff',
-                borderRadius: radius.lg,
-                padding: `${spacing['3']} ${spacing['4']}`,
-                boxShadow: shadow.lg,
-                pointerEvents: 'none',
-                maxWidth: '400px',
-                width: 'max-content',
-                fontSize: font.size.base,
-                wordBreak: 'keep-all',
-                lineHeight: font.lineHeight.normal,
-                animation: 'tooltipFadeIn 0.12s ease',
-            }}
-        >
-            {data.content}
-        </div>
-    );
-};
 
 const Checkbox = ({ checked, onClick }: { checked: boolean; onClick: () => void }) => (
     <div
@@ -82,16 +40,6 @@ const Checkbox = ({ checked, onClick }: { checked: boolean; onClick: () => void 
     </div>
 );
 
-function calcMargin(product: { originalPriceKrw: number; salePriceJpy: number }): number {
-    return calcMarginPercent(product.originalPriceKrw, product.salePriceJpy);
-}
-
-/** yy.mm.dd 형식 등록일 */
-function formatShortRegisteredDate(iso: string): string {
-    const d = new Date(iso);
-    const yy = String(d.getFullYear()).slice(2);
-    return `${yy}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-}
 
 const MONITORING_LABELS: Record<MonitoringCheckResult, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
     normal: { label: '정상', color: colors.success, bg: colors.successLight, icon: <Shield size={12} /> },
@@ -108,12 +56,14 @@ export const AllProductsTable: React.FC<Props> = ({
     onSelectAll,
     onRowClick,
     showMonitoring = false,
+    onToggleMonitoring,
     emptyMessage = '등록된 상품이 없어요',
 }) => {
     const [tooltip, setTooltip] = useState<TooltipData | null>(null);
-    const [dateSortDir, setDateSortDir] = useState<'asc' | 'desc' | null>(null);
+    const [dateSortDir, setDateSortDir] = useState<'asc' | 'desc' | null>('desc');
+    const [page, setPage] = useState(0);
+    const PAGE_SIZE = 20;
     const hasSelection = !!onToggleSelect;
-    const allSelected = results.length > 0 && selectedIds.length === results.length;
 
     const sortedResults = useMemo(() => {
         if (!dateSortDir) return results;
@@ -122,6 +72,13 @@ export const AllProductsTable: React.FC<Props> = ({
             return dateSortDir === 'asc' ? diff : -diff;
         });
     }, [results, dateSortDir]);
+
+    const totalPages = Math.max(1, Math.ceil(sortedResults.length / PAGE_SIZE));
+    const pagedResults = sortedResults.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    const allSelected = pagedResults.length > 0 && pagedResults.every(r => selectedIds.includes(r.id));
+
+    // 결과가 바뀌면 첫 페이지로
+    useEffect(() => { setPage(0); }, [results]);
 
     const toggleDateSort = () => {
         setDateSortDir(prev => prev === null ? 'desc' : prev === 'desc' ? 'asc' : null);
@@ -169,7 +126,7 @@ export const AllProductsTable: React.FC<Props> = ({
                 <div style={{ width: '72px', flexShrink: 0, ...colHeader }}>판매가</div>
                 <div style={{ width: '56px', flexShrink: 0, ...colHeader }}>마진율</div>
                 {showMonitoring && (
-                    <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>가격·재고 확인</div>
+                    <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>가격·품절 확인</div>
                 )}
                 <div
                     onClick={toggleDateSort}
@@ -193,23 +150,19 @@ export const AllProductsTable: React.FC<Props> = ({
 
             {/* 상품 목록 */}
             <div style={{
-                display: 'flex', flexDirection: 'column', gap: spacing['2'], paddingBottom: '100px',
+                display: 'flex', flexDirection: 'column', gap: spacing['2'],
                 animation: 'listFadeIn 0.4s ease',
             }}>
-                {sortedResults.map((r, i) => {
+                {pagedResults.map((r, i) => {
                     const isSelected = selectedIds.includes(r.id);
-                    const actualCost = r.monitoring?.currentSourcePriceKrw ?? r.product.originalPriceKrw;
-                    const margin = calcMargin({ originalPriceKrw: actualCost, salePriceJpy: r.product.salePriceJpy });
+                    // 판매가 자동 조정이므로 마진율은 항상 원래 원가 기준
+                    const margin = calcMarginPercent(r.product.originalPriceKrw, r.product.salePriceJpy);
                     const isTranslated = !!r.product.titleJa;
                     const displayTitle = r.product.titleJa
                         ? stripPrefix(r.product.titleJa)
                         : stripPrefix(r.product.titleKo);
                     const isMonitored = r.monitoring?.status === 'active';
-                    const rawMonitoringResult = r.monitoring?.lastCheckResult;
-                    // 역마진은 실제 마진 기준으로 판단
-                    const monitoringResult = (rawMonitoringResult === 'negative_margin' && margin > 5)
-                        ? 'normal' as const
-                        : rawMonitoringResult;
+                    const monitoringResult = r.monitoring?.lastCheckResult;
                     const isIssueRow = isMonitored && (monitoringResult === 'negative_margin' || monitoringResult === 'out_of_stock') && r.salesStatus !== 'paused';
 
                     return (
@@ -334,60 +287,153 @@ export const AllProductsTable: React.FC<Props> = ({
                             </div>
 
                             {/* 판매가 */}
-                            <div style={{ width: '72px', flexShrink: 0 }}>
+                            <div
+                                style={{ width: '72px', flexShrink: 0, cursor: 'default' }}
+                                onMouseMove={(e) => {
+                                    const krw = Math.round(r.product.salePriceJpy * EXCHANGE_RATE);
+                                    setTooltip({
+                                        x: e.clientX, y: e.clientY,
+                                        content: (
+                                            <div>
+                                                <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px' }}>
+                                                    한화 환산 (¥1 = ₩{EXCHANGE_RATE})
+                                                </div>
+                                                <div style={{ fontSize: font.size.lg, fontWeight: 700 }}>
+                                                    약 ₩{krw.toLocaleString()}
+                                                </div>
+                                            </div>
+                                        ),
+                                    });
+                                }}
+                                onMouseLeave={() => setTooltip(null)}
+                            >
                                 <span style={{
                                     fontSize: font.size.base, fontWeight: 700, color: colors.text.primary,
+                                    textDecoration: 'underline', textDecorationStyle: 'dotted',
+                                    textUnderlineOffset: '3px', textDecorationColor: colors.text.muted,
                                 }}>
                                     ¥{r.product.salePriceJpy.toLocaleString()}
                                 </span>
                             </div>
 
                             {/* 마진율 */}
-                            <div style={{
-                                width: '56px', flexShrink: 0,
-                                fontSize: font.size.base, fontWeight: 600,
-                                color: margin <= 5 ? colors.danger : colors.success,
-                            }}>
-                                {margin.toFixed(1)}%
-                            </div>
+                            {(() => {
+                                const salePriceKrw = Math.round(r.product.salePriceJpy * EXCHANGE_RATE);
+                                const profit = salePriceKrw - r.product.originalPriceKrw;
+                                return (
+                                    <div
+                                        style={{
+                                            width: '56px', flexShrink: 0,
+                                            fontSize: font.size.base, fontWeight: 600,
+                                            color: margin <= 5 ? colors.danger : colors.success,
+                                            cursor: 'default',
+                                        }}
+                                        onMouseMove={(e) => {
+                                            setTooltip({
+                                                x: e.clientX, y: e.clientY,
+                                                content: (
+                                                    <div>
+                                                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px' }}>
+                                                            1건 판매 시 예상 수익
+                                                        </div>
+                                                        <div style={{ fontSize: font.size.lg, fontWeight: 700, color: profit >= 0 ? colors.success : colors.danger }}>
+                                                            {profit >= 0 ? '+' : ''}₩{profit.toLocaleString()}
+                                                        </div>
+                                                    </div>
+                                                ),
+                                            });
+                                        }}
+                                        onMouseLeave={() => setTooltip(null)}
+                                    >
+                                        {margin.toFixed(1)}%
+                                    </div>
+                                );
+                            })()}
 
-                            {/* 가격·재고 확인 상태 */}
+                            {/* 가격·품절 확인 토글 */}
                             {showMonitoring && (
-                                <div style={{ width: '100px', flexShrink: 0 }}>
-                                    {isMonitored && monitoringResult ? (
-                                        <span style={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '4px',
-                                            padding: '3px 10px',
-                                            borderRadius: radius.full,
-                                            fontSize: font.size.xs,
-                                            fontWeight: 600,
-                                            color: MONITORING_LABELS[monitoringResult].color,
-                                            background: MONITORING_LABELS[monitoringResult].bg,
-                                        }}>
-                                            {MONITORING_LABELS[monitoringResult].icon}
-                                            {MONITORING_LABELS[monitoringResult].label}
-                                        </span>
-                                    ) : (
-                                        <span style={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '4px',
-                                            fontSize: font.size.xs,
-                                            fontWeight: 500,
-                                            color: colors.text.muted,
-                                        }}>
-                                            <Minus size={12} />
-                                            미등록
-                                        </span>
-                                    )}
+                                <div
+                                    style={{ width: '100px', flexShrink: 0, display: 'flex', alignItems: 'center' }}
+                                    onClick={e => e.stopPropagation()}
+                                >
+                                    {(() => {
+                                        const isOos = isMonitored && monitoringResult === 'out_of_stock';
+                                        const isError = isMonitored && monitoringResult === 'negative_margin'; // 소싱처 오류로 간주
+                                        const oosOrange = '#FF9500';
+                                        const toggleBg = !isMonitored
+                                            ? colors.border.light
+                                            : isError
+                                                ? colors.danger
+                                                : isOos
+                                                    ? oosOrange
+                                                    : colors.primary;
+                                        const KnobIcon = isOos ? PackageX : isError ? AlertTriangle : Shield;
+                                        const tooltipNode = isOos ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <PackageX size={14} color={oosOrange} />
+                                                    <span style={{ fontWeight: 700, fontSize: font.size.sm }}>품절 감지 — 판매 자동 일시중지</span>
+                                                </div>
+                                                <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>
+                                                    재입고되면 자동으로 판매를 재개해요.
+                                                </div>
+                                            </div>
+                                        ) : isError ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <AlertTriangle size={14} color={colors.danger} />
+                                                    <span style={{ fontWeight: 700, fontSize: font.size.sm }}>쇼핑몰 접근 불가</span>
+                                                </div>
+                                                <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>
+                                                    상품 페이지가 삭제되었거나 접근할 수 없어요.<br />
+                                                    쇼핑몰에서 상품 상태를 확인해주세요.
+                                                </div>
+                                            </div>
+                                        ) : null;
+
+                                        return (
+                                            <button
+                                                onClick={() => onToggleMonitoring?.(r.id, !isMonitored)}
+                                                onMouseMove={tooltipNode ? (e) => setTooltip({
+                                                    x: e.clientX, y: e.clientY,
+                                                    content: tooltipNode,
+                                                }) : undefined}
+                                                onMouseLeave={tooltipNode ? () => setTooltip(null) : undefined}
+                                                style={{
+                                                    width: '48px', height: '26px',
+                                                    borderRadius: radius.full,
+                                                    border: 'none',
+                                                    background: toggleBg,
+                                                    cursor: 'pointer',
+                                                    position: 'relative',
+                                                    transition: 'background 0.2s',
+                                                    flexShrink: 0,
+                                                }}
+                                            >
+                                                <div style={{
+                                                    width: '20px', height: '20px',
+                                                    borderRadius: '50%',
+                                                    background: colors.bg.surface,
+                                                    boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                                                    position: 'absolute',
+                                                    top: '3px',
+                                                    left: isMonitored ? '25px' : '3px',
+                                                    transition: 'left 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                }}>
+                                                    <KnobIcon size={11} color={isMonitored ? toggleBg : colors.text.muted} />
+                                                </div>
+                                            </button>
+                                        );
+                                    })()}
                                 </div>
                             )}
 
                             {/* 등록일 */}
-                            <div style={{ width: '64px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, whiteSpace: 'nowrap' }}>
-                                {formatShortRegisteredDate(r.registeredAt)}
+                            <div style={{ width: '64px', flexShrink: 0, fontSize: font.size.sm, color: colors.text.muted, whiteSpace: 'nowrap' }}>
+                                {formatShortDate(r.registeredAt)}
                             </div>
 
                             {/* 판매처 링크 */}
@@ -427,6 +473,38 @@ export const AllProductsTable: React.FC<Props> = ({
                     );
                 })}
             </div>
+
+            {/* 페이지네이션 */}
+            {totalPages > 1 && (
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: spacing['1'],
+                    padding: `${spacing['5']} 0`,
+                }}>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setPage(i)}
+                            style={{
+                                width: '32px', height: '32px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: page === i ? colors.primary : 'none',
+                                color: page === i ? colors.bg.surface : colors.text.muted,
+                                border: page === i ? 'none' : `1px solid ${colors.border.default}`,
+                                borderRadius: radius.sm,
+                                fontSize: font.size.sm,
+                                fontWeight: page === i ? 700 : 500,
+                                cursor: 'pointer',
+                                transition: 'all 0.15s',
+                            }}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {/* 플로팅 툴팁 */}
             {tooltip && <FloatingTooltip data={tooltip} />}

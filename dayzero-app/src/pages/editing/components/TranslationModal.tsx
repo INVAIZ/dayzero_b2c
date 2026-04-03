@@ -1,21 +1,21 @@
-import { X, Languages, Check, AlertCircle } from 'lucide-react';
+import { X, Check, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { colors, font, radius, shadow, spacing, zIndex } from '../../../design/tokens';
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
-    onStart: (targets: ('title' | 'description' | 'options')[]) => void;
+    onStart: (targets: ('title' | 'description' | 'options' | 'thumbnail' | 'detailPage')[]) => void;
     selectedCount: number;
     alreadyTranslatedCount: number;
 }
 
 export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, selectedCount, alreadyTranslatedCount }) => {
-    const [targets, setTargets] = useState<('title' | 'description' | 'options')[]>(['title', 'options', 'description']);
+    const [targets, setTargets] = useState<('title' | 'description' | 'options' | 'thumbnail' | 'detailPage')[]>(['title', 'options', 'description']);
 
     if (!isOpen) return null;
 
-    const toggleTarget = (t: 'title' | 'description' | 'options') => {
+    const toggleTarget = (t: 'title' | 'description' | 'options' | 'thumbnail' | 'detailPage') => {
         setTargets(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
     };
 
@@ -35,8 +35,7 @@ export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, se
                 </button>
 
                 <div style={{ marginBottom: spacing['5'] }}>
-                    <h2 style={{ fontSize: font.size.lg, fontWeight: 700, marginBottom: spacing['1'] }}>AI 편집 설정</h2>
-                    <p style={{ fontSize: font.size.sm, color: colors.text.tertiary }}>시작 버튼을 누르면 AI 편집이 시작됩니다. ({selectedCount}건)</p>
+                    <h2 style={{ fontSize: font.size.lg, fontWeight: 700, marginBottom: 0 }}>AI 편집 설정</h2>
                 </div>
 
                 {alreadyTranslatedCount > 0 && (
@@ -54,7 +53,7 @@ export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, se
                 )}
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['3'], marginBottom: spacing['6'] }}>
-                    {(['title', 'options', 'description'] as const).map(t => (
+                    {(['title', 'options', 'description', 'thumbnail', 'detailPage'] as const).map(t => (
                         <div
                             key={t}
                             onClick={() => toggleTarget(t)}
@@ -75,7 +74,7 @@ export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, se
                                 {targets.includes(t) && <Check size={14} color="#fff" />}
                             </div>
                             <span style={{ fontSize: font.size.md, fontWeight: 600 }}>
-                                {t === 'title' ? '상품명 번역' : t === 'description' ? '상세설명 작성 및 번역' : '옵션 번역'}
+                                {t === 'title' ? '상품명 번역' : t === 'description' ? '상세설명 작성 및 번역' : t === 'options' ? '옵션 번역' : t === 'thumbnail' ? '썸네일 번역' : '상세페이지 번역'}
                             </span>
                         </div>
                     ))}
@@ -92,8 +91,7 @@ export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, se
                         opacity: targets.length > 0 ? 1 : 0.5,
                     }}
                 >
-                    <Languages size={18} />
-                    AI 편집 시작
+                    {selectedCount}건 AI 편집 시작
                 </button>
             </div>
         </div>

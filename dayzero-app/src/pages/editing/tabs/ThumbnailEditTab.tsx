@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Star, Trash2, Check, RotateCcw, Scissors } from 'lucide-react';
+import { Loader2, Star, Trash2, Check, RotateCcw, Scissors, Languages } from 'lucide-react';
 
 import type { ProductDetail, ProductImage } from '../../../types/editing';
 import { useEditingStore } from '../../../store/useEditingStore';
@@ -70,7 +70,10 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
 
     return (
         <div style={{ maxWidth: '760px' }}>
-            <style>{`@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }`}</style>
+            <style>{`
+                @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+                .thumb-img-wrap:hover .thumb-delete-btn { opacity: 1 !important; }
+            `}</style>
 
             {/* 상단 */}
             <div style={{ marginBottom: spacing['4'] }}>
@@ -122,8 +125,11 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
                                 </div>
                             )}
 
-                            {/* 이미지 */}
-                            <div style={{ aspectRatio: '1', overflow: 'hidden', position: 'relative' }}>
+                            {/* 이미지 + 호버 삭제 버튼 */}
+                            <div
+                                style={{ aspectRatio: '1', overflow: 'hidden', position: 'relative' }}
+                                className="thumb-img-wrap"
+                            >
                                 <img
                                     src={isDone && img.translatedUrl ? img.translatedUrl : img.url}
                                     alt=""
@@ -140,11 +146,28 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
                                         <span style={{ fontSize: font.size.xs, fontWeight: 600, color: colors.primary }}>처리 중...</span>
                                     </div>
                                 )}
+                                {/* 호버 시 삭제 버튼 */}
+                                {images.length > 1 && !isDone && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setDeleteConfirm(img.id); }}
+                                        className="thumb-delete-btn"
+                                        style={{
+                                            position: 'absolute', top: spacing['2'], right: spacing['2'], zIndex: 3,
+                                            width: '28px', height: '28px',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            background: 'rgba(0,0,0,0.55)', border: 'none',
+                                            borderRadius: radius.full, cursor: 'pointer',
+                                            opacity: 0, transition: 'opacity 0.15s',
+                                        }}
+                                    >
+                                        <Trash2 size={13} color="#fff" />
+                                    </button>
+                                )}
                             </div>
 
-                            {/* 버튼 영역 */}
+                            {/* 버튼 영역 — 배경 삭제 + 번역 */}
                             <div style={{
-                                padding: spacing['2'], display: 'flex', gap: spacing['1'],
+                                padding: spacing['2'], display: 'flex', flexDirection: 'column', gap: spacing['1'],
                                 borderTop: `1px solid ${colors.border.default}`,
                                 background: colors.bg.faint,
                             }}>
@@ -156,35 +179,27 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
                                         <RotateCcw size={11} /> 원본 복원
                                     </button>
                                 ) : (
-                                    <button
-                                        onClick={() => handleRemoveBg(img.id)}
-                                        disabled={isProcessing}
-                                        style={btnBase(!isProcessing)}
-                                    >
-                                        {isProcessing
-                                            ? <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} />
-                                            : <Scissors size={11} />
-                                        }
-                                        {isProcessing ? '처리 중...' : 'AI 배경 개선'}
-                                    </button>
+                                    <>
+                                        <button
+                                            onClick={() => handleRemoveBg(img.id)}
+                                            disabled={isProcessing}
+                                            style={btnBase(!isProcessing)}
+                                        >
+                                            {isProcessing
+                                                ? <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} />
+                                                : <Scissors size={11} />
+                                            }
+                                            {isProcessing ? '처리 중...' : '배경 삭제'}
+                                        </button>
+                                        <button
+                                            onClick={() => {/* 이미지 번역 — UT 프로토타입 */}}
+                                            style={btnBase(true)}
+                                        >
+                                            <Languages size={11} />
+                                            이미지 번역
+                                        </button>
+                                    </>
                                 )}
-                                <button
-                                    onClick={() => images.length > 1 && setDeleteConfirm(img.id)}
-                                    disabled={images.length <= 1}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        width: '30px', background: 'none',
-                                        border: `1px solid ${colors.border.default}`,
-                                        borderRadius: radius.sm,
-                                        color: images.length <= 1 ? colors.text.disabled : colors.text.muted,
-                                        cursor: images.length <= 1 ? 'not-allowed' : 'pointer',
-                                        transition: 'color 0.15s',
-                                    }}
-                                    onMouseEnter={e => { if (images.length > 1) e.currentTarget.style.color = colors.danger; }}
-                                    onMouseLeave={e => { if (images.length > 1) e.currentTarget.style.color = colors.text.muted; }}
-                                >
-                                    <Trash2 size={11} />
-                                </button>
                             </div>
                         </div>
                     );

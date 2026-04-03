@@ -119,9 +119,8 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                             flexWrap: 'wrap',
                         }}>
                             <ResultBadge icon={<Shield size={12} />} label="정상" count={normal} color={colors.success} />
-                            {priceChanged > 0 && <ResultBadge icon={<TrendingDown size={12} />} label="가격 변동" count={priceChanged} color={colors.warningIcon} />}
-                            {negativeMargin > 0 && <ResultBadge icon={<AlertTriangle size={12} />} label="역마진" count={negativeMargin} color={colors.danger} />}
-                            {outOfStock > 0 && <ResultBadge icon={<PackageX size={12} />} label="품절" count={outOfStock} color={colors.text.primary} />}
+                            {priceChanged > 0 && <ResultBadge icon={<TrendingDown size={12} />} label="가격 조정" count={priceChanged} color={colors.primary} />}
+                            {outOfStock > 0 && <ResultBadge icon={<PackageX size={12} />} label="품절" count={outOfStock} color={'#FF9500'} />}
                         </div>
                     </div>
                 )}
@@ -148,7 +147,7 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                             color: colors.text.muted,
                             fontSize: font.size.base,
                         }}>
-                            가격·재고 자동 확인이 등록된 상품이 없어요
+                            가격·품절 확인이 켜진 상품이 없어요
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>
@@ -239,7 +238,7 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                                     }}
                                     onMouseEnter={e => { e.currentTarget.style.opacity = '0.75'; }}
                                     onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
-                                    title="UT 테스트용: 품절 1건 + 역마진 1건 강제 생성"
+                                    title="UT 테스트용: 품절 + 가격 조정 강제 생성"
                                 >
                                     <AlertTriangle size={11} />
                                     데모 이슈

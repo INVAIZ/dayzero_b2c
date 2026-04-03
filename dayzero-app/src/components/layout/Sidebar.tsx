@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, LayoutList, PackageOpen, ChevronRight, ChevronDown, Settings } from 'lucide-react';
 import { useSourcingStore } from '../../store/useSourcingStore';
-import { colors, spacing, radius, font } from '../../design/tokens';
+import { colors, spacing, radius, font, zIndex as z } from '../../design/tokens';
 
 type NavItem = '수집하기' | '수집된 상품' | '판매 중인 상품';
 
@@ -54,16 +54,16 @@ export const Sidebar: React.FC = () => {
         <aside style={{
             width: '280px',
             height: '100vh',
-            background: '#F9FAFB',
-            borderRight: '1px solid #E5E8EB',
+            background: colors.bg.page,
+            borderRight: `1px solid ${colors.border.default}`,
             position: 'fixed',
             left: 0,
             top: 0,
             display: 'flex',
             flexDirection: 'column',
-            padding: '40px 24px',
-            fontFamily: 'Pretendard, -apple-system, sans-serif',
-            zIndex: 1000,
+            padding: `${spacing['10']} ${spacing['6']}`,
+            fontFamily: font.family.sans,
+            zIndex: z.nav,
         }}>
             {/* Logo */}
             <div style={{ padding: '0 12px', marginBottom: '48px', cursor: 'pointer' }} onClick={() => navigate('/sourcing')}>
@@ -71,53 +71,53 @@ export const Sidebar: React.FC = () => {
             </div>
 
             {/* Menu Items */}
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>
                 <button
                     onClick={() => handleNav('수집하기')}
                     style={{
-                        display: 'flex', alignItems: 'center', gap: '12px', width: '100%',
-                        padding: '12px 12px',
-                        background: isSourcingActive ? '#FFFFFF' : 'transparent',
-                        border: 'none', borderRadius: '12px', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: spacing['3'], width: '100%',
+                        padding: `${spacing['3']} ${spacing['3']}`,
+                        background: isSourcingActive ? colors.bg.surface : 'transparent',
+                        border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: isSourcingActive ? colors.text.primary : colors.text.tertiary,
-                        fontWeight: isSourcingActive ? 700 : 500, fontSize: '15px',
+                        fontWeight: isSourcingActive ? 700 : 500, fontSize: font.size.base,
                         transition: 'all 0.2s',
                         boxShadow: isSourcingActive ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
                     }}
-                    onMouseOver={e => { if (!isSourcingActive) e.currentTarget.style.background = '#F2F4F6'; }}
+                    onMouseOver={e => { if (!isSourcingActive) e.currentTarget.style.background = colors.bg.subtle; }}
                     onMouseOut={e => { if (!isSourcingActive) e.currentTarget.style.background = 'transparent'; }}
                 >
                     <Search size={20} color={isSourcingActive ? colors.text.primary : colors.text.muted} />
                     수집하기
-                    {isSourcingActive && <ChevronRight size={16} color="#B0B8C1" style={{ marginLeft: 'auto' }} />}
+                    {isSourcingActive && <ChevronRight size={16} color={colors.text.disabled} style={{ marginLeft: 'auto' }} />}
                 </button>
 
                 <button
                     onClick={() => handleNav('수집된 상품')}
                     style={{
-                        display: 'flex', alignItems: 'center', gap: '12px', width: '100%',
-                        padding: '12px 12px',
-                        background: isEditingActive ? '#FFFFFF' : 'transparent',
-                        border: 'none', borderRadius: '12px', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: spacing['3'], width: '100%',
+                        padding: `${spacing['3']} ${spacing['3']}`,
+                        background: isEditingActive ? colors.bg.surface : 'transparent',
+                        border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: isEditingActive ? colors.text.primary : colors.text.tertiary,
-                        fontWeight: isEditingActive ? 700 : 500, fontSize: '15px',
+                        fontWeight: isEditingActive ? 700 : 500, fontSize: font.size.base,
                         transition: 'all 0.2s',
                         boxShadow: isEditingActive ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
                     }}
-                    onMouseOver={e => { if (!isEditingActive) e.currentTarget.style.background = '#F2F4F6'; }}
+                    onMouseOver={e => { if (!isEditingActive) e.currentTarget.style.background = colors.bg.subtle; }}
                     onMouseOut={e => { if (!isEditingActive) e.currentTarget.style.background = 'transparent'; }}
                 >
                     <LayoutList size={20} color={isEditingActive ? colors.text.primary : colors.text.muted} />
                     수집된 상품
-                    {isEditingActive && <ChevronRight size={16} color="#B0B8C1" style={{ marginLeft: 'auto' }} />}
+                    {isEditingActive && <ChevronRight size={16} color={colors.text.disabled} style={{ marginLeft: 'auto' }} />}
                     {!isEditingActive && unprocessedProductCount > 0 && (
                         <div
                             id="sidebar-badge"
                             className={badgeAnimating ? 'badge-bounce' : ''}
                             style={{
-                                marginLeft: 'auto', background: colors.primary, color: '#FFFFFF',
-                                borderRadius: '10px', padding: '2px 8px', fontSize: '12px',
-                                fontWeight: 700, fontFamily: 'Pretendard, sans-serif',
+                                marginLeft: 'auto', background: colors.primary, color: colors.bg.surface,
+                                borderRadius: radius.img, padding: `2px ${spacing['2']}`, fontSize: font.size.xs,
+                                fontWeight: 700, fontFamily: font.family.sans,
                                 minWidth: '20px', textAlign: 'center',
                                 boxShadow: '0 2px 4px rgba(49,130,246,0.2)',
                             }}
@@ -130,21 +130,21 @@ export const Sidebar: React.FC = () => {
                 <button
                     onClick={() => handleNav('판매 중인 상품')}
                     style={{
-                        display: 'flex', alignItems: 'center', gap: '12px', width: '100%',
-                        padding: '12px 12px',
-                        background: isRegistrationActive ? '#FFFFFF' : 'transparent',
-                        border: 'none', borderRadius: '12px', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: spacing['3'], width: '100%',
+                        padding: `${spacing['3']} ${spacing['3']}`,
+                        background: isRegistrationActive ? colors.bg.surface : 'transparent',
+                        border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: isRegistrationActive ? colors.text.primary : colors.text.tertiary,
-                        fontWeight: isRegistrationActive ? 700 : 500, fontSize: '15px',
+                        fontWeight: isRegistrationActive ? 700 : 500, fontSize: font.size.base,
                         transition: 'all 0.2s',
                         boxShadow: isRegistrationActive ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
                     }}
-                    onMouseOver={e => { if (!isRegistrationActive) e.currentTarget.style.background = '#F2F4F6'; }}
+                    onMouseOver={e => { if (!isRegistrationActive) e.currentTarget.style.background = colors.bg.subtle; }}
                     onMouseOut={e => { if (!isRegistrationActive) e.currentTarget.style.background = 'transparent'; }}
                 >
                     <PackageOpen size={20} color={isRegistrationActive ? colors.text.primary : colors.text.muted} />
                     판매 중인 상품
-                    {isRegistrationActive && <ChevronRight size={16} color="#B0B8C1" style={{ marginLeft: 'auto' }} />}
+                    {isRegistrationActive && <ChevronRight size={16} color={colors.text.disabled} style={{ marginLeft: 'auto' }} />}
                 </button>
 
                 {/* 구분선 */}
@@ -154,15 +154,15 @@ export const Sidebar: React.FC = () => {
                 <button
                     onClick={() => setSettingsExpanded(!settingsExpanded)}
                     style={{
-                        display: 'flex', alignItems: 'center', gap: '12px', width: '100%',
-                        padding: '12px 12px',
+                        display: 'flex', alignItems: 'center', gap: spacing['3'], width: '100%',
+                        padding: `${spacing['3']} ${spacing['3']}`,
                         background: 'transparent',
-                        border: 'none', borderRadius: '12px', cursor: 'pointer',
+                        border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: colors.text.tertiary,
-                        fontWeight: 500, fontSize: '15px',
+                        fontWeight: 500, fontSize: font.size.base,
                         transition: 'all 0.2s',
                     }}
-                    onMouseOver={e => e.currentTarget.style.background = '#F2F4F6'}
+                    onMouseOver={e => e.currentTarget.style.background = colors.bg.subtle}
                     onMouseOut={e => e.currentTarget.style.background = 'transparent'}
                 >
                     <Settings size={20} color={colors.text.muted} />
@@ -194,16 +194,16 @@ export const Sidebar: React.FC = () => {
                                         onClick={() => navigate(`/settings/${item.key}`)}
                                         style={{
                                             display: 'flex', alignItems: 'center', width: '100%',
-                                            padding: '10px 12px',
-                                            background: active ? '#FFFFFF' : 'transparent',
+                                            padding: `10px ${spacing['3']}`,
+                                            background: active ? colors.bg.surface : 'transparent',
                                             border: 'none', borderRadius: radius.md, cursor: 'pointer',
                                             color: active ? colors.text.primary : colors.text.tertiary,
                                             fontWeight: active ? 700 : 500,
-                                            fontSize: '15px', transition: 'all 0.15s', textAlign: 'left',
+                                            fontSize: font.size.base, transition: 'all 0.15s', textAlign: 'left',
                                             boxShadow: active ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
                                         }}
                                         onMouseOver={e => { if (!active) e.currentTarget.style.background = colors.bg.subtle; }}
-                                        onMouseOut={e => { if (!active) e.currentTarget.style.background = active ? '#FFFFFF' : 'transparent'; }}
+                                        onMouseOut={e => { if (!active) e.currentTarget.style.background = active ? colors.bg.surface : 'transparent'; }}
                                     >
                                         {item.label}
                                     </button>

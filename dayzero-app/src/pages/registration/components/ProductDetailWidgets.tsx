@@ -39,38 +39,47 @@ export const NavButton: React.FC<{
 
 export const MonitoringToggle: React.FC<{
     checked: boolean;
+    hasIssue?: boolean;
     onClick: () => void;
-}> = ({ checked, onClick }) => (
-    <button
-        onClick={onClick}
-        style={{
-            width: '48px', height: '28px',
-            borderRadius: radius.full,
-            border: 'none',
-            background: checked ? colors.primary : colors.bg.subtle,
-            cursor: 'pointer',
-            position: 'relative',
-            transition: 'background 0.2s',
-            flexShrink: 0,
-        }}
-    >
-        <div style={{
-            width: '22px', height: '22px',
-            borderRadius: '50%',
-            background: colors.bg.surface,
-            boxShadow: shadow.sm,
-            position: 'absolute',
-            top: '3px',
-            left: checked ? '23px' : '3px',
-            transition: 'left 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-        }}>
-            <Shield size={12} color={checked ? colors.primary : colors.text.muted} />
-        </div>
-    </button>
-);
+}> = ({ checked, hasIssue, onClick }) => {
+    const bg = !checked
+        ? colors.border.light
+        : hasIssue
+            ? '#FF9500'
+            : colors.primary;
+
+    return (
+        <button
+            onClick={onClick}
+            style={{
+                width: '48px', height: '28px',
+                borderRadius: radius.full,
+                border: 'none',
+                background: bg,
+                cursor: 'pointer',
+                position: 'relative',
+                transition: 'background 0.2s',
+                flexShrink: 0,
+            }}
+        >
+            <div style={{
+                width: '22px', height: '22px',
+                borderRadius: '50%',
+                background: colors.bg.surface,
+                boxShadow: shadow.sm,
+                position: 'absolute',
+                top: '3px',
+                left: checked ? '23px' : '3px',
+                transition: 'left 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+                <Shield size={12} color={checked ? (hasIssue ? '#FF9500' : colors.primary) : colors.text.muted} />
+            </div>
+        </button>
+    );
+};
 
 // ── InfoCard ─────────────────────────────────────────────────────────────────
 
@@ -166,7 +175,7 @@ export const AlertCard: React.FC<{
             return '현재 판매가 일시 중지된 상태예요. 재입고되면 자동으로 판매를 재개해드릴게요.';
         }
         if (isOutOfStock && isPaused && !isMonitored) {
-            return '현재 판매가 일시 중지된 상태예요. 가격·재고 자동 확인을 켜면 재입고 시 자동으로 재개해드릴게요.';
+            return '현재 판매가 일시 중지된 상태예요. 가격·품절 확인을 켜면 재입고 시 자동으로 재개해드릴게요.';
         }
         if (isOutOfStock && !isPaused) {
             return '판매를 일시중지하거나, 국내 쇼핑몰에서 재고 상태를 확인해주세요.';
@@ -256,15 +265,19 @@ export const AlertCard: React.FC<{
 // ── StatusHelper ─────────────────────────────────────────────────────────────
 
 export const StatusHelper: React.FC<{
-    type: 'paused' | 'watching';
+    type: 'paused' | 'watching' | 'warning';
     title: string;
-    description: string;
+    description: React.ReactNode;
 }> = ({ type, title, description }) => {
     const isPaused = type === 'paused';
+    const isWarning = type === 'warning';
+    const bgColor = isWarning ? '#FFF8EE' : colors.bg.info;
+    const borderColor = isWarning ? '#FFD99A' : colors.primaryLightBorder;
+    const iconColor = isWarning ? '#FF9500' : colors.primary;
     return (
         <div style={{
-            background: colors.bg.info,
-            border: `1px solid ${colors.primaryLightBorder}`,
+            background: bgColor,
+            border: `1px solid ${borderColor}`,
             borderRadius: radius.lg,
             padding: spacing['5'],
             marginBottom: spacing['5'],
@@ -276,9 +289,9 @@ export const StatusHelper: React.FC<{
                 gap: spacing['2'],
                 marginBottom: spacing['3'],
             }}>
-                {isPaused
-                    ? <Bell size={18} color={colors.primary} />
-                    : <Shield size={18} color={colors.primary} />
+                {isPaused || isWarning
+                    ? <Bell size={18} color={iconColor} />
+                    : <Shield size={18} color={iconColor} />
                 }
                 <span style={{
                     fontSize: font.size.base,
@@ -288,14 +301,13 @@ export const StatusHelper: React.FC<{
                     {title}
                 </span>
             </div>
-            <p style={{
+            <div style={{
                 fontSize: font.size.sm,
                 color: colors.text.secondary,
                 lineHeight: font.lineHeight.normal,
-                margin: 0,
             }}>
                 {description}
-            </p>
+            </div>
         </div>
     );
 };

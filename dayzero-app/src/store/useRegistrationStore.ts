@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { RegistrationJob, RegistrationResult } from '../types/registration';
+import type { RegistrationJob, RegistrationResult, MonitoringActivityLog } from '../types/registration';
 import type { ProductDetail } from '../types/editing';
 import { useEditingStore } from './useEditingStore';
 import {
@@ -269,6 +269,41 @@ export const useRegistrationStore = create<RegistrationState>()(
                                 initial.currentPrice,
                             );
 
+                            // 활동 로그 — 14일치 더미 데이터
+                            const activityLog: MonitoringActivityLog[] = [];
+                            const basePrice = r.product.originalPriceKrw;
+                            const baseSale = r.product.salePriceJpy;
+
+                            activityLog.push({
+                                date: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+                                type: 'monitoring_started',
+                                description: '가격·품절 자동확인이 시작됐어요. 변동이 생기면 알려드릴게요.',
+                            });
+
+                            const priceSteps = [1.05, 0.97, 0.97, 0.97, 1.08, 1.03, 1.03, 1.03, 1.1, 1.0];
+                            const dummyEvents: Array<{ daysAgo: number; type: MonitoringActivityLog['type']; desc: string }> = [
+                                { daysAgo: 12, type: 'price_changed', desc: (() => { const p = Math.round(basePrice * priceSteps[0]); const s = Math.ceil((p * 1.2) * 0.11); return `원가 ₩${basePrice.toLocaleString()} → ₩${p.toLocaleString()}로 변동, 판매가를 ¥${baseSale.toLocaleString()} → ¥${s.toLocaleString()}로 자동 조정했어요.`; })() },
+                                { daysAgo: 10, type: 'price_changed', desc: (() => { const p = Math.round(basePrice * priceSteps[1]); const s = Math.ceil((p * 1.2) * 0.11); return `원가 ₩${Math.round(basePrice * priceSteps[0]).toLocaleString()} → ₩${p.toLocaleString()}로 변동, 판매가를 ¥${Math.ceil((Math.round(basePrice * priceSteps[0]) * 1.2) * 0.11).toLocaleString()} → ¥${s.toLocaleString()}로 자동 조정했어요.`; })() },
+                                { daysAgo: 8, type: 'out_of_stock', desc: '쇼핑몰에서 품절이 감지되어 판매를 자동 일시중지했어요.' },
+                                { daysAgo: 7, type: 'restocked', desc: '재입고가 확인되어 판매를 자동 재개했어요.' },
+                                { daysAgo: 6, type: 'price_changed', desc: (() => { const p = Math.round(basePrice * priceSteps[4]); const s = Math.ceil((p * 1.2) * 0.11); return `원가 ₩${Math.round(basePrice * priceSteps[1]).toLocaleString()} → ₩${p.toLocaleString()}로 변동, 판매가를 ¥${Math.ceil((Math.round(basePrice * priceSteps[1]) * 1.2) * 0.11).toLocaleString()} → ¥${s.toLocaleString()}로 자동 조정했어요.`; })() },
+                                { daysAgo: 5, type: 'price_changed', desc: (() => { const p = Math.round(basePrice * priceSteps[5]); const s = Math.ceil((p * 1.2) * 0.11); return `원가 ₩${Math.round(basePrice * priceSteps[4]).toLocaleString()} → ₩${p.toLocaleString()}로 변동, 판매가를 ¥${Math.ceil((Math.round(basePrice * priceSteps[4]) * 1.2) * 0.11).toLocaleString()} → ¥${s.toLocaleString()}로 자동 조정했어요.`; })() },
+                                { daysAgo: 4, type: 'out_of_stock', desc: '쇼핑몰에서 품절이 감지되어 판매를 자동 일시중지했어요.' },
+                                { daysAgo: 3, type: 'restocked', desc: '재입고가 확인되어 판매를 자동 재개했어요.' },
+                                { daysAgo: 2, type: 'price_changed', desc: (() => { const p = Math.round(basePrice * priceSteps[8]); const s = Math.ceil((p * 1.2) * 0.11); return `원가 ₩${Math.round(basePrice * priceSteps[5]).toLocaleString()} → ₩${p.toLocaleString()}로 변동, 판매가를 ¥${Math.ceil((Math.round(basePrice * priceSteps[5]) * 1.2) * 0.11).toLocaleString()} → ¥${s.toLocaleString()}로 자동 조정했어요.`; })() },
+                                { daysAgo: 1, type: 'price_changed', desc: (() => { const s = Math.ceil((initial.currentPrice * 1.2) * 0.11); return `원가 ₩${Math.round(basePrice * priceSteps[8]).toLocaleString()} → ₩${initial.currentPrice.toLocaleString()}로 변동, 판매가를 ¥${Math.ceil((Math.round(basePrice * priceSteps[8]) * 1.2) * 0.11).toLocaleString()} → ¥${s.toLocaleString()}로 자동 조정했어요.`; })() },
+                            ];
+
+                            if (initial.result === 'out_of_stock') {
+                                dummyEvents.push({ daysAgo: 0, type: 'out_of_stock', desc: '쇼핑몰에서 품절이 감지되어 판매를 자동 일시중지했어요.' });
+                            }
+
+                            for (const ev of dummyEvents) {
+                                activityLog.push({ date: new Date(now.getTime() - ev.daysAgo * 24 * 60 * 60 * 1000).toISOString(), type: ev.type, description: ev.desc });
+                            }
+
+                            activityLog.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
                             return {
                                 ...r,
                                 monitoring: {
@@ -279,6 +314,7 @@ export const useRegistrationStore = create<RegistrationState>()(
                                     currentSourcePriceKrw: initial.currentPrice,
                                     priceHistory: history,
                                     issueDescription: initial.issueDescription,
+                                    activityLog,
                                 },
                             };
                         }),
@@ -320,24 +356,22 @@ export const useRegistrationStore = create<RegistrationState>()(
                                 if (found || r.monitoring?.status !== 'active') return r;
                                 found = true;
 
-                                // negative_margin / out_of_stock 번갈아 가며
-                                const issueType = Math.random() < 0.5 ? 'negative_margin' : 'out_of_stock';
+                                // 품절 / 가격변동 번갈아 가며
+                                const issueType = Math.random() < 0.5 ? 'out_of_stock' : 'price_changed';
                                 const simulated = issueType === 'out_of_stock'
                                     ? {
                                         result: 'out_of_stock' as const,
                                         currentPrice: r.product.originalPriceKrw,
-                                        issueDescription: `쇼핑몰에서 해당 상품이 품절됐어요. Qoo10 판매를 일시 중지하거나, 다른 쇼핑몰을 찾아주세요.`,
+                                        issueDescription: '쇼핑몰에서 해당 상품이 품절됐어요. 판매를 자동 일시중지했어요.',
                                     }
                                     : (() => {
-                                        const increase = Math.round(r.product.originalPriceKrw * (0.5 + Math.random() * 0.2));
-                                        const newPrice = r.product.originalPriceKrw + increase;
-                                        const saleInKrw = r.product.salePriceJpy / 0.11;
-                                        const marginPct = ((saleInKrw - newPrice) / saleInKrw * 100).toFixed(1);
-                                        const recommendedJpy = Math.ceil((newPrice * 1.2) * 0.11);
+                                        const change = Math.round(r.product.originalPriceKrw * (0.05 + Math.random() * 0.15));
+                                        const newPrice = r.product.originalPriceKrw + change;
+                                        const newSaleJpy = Math.ceil((newPrice * 1.2) * 0.11);
                                         return {
-                                            result: 'negative_margin' as const,
+                                            result: 'price_changed' as const,
                                             currentPrice: newPrice,
-                                            issueDescription: `쇼핑몰 구매가가 ₩${r.product.originalPriceKrw.toLocaleString()} → ₩${newPrice.toLocaleString()}로 올라 현재 판매가(¥${r.product.salePriceJpy.toLocaleString()}) 기준 마진율이 ${marginPct}%예요. 판매가를 ¥${recommendedJpy.toLocaleString()} 이상으로 조정하거나, 다른 쇼핑몰을 검토해주세요.`,
+                                            issueDescription: `원가 ₩${r.product.originalPriceKrw.toLocaleString()} → ₩${newPrice.toLocaleString()}로 변동, 판매가를 ¥${r.product.salePriceJpy.toLocaleString()} → ¥${newSaleJpy.toLocaleString()}로 자동 조정했어요.`,
                                         };
                                     })();
 
@@ -348,7 +382,14 @@ export const useRegistrationStore = create<RegistrationState>()(
                                     simulated.currentPrice,
                                 );
 
-                                const autoPause = (state.autoPauseOnOutOfStock && simulated.result === 'out_of_stock') || (state.autoPauseOnNegativeMargin && simulated.result === 'negative_margin');
+                                const autoPause = simulated.result === 'out_of_stock';
+                                // 활동 로그 갱신
+                                const prevLog = r.monitoring?.activityLog ?? [];
+                                const newLogEntry: MonitoringActivityLog = simulated.result === 'out_of_stock'
+                                    ? { date: checkTime.toISOString(), type: 'out_of_stock', description: '품절 감지 → 판매 자동 일시중지' }
+                                    : { date: checkTime.toISOString(), type: 'price_changed', description: simulated.issueDescription ?? '원가 변동 → 판매가 자동 조정', details: { prevPrice: r.product.originalPriceKrw, newPrice: simulated.currentPrice } };
+                                const updatedLog = [newLogEntry, ...prevLog];
+
                                 return {
                                     ...r,
                                     ...(autoPause ? { salesStatus: 'paused' as const, pauseReason: 'auto' as const } : {}),
@@ -360,6 +401,7 @@ export const useRegistrationStore = create<RegistrationState>()(
                                         currentSourcePriceKrw: simulated.currentPrice,
                                         priceHistory: history,
                                         issueDescription: simulated.issueDescription,
+                                        activityLog: updatedLog,
                                     },
                                 };
                             }),
@@ -376,10 +418,10 @@ export const useRegistrationStore = create<RegistrationState>()(
 
                 // 다양한 감지 시간 (시간대별로 분산)
                 const hoursAgo = [1, 2, 3, 5, 9, 14, 22];
-                // 이슈 유형 패턴: 품절, 역마진, 재입고 혼합 (재입고를 2번째에 배치)
-                const issuePattern: Array<'out_of_stock' | 'negative_margin' | 'restocked'> = [
-                    'out_of_stock', 'restocked', 'negative_margin',
-                    'out_of_stock', 'negative_margin', 'out_of_stock', 'negative_margin',
+                // 이슈 유형 패턴: 품절, 가격변동, 재입고 혼합
+                const issuePattern: Array<'out_of_stock' | 'price_changed' | 'restocked'> = [
+                    'out_of_stock', 'restocked', 'price_changed',
+                    'out_of_stock', 'price_changed', 'out_of_stock', 'price_changed',
                 ];
 
                 set((state) => {
@@ -413,15 +455,13 @@ export const useRegistrationStore = create<RegistrationState>()(
                                         issueDescription: '재입고가 확인돼 자동으로 판매가 재개됐어요.',
                                     }
                                     : (() => {
-                                        const increase = Math.round(r.product.originalPriceKrw * (0.4 + Math.random() * 0.3));
-                                        const newPrice = r.product.originalPriceKrw + increase;
-                                        const saleInKrw = r.product.salePriceJpy / 0.11;
-                                        const marginPct = ((saleInKrw - newPrice) / saleInKrw * 100).toFixed(1);
-                                        const recommendedJpy = Math.ceil((newPrice * 1.2) * 0.11);
+                                        const change = Math.round(r.product.originalPriceKrw * (0.05 + Math.random() * 0.15));
+                                        const newPrice = r.product.originalPriceKrw + change;
+                                        const newSaleJpy = Math.ceil((newPrice * 1.2) * 0.11);
                                         return {
-                                            result: 'negative_margin' as const,
+                                            result: 'price_changed' as const,
                                             currentPrice: newPrice,
-                                            issueDescription: `구매가가 ₩${r.product.originalPriceKrw.toLocaleString()} → ₩${newPrice.toLocaleString()}로 올라 마진율이 ${marginPct}%예요. 판매가를 ¥${recommendedJpy.toLocaleString()} 이상으로 조정해주세요.`,
+                                            issueDescription: `원가 ₩${r.product.originalPriceKrw.toLocaleString()} → ₩${newPrice.toLocaleString()}로 변동, 판매가를 ¥${r.product.salePriceJpy.toLocaleString()} → ¥${newSaleJpy.toLocaleString()}로 자동 조정했어요.`,
                                         };
                                     })();
 
@@ -433,6 +473,15 @@ export const useRegistrationStore = create<RegistrationState>()(
                                 );
 
                                 const idx = config.idx;
+
+                                // 활동 로그 생성
+                                const prevLog2 = r.monitoring?.activityLog ?? [];
+                                const newEntry2: MonitoringActivityLog = simulated.result === 'out_of_stock'
+                                    ? { date: checkTime.toISOString(), type: 'out_of_stock', description: '품절 감지 → 판매 자동 일시중지' }
+                                    : simulated.result === 'restocked'
+                                    ? { date: checkTime.toISOString(), type: 'restocked', description: '재입고 감지 → 판매 자동 재개' }
+                                    : { date: checkTime.toISOString(), type: 'negative_margin', description: simulated.issueDescription ?? '역마진 발생', details: { prevPrice: r.product.originalPriceKrw, newPrice: simulated.currentPrice } };
+                                const updatedLog2 = [newEntry2, ...prevLog2];
 
                                 // 재입고: 판매 재개 상태
                                 if (simulated.result === 'restocked') {
@@ -448,16 +497,14 @@ export const useRegistrationStore = create<RegistrationState>()(
                                             currentSourcePriceKrw: simulated.currentPrice,
                                             priceHistory: history,
                                             issueDescription: simulated.issueDescription,
+                                            activityLog: updatedLog2,
                                         },
                                     };
                                 }
 
-                                // 대부분 자동 처리, idx===5 (6번째)만 자동중지 안 됨 → 빨간 품절
+                                // 품절 시 자동 일시중지 (idx===5는 자동중지 안 함 — 데모용)
                                 const shouldAutoPause = idx !== 5;
-                                const autoPause = shouldAutoPause && (
-                                    (state.autoPauseOnOutOfStock && simulated.result === 'out_of_stock') ||
-                                    (state.autoPauseOnNegativeMargin && simulated.result === 'negative_margin')
-                                );
+                                const autoPause = shouldAutoPause && simulated.result === 'out_of_stock';
 
                                 return {
                                     ...r,
@@ -470,6 +517,7 @@ export const useRegistrationStore = create<RegistrationState>()(
                                         currentSourcePriceKrw: simulated.currentPrice,
                                         priceHistory: history,
                                         issueDescription: simulated.issueDescription,
+                                        activityLog: updatedLog2,
                                     },
                                 };
                             }),
@@ -502,7 +550,20 @@ export const useRegistrationStore = create<RegistrationState>()(
                                 simulated.currentPrice,
                             );
 
-                            const autoPause = (state.autoPauseOnOutOfStock && simulated.result === 'out_of_stock') || (state.autoPauseOnNegativeMargin && simulated.result === 'negative_margin');
+                            const autoPause = simulated.result === 'out_of_stock';
+                            // 활동 로그 갱신
+                            const prevLog3 = r.monitoring?.activityLog ?? [];
+                            const newEntry3: MonitoringActivityLog = simulated.result === 'out_of_stock'
+                                ? { date: checkTime.toISOString(), type: 'out_of_stock', description: '품절 감지 → 판매 자동 일시중지' }
+                                : simulated.result === 'negative_margin'
+                                ? { date: checkTime.toISOString(), type: 'negative_margin', description: simulated.issueDescription ?? '역마진 발생' }
+                                : simulated.result === 'restocked'
+                                ? { date: checkTime.toISOString(), type: 'restocked', description: '재입고 감지 → 판매 자동 재개' }
+                                : simulated.result === 'price_changed'
+                                ? { date: checkTime.toISOString(), type: 'price_changed', description: `원가 변동: ₩${r.product.originalPriceKrw.toLocaleString()} → ₩${simulated.currentPrice.toLocaleString()}` }
+                                : { date: checkTime.toISOString(), type: 'monitoring_started', description: '정상 확인 완료' };
+                            const updatedLog3 = [newEntry3, ...prevLog3];
+
                             return {
                                 ...r,
                                 ...(autoPause ? { salesStatus: 'paused' as const, pauseReason: 'auto' as const } : {}),
@@ -514,6 +575,7 @@ export const useRegistrationStore = create<RegistrationState>()(
                                     currentSourcePriceKrw: simulated.currentPrice,
                                     priceHistory: history,
                                     issueDescription: simulated.issueDescription,
+                                    activityLog: updatedLog3,
                                 },
                             };
                         }),

@@ -104,8 +104,8 @@ function getAlertIcon(alert: AlertItem) {
         iconColor = alert.isAutoPaused ? colors.primary : colors.danger;
         IconComp = alert.isAutoPaused ? TrendingUp : AlertTriangle;
     } else {
-        iconBg = alert.isAutoPaused ? colors.primaryLight : colors.dangerLight;
-        iconColor = alert.isAutoPaused ? colors.primary : colors.danger;
+        iconBg = alert.isAutoPaused ? '#FFF4E0' : colors.dangerLight;
+        iconColor = alert.isAutoPaused ? '#FF9500' : colors.danger;
         IconComp = alert.isAutoPaused ? PauseCircle : PackageX;
     }
 
@@ -388,7 +388,7 @@ export const NotificationPanel: React.FC = () => {
                                     }}>
                                         <Bell size={20} color={colors.text.muted} />
                                     </div>
-                                    가격·재고 확인 중인 상품에서<br />
+                                    가격·품절 확인 중인 상품에서<br />
                                     변동 사항이 없어요
 
                                     <button

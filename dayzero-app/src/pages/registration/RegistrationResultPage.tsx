@@ -14,17 +14,27 @@ import { BulkActionBar } from './components/FailedBulkActionBar';
 import { MonitoringStatusTabs } from './components/MonitoringStatusTabs';
 import { MonitoringHistoryModal } from './components/MonitoringHistoryModal';
 import { MonitoringInfoCallout } from './components/MonitoringInfoCallout';
-import { MonitoringSettingsModal } from './components/MonitoringSettingsModal';
 
+import { MonitoringEnableDescription, MonitoringDisableDescription, MonitoringDisableOosDescription } from './components/MonitoringModalDescriptions';
+import type { MonitoringTabFilter } from './components/MonitoringStatusTabs';
 import { useRegistrationFilters } from './hooks/useRegistrationFilters';
 import { useRegistrationSelection } from './hooks/useRegistrationSelection';
 import { useRegistrationActions } from './hooks/useRegistrationActions';
 
 const FREE_PLAN_LIMIT = 10;
 
+const EMPTY_MESSAGES: Record<MonitoringTabFilter, string> = {
+    '전체': '등록된 상품이 없어요',
+    '판매 중': '판매 중인 상품이 없어요',
+    '가격·품절 확인 중': '가격·품절 확인 중인 상품이 없어요',
+    '품절': '품절된 상품이 없어요',
+    '문제 발생': '문제가 발생한 상품이 없어요',
+    '일시 중지': '일시 중지된 상품이 없어요',
+};
+
 export const RegistrationResultPage: React.FC = () => {
     const navigate = useNavigate();
-    const { jobs, deleteResults, pauseSales, resumeSales, enableMonitoring, disableMonitoring, runMonitoringCheck, forceIssueOnOne, seedDemoIssues, autoPauseOnOutOfStock, setAutoPauseOnOutOfStock, autoPauseOnNegativeMargin, setAutoPauseOnNegativeMargin } = useRegistrationStore();
+    const { jobs, deleteResults, pauseSales, resumeSales, enableMonitoring, disableMonitoring, runMonitoringCheck, forceIssueOnOne, seedDemoIssues } = useRegistrationStore();
 
     // 모든 성공 결과 통합
     const allSuccessResults = useMemo(
@@ -74,7 +84,44 @@ export const RegistrationResultPage: React.FC = () => {
         { pauseSales, resumeSales, deleteResults, enableMonitoring, disableMonitoring },
     );
 
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    // 개별 토글 모니터링
+    const [pendingToggleId, setPendingToggleId] = useState<string | null>(null);
+    const [isToggleEnableModalOpen, setIsToggleEnableModalOpen] = useState(false);
+    const [isToggleDisableModalOpen, setIsToggleDisableModalOpen] = useState(false);
+
+    const handleToggleMonitoring = useCallback((resultId: string, enable: boolean) => {
+        setPendingToggleId(resultId);
+        if (enable) {
+            setIsToggleEnableModalOpen(true);
+        } else {
+            setIsToggleDisableModalOpen(true);
+        }
+    }, []);
+
+    const handleConfirmToggleEnable = useCallback(() => {
+        if (pendingToggleId) {
+            enableMonitoring([pendingToggleId]);
+        }
+        setIsToggleEnableModalOpen(false);
+        setPendingToggleId(null);
+    }, [pendingToggleId, enableMonitoring]);
+
+    const handleConfirmToggleDisable = useCallback(() => {
+        if (pendingToggleId) {
+            disableMonitoring([pendingToggleId]);
+        }
+        setIsToggleDisableModalOpen(false);
+        setPendingToggleId(null);
+    }, [pendingToggleId, disableMonitoring]);
+
+    // OFF 모달에 표시할 상태별 문구
+    const pendingResult = pendingToggleId
+        ? allSuccessResults.find(r => r.id === pendingToggleId)
+        : null;
+    const pendingCheckResult = pendingResult?.monitoring?.lastCheckResult;
+    const disableModalDescription = pendingCheckResult === 'out_of_stock'
+        ? MonitoringDisableOosDescription
+        : MonitoringDisableDescription;
 
     const handleRowClick = useCallback((resultId: string) => {
         navigate(`/registration/${resultId}`);
@@ -114,7 +161,7 @@ export const RegistrationResultPage: React.FC = () => {
                             </span>
                         </h1>
                         <p style={{ fontSize: font.size.md, color: colors.text.tertiary, margin: 0 }}>
-                            Qoo10 JP에 등록된 상품을 관리하고, 쇼핑몰 가격·재고 변동을 확인하세요.
+                            Qoo10 JP에 등록된 상품을 관리하고, 쇼핑몰 가격·품절 변동을 확인하세요.
                         </p>
                     </div>
 
@@ -140,13 +187,11 @@ export const RegistrationResultPage: React.FC = () => {
                     <SuccessSummaryCard results={allSuccessResults} />
                 )}
 
+
                 {/* 변동 확인 콜아웃 */}
                 <MonitoringInfoCallout
                     monitoringCount={filters.monitoringCounts.monitoring}
                     limit={FREE_PLAN_LIMIT}
-                    autoPauseOnOutOfStock={autoPauseOnOutOfStock}
-                    autoPauseOnNegativeMargin={autoPauseOnNegativeMargin}
-                    onSettingsClick={() => setIsSettingsOpen(true)}
                 />
 
                 {/* 모니터링 상태 탭 */}
@@ -197,13 +242,8 @@ export const RegistrationResultPage: React.FC = () => {
                     onSelectAll={selection.handleSelectAll}
                     onRowClick={handleRowClick}
                     showMonitoring
-                    emptyMessage={
-                        filters.monitoringTab === '가격·재고 확인 중' ? '가격·재고 자동 확인 중인 상품이 없어요' :
-                            filters.monitoringTab === '품절' ? '품절된 상품이 없어요' :
-                                filters.monitoringTab === '역마진' ? '역마진 상품이 없어요' :
-                                    filters.monitoringTab === '일시 중지' ? '일시 중지된 상품이 없어요' :
-                                        '판매 중인 상품이 없어요'
-                    }
+                    onToggleMonitoring={handleToggleMonitoring}
+                    emptyMessage={EMPTY_MESSAGES[filters.monitoringTab]}
                 />
             </div>
 
@@ -260,14 +300,14 @@ export const RegistrationResultPage: React.FC = () => {
                 cancelText="취소"
             />
 
-            {/* 판매 종료 확인 모달 */}
+            {/* 삭제 확인 모달 */}
             <ConfirmModal
                 isOpen={actions.isDeleteModalOpen}
                 onClose={() => actions.setIsDeleteModalOpen(false)}
                 onConfirm={actions.handleDelete}
-                title={`${selection.selectedIds.length}건의 판매를 종료할까요?`}
-                description="판매 종료 후에는 복구할 수 없어요. Qoo10에서도 상품이 완전히 제거되고, 편집 목록으로 돌아가지 않아요."
-                confirmText="판매 종료"
+                title={`${selection.selectedIds.length}건을 삭제할까요?`}
+                description="삭제 후에는 복구할 수 없어요. Qoo10에서도 상품이 완전히 제거되고, 편집 목록으로 돌아가지 않아요."
+                confirmText="삭제"
                 cancelText="취소"
                 type="danger"
             />
@@ -277,9 +317,9 @@ export const RegistrationResultPage: React.FC = () => {
                 isOpen={actions.isEnableMonitoringModalOpen}
                 onClose={() => actions.setIsEnableMonitoringModalOpen(false)}
                 onConfirm={actions.handleEnableMonitoring}
-                title={`${selection.selectedMonitoringInfo.unmonitoredCount}건에 가격·재고 자동 확인을 등록할까요?`}
+                title={`${selection.selectedMonitoringInfo.unmonitoredCount}건에 가격·품절 확인을 켤까요?`}
                 description={`매일 오전 7시에 쇼핑몰의 가격과 재고를 자동으로 확인해서, 역마진이나 품절이 생기면 알려드려요.\n\n현재 등록: ${filters.monitoringCounts.monitoring}건 / 최대 ${FREE_PLAN_LIMIT}건`}
-                confirmText="가격·재고 자동 확인 시작"
+                confirmText="가격·품절 확인 시작"
                 cancelText="취소"
                 type="info"
             />
@@ -289,8 +329,8 @@ export const RegistrationResultPage: React.FC = () => {
                 isOpen={actions.isDisableMonitoringModalOpen}
                 onClose={() => actions.setIsDisableMonitoringModalOpen(false)}
                 onConfirm={actions.handleDisableMonitoring}
-                title={`${selection.selectedMonitoringInfo.monitoredCount}건의 가격·재고 자동 확인을 해제할까요?`}
-                description="해제하면 쇼핑몰 가격·재고 변동이 더 이상 확인되지 않아요."
+                title={`${selection.selectedMonitoringInfo.monitoredCount}건의 가격·품절 확인을 끌까요?`}
+                description="해제하면 쇼핑몰 가격·품절 변동이 더 이상 확인되지 않아요."
                 confirmText="알림 해제"
                 cancelText="취소"
             />
@@ -304,14 +344,26 @@ export const RegistrationResultPage: React.FC = () => {
                 onForceIssue={forceIssueOnOne}
                 onSeedDemoIssues={seedDemoIssues}
             />
-            {/* 알림 설정 모달 */}
-            <MonitoringSettingsModal
-                isOpen={isSettingsOpen}
-                onClose={() => setIsSettingsOpen(false)}
-                autoPauseOnOutOfStock={autoPauseOnOutOfStock}
-                onToggleOutOfStock={setAutoPauseOnOutOfStock}
-                autoPauseOnNegativeMargin={autoPauseOnNegativeMargin}
-                onToggleNegativeMargin={setAutoPauseOnNegativeMargin}
+            {/* 자동확인 토글 ON 안내 모달 */}
+            <ConfirmModal
+                isOpen={isToggleEnableModalOpen}
+                onClose={() => { setIsToggleEnableModalOpen(false); setPendingToggleId(null); }}
+                onConfirm={handleConfirmToggleEnable}
+                title="가격·품절 확인을 켤까요?"
+                description={MonitoringEnableDescription}
+                confirmText="켜기"
+                cancelText="취소"
+                type="info"
+            />
+            {/* 자동확인 토글 OFF 확인 모달 */}
+            <ConfirmModal
+                isOpen={isToggleDisableModalOpen}
+                onClose={() => { setIsToggleDisableModalOpen(false); setPendingToggleId(null); }}
+                onConfirm={handleConfirmToggleDisable}
+                title="가격·품절 확인을 끌까요?"
+                description={disableModalDescription}
+                confirmText="끄기"
+                cancelText="취소"
             />
         </MainLayout>
     );

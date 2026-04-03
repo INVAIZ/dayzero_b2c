@@ -556,7 +556,7 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
                             ₩{totalCostKrw.toLocaleString()}
                         </span>
                         <div style={{ fontSize: font.size['2xs+'], color: colors.text.muted, marginTop: '2px' }}>
-                            ¥{Math.round(costJpy).toLocaleString()} · 환율 ¥1=₩{EXCHANGE_RATE.toLocaleString()}
+                            ≈ ¥{Math.round(costJpy).toLocaleString()}
                         </div>
                     </div>
                 </div>
@@ -599,7 +599,12 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
                         해외 배송비
                         <span style={{ fontSize: font.size.xs, fontWeight: 400, color: colors.text.muted, marginLeft: '4px' }}>KSE SAGAWA 기준</span>
                     </span>
-                    <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>¥{intlShipping.toLocaleString()}</span>
+                    <div style={{ textAlign: 'right' }}>
+                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}</span>
+                        <div style={{ fontSize: font.size['2xs+'], color: colors.text.muted, marginTop: '2px' }}>
+                            ≈ ¥{intlShipping.toLocaleString()}
+                        </div>
+                    </div>
                 </div>
             </div>
 

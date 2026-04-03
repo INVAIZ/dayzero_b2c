@@ -59,7 +59,7 @@ export interface ProductDetail {
     translationStatus: 'pending' | 'processing' | 'completed' | 'failed';
     editStatus: 'pending' | 'processing' | 'completed' | 'failed';
     lastSavedAt: string | null;
-    createdAt: string; // 수집 등록일 (ISO string)
+    createdAt: string; // 최근 수집일 (ISO string)
     isRead: boolean;
     jobId?: string; // 소싱 작업 고유 ID (알림 연동용)
     weightKg: number;

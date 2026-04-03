@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Loader2, Check, Globe, Info, AlertCircle } from 'lucide-react';
 import { AIIcon } from '../../../components/common/AIIcon';
 import type { ProductDetail } from '../../../types/editing';
@@ -6,16 +6,10 @@ import { getProviderLogo } from '../../../types/sourcing';
 import { Checkbox } from '../../../components/common/Checkbox';
 import { SOURCE_TAG_STYLES } from '../../../components/common/SourceTag';
 import { toKoCategory, shortKoCategory, EXCHANGE_RATE } from '../../../mock/categoryMap';
-import { colors, font, radius, shadow, spacing, zIndex } from '../../../design/tokens';
+import { colors, font, radius, shadow, spacing } from '../../../design/tokens';
 import { stripPrefix, hasKorean } from '../../../utils/editing';
-
-const formatDate = (iso: string) => {
-    const d = new Date(iso);
-    const yy = String(d.getFullYear()).slice(2);
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yy}.${mm}.${dd}`;
-};
+import { FloatingTooltip, type TooltipData } from '../../../components/common/FloatingTooltip';
+import { formatShortDate } from '../../../utils/formatDate';
 
 interface Props {
     product: ProductDetail;
@@ -24,58 +18,6 @@ interface Props {
     onClick: () => void;
     'data-job-id'?: string;
 }
-
-interface TooltipData {
-    x: number;
-    y: number;
-    content: React.ReactNode;
-}
-
-
-/** 화면 고정 위치 툴팁 */
-const FloatingTooltip: React.FC<{ data: TooltipData }> = ({ data }) => {
-    const ref = useRef<HTMLDivElement>(null);
-    const [pos, setPos] = useState({ x: data.x, y: data.y });
-
-    useEffect(() => {
-        if (!ref.current) return;
-        const { width, height } = ref.current.getBoundingClientRect();
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        let x = data.x;
-        let y = data.y + 12;
-        if (x + width > vw - 16) x = vw - width - 16;
-        if (y + height > vh - 16) y = data.y - height - 12;
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setPos({ x, y });
-    }, [data.x, data.y]);
-
-    return (
-        <div
-            ref={ref}
-            style={{
-                position: 'fixed',
-                left: pos.x,
-                top: pos.y,
-                zIndex: zIndex.toast,
-                background: colors.text.primary,
-                color: '#fff',
-                borderRadius: radius.lg,
-                padding: `${spacing['3']} ${spacing['4']}`,
-                boxShadow: shadow.lg,
-                pointerEvents: 'none',
-                maxWidth: '400px',
-                width: 'max-content',
-                fontSize: font.size.base,
-                wordBreak: 'keep-all',
-                lineHeight: font.lineHeight.normal,
-                animation: 'tooltipFadeIn 0.12s ease',
-            }}
-        >
-            {data.content}
-        </div>
-    );
-};
 
 
 const SOURCE_TOOLTIPS: Record<string, string> = {
@@ -373,7 +315,13 @@ export const ProductListItem: React.FC<Props> = ({
                 onMouseMove={(e) => showTooltip(e, (
                     <div>
                         <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: 500 }}>
-                            Qoo10 카테고리 전체 경로
+                            원본 카테고리
+                        </div>
+                        <div style={{ fontSize: font.size.sm, fontWeight: 500, marginBottom: '8px' }}>
+                            {product.sourceCategoryPath}
+                        </div>
+                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: 500 }}>
+                            Qoo10 카테고리
                         </div>
                         <span style={{ fontSize: font.size.sm, fontWeight: 500 }}>
                             {toKoCategory(product.qoo10CategoryPath)}
@@ -424,9 +372,9 @@ export const ProductListItem: React.FC<Props> = ({
                 ₩{product.originalPriceKrw.toLocaleString()}
             </div>
 
-            {/* 등록일 */}
-            <div style={{ width: '65px', flexShrink: 0, fontSize: font.size.sm, color: colors.text.tertiary }}>
-                {formatDate(product.createdAt)}
+            {/* 최근 수집일 */}
+            <div style={{ width: '90px', flexShrink: 0, fontSize: font.size.sm, color: colors.text.tertiary }}>
+                {formatShortDate(product.createdAt)}
             </div>
 
             {tooltip && <FloatingTooltip data={tooltip} />}

@@ -8,7 +8,7 @@ interface ConfirmModalProps {
     onClose: () => void;
     onConfirm: () => void;
     title: string;
-    description: string;
+    description: React.ReactNode;
     confirmText?: string;
     cancelText?: string;
     type?: 'danger' | 'info';
@@ -108,16 +108,17 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                     {title}
                 </h3>
 
-                <p style={{
+                <div style={{
                     fontSize: font.size.base,
                     color: colors.text.tertiary,
                     lineHeight: '1.6',
                     marginBottom: '32px',
-                    whiteSpace: 'pre-wrap',
+                    whiteSpace: typeof description === 'string' ? 'pre-wrap' : undefined,
                     wordBreak: 'keep-all',
+                    width: '100%',
                 }}>
                     {description}
-                </p>
+                </div>
 
                 <div style={{
                     display: 'flex',
@@ -152,7 +153,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                             flex: 1,
                             padding: '14px',
                             borderRadius: radius.md,
-                            background: type === 'danger' ? colors.danger : colors.text.primary,
+                            background: type === 'danger' ? colors.danger : colors.primary,
                             border: 'none',
                             fontSize: font.size.md,
                             fontWeight: 700,

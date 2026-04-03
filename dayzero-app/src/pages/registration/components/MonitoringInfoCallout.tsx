@@ -1,32 +1,18 @@
 /**
- * 변동 확인 중 콜아웃 — 정보 표시 + 설정 버튼
+ * 변동 확인 중 콜아웃 — 카운트 + 안내 문구만 표시 (간소화)
  */
-import { Shield, Clock, RefreshCw, TrendingUp, Settings2 } from 'lucide-react';
+import { Shield, Clock } from 'lucide-react';
 import { colors, font, spacing, radius } from '../../../design/tokens';
 import { ANIM } from '../../../design/animations';
 
 interface Props {
     monitoringCount: number;
     limit: number;
-    autoPauseOnOutOfStock: boolean;
-    autoPauseOnNegativeMargin: boolean;
-    onSettingsClick: () => void;
 }
 
 export const MonitoringInfoCallout: React.FC<Props> = ({
     monitoringCount, limit,
-    autoPauseOnOutOfStock, autoPauseOnNegativeMargin,
-    onSettingsClick,
 }) => {
-    const infoLineStyle: React.CSSProperties = {
-        fontSize: font.size.sm,
-        color: colors.text.tertiary,
-        lineHeight: '1.5',
-        display: 'flex',
-        alignItems: 'center',
-        gap: spacing['1'],
-    };
-
     return (
         <div
             style={{
@@ -59,7 +45,7 @@ export const MonitoringInfoCallout: React.FC<Props> = ({
                     color: colors.text.tertiary,
                     marginBottom: spacing['1'],
                 }}>
-                    가격·재고 자동 확인
+                    가격·품절 확인
                 </div>
 
                 {/* 카운트 + 태그 */}
@@ -85,57 +71,18 @@ export const MonitoringInfoCallout: React.FC<Props> = ({
                     </span>
                 </div>
 
-                {/* 정보 라인들 */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: spacing['3'] }}>
-                    <div style={infoLineStyle}>
-                        <Clock size={12} color={colors.primary} style={{ flexShrink: 0 }} />
-                        매일 7시에 가격과 재고를 확인하고, 변동 시 알려드려요
-                    </div>
-                    {autoPauseOnOutOfStock && (
-                        <div style={infoLineStyle}>
-                            <RefreshCw size={12} color={colors.primary} style={{ flexShrink: 0 }} />
-                            품절 자동 관리 중
-                        </div>
-                    )}
-                    {autoPauseOnNegativeMargin && (
-                        <div style={infoLineStyle}>
-                            <TrendingUp size={12} color={colors.primary} style={{ flexShrink: 0 }} />
-                            판매가 자동 최적화 중
-                        </div>
-                    )}
+                {/* 안내 문구 */}
+                <div style={{
+                    fontSize: font.size.sm,
+                    color: colors.text.tertiary,
+                    lineHeight: '1.5',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: spacing['1'],
+                }}>
+                    <Clock size={12} color={colors.primary} style={{ flexShrink: 0 }} />
+                    매일 7시부터 가격과 재고를 확인하고, 변동 시 자동으로 처리해요
                 </div>
-
-                {/* 설정 버튼 */}
-                <button
-                    onClick={onSettingsClick}
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        padding: `${spacing['2']} ${spacing['3']}`,
-                        background: colors.bg.surface,
-                        border: `1px solid ${colors.primaryLightBorder}`,
-                        borderRadius: radius.md,
-                        fontSize: font.size.sm,
-                        fontWeight: font.weight.semibold,
-                        color: colors.primary,
-                        cursor: 'pointer',
-                        transition: 'all 0.15s',
-                    }}
-                    onMouseEnter={e => {
-                        e.currentTarget.style.background = colors.primary;
-                        e.currentTarget.style.color = colors.bg.surface;
-                        e.currentTarget.style.borderColor = colors.primary;
-                    }}
-                    onMouseLeave={e => {
-                        e.currentTarget.style.background = colors.bg.surface;
-                        e.currentTarget.style.color = colors.primary;
-                        e.currentTarget.style.borderColor = colors.primaryLightBorder;
-                    }}
-                >
-                    <Settings2 size={13} />
-                    설정 관리
-                </button>
             </div>
 
             <style>{ANIM.calloutIn + ANIM.fadeInUp}</style>

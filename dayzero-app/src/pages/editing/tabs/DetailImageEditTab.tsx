@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Check, RotateCcw } from 'lucide-react';
-import { AIIcon } from '../../../components/common/AIIcon';
+import { Loader2, Check, RotateCcw, Languages } from 'lucide-react';
 import type { ProductDetail } from '../../../types/editing';
 import { useEditingStore } from '../../../store/useEditingStore';
 import { colors, font, radius, spacing } from '../../../design/tokens';
@@ -30,7 +29,7 @@ export const DetailImageEditTab: React.FC<Props> = ({ product }) => {
                 setProgress(Math.round((done / totalCount) * 100));
                 if (done === totalCount) {
                     setStatus('done');
-                    addCompletedTranslationBatch(product.id, '상세페이지 AI 편집');
+                    addCompletedTranslationBatch(product.id, '상세페이지 번역');
                 }
             }, (i + 1) * 1800);
         });
@@ -51,9 +50,6 @@ export const DetailImageEditTab: React.FC<Props> = ({ product }) => {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing['4'] }}>
                 <div>
                     <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary }}>상세페이지 이미지</span>
-                    <span style={{ fontSize: font.size.xs, color: colors.text.muted, marginLeft: spacing['2'] }}>
-                        이미지 내 텍스트 일본어 번역
-                    </span>
                 </div>
                 <div style={{ display: 'flex', gap: spacing['2'] }}>
                     {isDone && (
@@ -89,9 +85,9 @@ export const DetailImageEditTab: React.FC<Props> = ({ product }) => {
                     >
                         {status === 'translating'
                             ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />
-                            : isDone ? <Check size={13} /> : <AIIcon size={13} />
+                            : isDone ? <Check size={13} /> : <Languages size={13} />
                         }
-                        {isDone ? '편집 완료' : status === 'translating' ? `편집 중... ${progress}%` : 'AI 편집'}
+                        {isDone ? '번역 완료' : status === 'translating' ? `번역 중... ${progress}%` : '상세페이지 번역'}
                     </button>
                 </div>
             </div>
@@ -135,7 +131,7 @@ export const DetailImageEditTab: React.FC<Props> = ({ product }) => {
                     }}>
                         <Loader2 size={36} color={colors.primary} style={{ animation: 'spin 1s linear infinite' }} />
                         <span style={{ fontSize: font.size.base, fontWeight: 600, color: colors.primary }}>
-                            이미지 내 텍스트 번역 중...
+                            상세페이지 번역 중...
                         </span>
                     </div>
                 )}

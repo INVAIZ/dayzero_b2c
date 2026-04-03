@@ -361,7 +361,7 @@ export default function EditingListPage() {
                 <div style={{ width: '70px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600, paddingLeft: '4px' }}>무게</div>
                 <SortHeader label="판매가" sortKey="salePriceJpy" active={sortKey} dir={sortDir} onSort={handleSort} style={{ width: '90px', flexShrink: 0 }} />
                 <div style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600 }}>원가</div>
-                <SortHeader label="등록일" sortKey="createdAt" active={sortKey} dir={sortDir} onSort={handleSort} style={{ width: '65px', flexShrink: 0 }} />
+                <SortHeader label="최근 수집일" sortKey="createdAt" active={sortKey} dir={sortDir} onSort={handleSort} style={{ width: '90px', flexShrink: 0 }} />
             </div>
 
             {/* 상품 목록 */}

@@ -81,22 +81,22 @@ export const BulkActionBar: React.FC<Props> = ({
 
                 <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.2)' }} />
 
-                {/* 가격·재고 자동 확인 받기 */}
+                {/* 가격·품절 확인 켜기 */}
                 {hasUnmonitoredSelected && onEnableMonitoring && (
                     <ActionButton
                         onClick={onEnableMonitoring}
                         icon={<Bell size={14} />}
-                        label="가격·재고 자동 확인 받기"
+                        label="가격·품절 확인 켜기"
                         color={colors.primary}
                     />
                 )}
 
-                {/* 가격·재고 자동 확인 해제 */}
+                {/* 가격·품절 확인 끄기 */}
                 {hasMonitoredSelected && onDisableMonitoring && (
                     <ActionButton
                         onClick={onDisableMonitoring}
                         icon={<BellOff size={14} />}
-                        label="가격·재고 자동 확인 해제"
+                        label="가격·품절 확인 끄기"
                         color="rgba(255,255,255,0.75)"
                     />
                 )}

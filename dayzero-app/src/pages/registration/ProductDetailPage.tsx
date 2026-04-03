@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-    ArrowLeft, ExternalLink, Shield, AlertTriangle,
+    ArrowLeft, ExternalLink, Shield, AlertTriangle, PackageX, AlertCircle,
     TrendingDown, TrendingUp, ChevronLeft, ChevronRight, PenLine, Trash2,
+    PackageCheck, PauseCircle, Play,
 } from 'lucide-react';
 import { colors, font, spacing, radius, shadow } from '../../design/tokens';
 import { ANIM } from '../../design/animations';
@@ -16,11 +17,13 @@ import { calcMarginPercent } from '../../utils/margin';
 import { useRegistrationStore } from '../../store/useRegistrationStore';
 import { PriceHistorySection } from './components/PriceHistorySection';
 import { NavButton, MonitoringToggle, InfoCard, InfoRow, AlertCard, StatusHelper } from './components/ProductDetailWidgets';
+import { MonitoringEnableDescription, MonitoringDisableDescription } from './components/MonitoringModalDescriptions';
+import type { MonitoringActivityLog } from '../../types/registration';
 
 export const ProductDetailPage: React.FC = () => {
     const { resultId } = useParams<{ resultId: string }>();
     const navigate = useNavigate();
-    const { jobs, enableMonitoring, disableMonitoring, pauseSales, resumeSales, deleteResults, autoPauseOnOutOfStock, autoPauseOnNegativeMargin } = useRegistrationStore();
+    const { jobs, enableMonitoring, disableMonitoring, pauseSales, resumeSales, deleteResults } = useRegistrationStore();
 
     const [isEnableModalOpen, setIsEnableModalOpen] = useState(false);
     const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
@@ -350,51 +353,6 @@ export const ProductDetailPage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* 상태 도우미 콜아웃 — 모니터링 활성 시 상태에 따라 하나 표시 */}
-                {isMonitored && (
-                    isNegativeMargin && currentMargin <= 5 ? (
-                        <AlertCard
-                            type="negative_margin"
-                            description={monitoring?.issueDescription ?? ''}
-                            resultId={result.id}
-                            onNavigate={navigate}
-                        />
-                    ) : isOutOfStock && !isPaused ? (
-                        <AlertCard
-                            type="out_of_stock"
-                            description={monitoring?.issueDescription ?? ''}
-                            isPaused={isPaused}
-                            isMonitored={isMonitored}
-                            onPause={() => setIsPauseModalOpen(true)}
-                        />
-                    ) : isPaused ? (
-                        <StatusHelper
-                            type="paused"
-                            title={isOutOfStock ? '재입고를 기다리고 있어요' : '판매 일시중지 중'}
-                            description={
-                                isOutOfStock && autoPauseOnOutOfStock
-                                    ? '현재 쇼핑몰에서 품절된 상태예요. 매일 쇼핑몰을 확인하고 있고, 재입고되면 자동으로 판매를 재개해드릴게요.'
-                                : isOutOfStock
-                                    ? '현재 쇼핑몰에서 품절된 상태예요. 매일 쇼핑몰을 확인하고 있고, 재입고되면 바로 알려드릴게요.'
-                                    : '현재 판매가 일시중지된 상태예요. 가격·재고 변동은 계속 확인하고 있으니, 판매를 재개하고 싶을 때 언제든 다시 시작하실 수 있어요.'
-                            }
-                        />
-                    ) : (
-                        <StatusHelper
-                            type="watching"
-                            title="매일 가격·재고를 확인하고 있어요"
-                            description={autoPauseOnOutOfStock && autoPauseOnNegativeMargin
-                                ? '품절되면 자동으로 판매를 일시중지하고, 원가가 변동되면 판매가를 자동으로 조정해드릴게요.'
-                            : autoPauseOnOutOfStock
-                                ? '품절되면 자동으로 판매를 일시중지해드릴게요. 가격이 변동되면 바로 알려드릴게요.'
-                            : autoPauseOnNegativeMargin
-                                ? '원가가 변동되면 판매가를 자동으로 조정해드릴게요. 품절되면 바로 알려드릴게요.'
-                                : '가격이 변동되거나 품절이 발생하면 바로 알려드릴게요.'
-                            }
-                        />
-                    )
-                )}
-
                 {/* 가격·등록 정보 2컬럼 */}
                 <div style={{
                     display: 'grid',
@@ -540,7 +498,114 @@ export const ProductDetailPage: React.FC = () => {
                 </div>
 
                 {/* 가격 변동 이력 + 모니터링 토글 통합 섹션 */}
-                {isMonitored && monitoring?.priceHistory && monitoring.priceHistory.length > 0 ? (
+                {/* 가격·품절 확인 — 토글 + 상태 안내 + 활동 기록 */}
+                <div style={{
+                    background: colors.bg.surface,
+                    border: `1px solid ${colors.border.default}`,
+                    borderRadius: radius.lg,
+                    padding: spacing['5'],
+                    marginBottom: spacing['5'],
+                    minHeight: '280px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}>
+                    {/* 헤더: 제목 + 토글 */}
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: spacing['3'],
+                    }}>
+                        <span style={{
+                            fontSize: font.size.base,
+                            fontWeight: 700,
+                            color: colors.text.primary,
+                        }}>
+                            가격·품절 확인
+                        </span>
+                        <MonitoringToggle
+                            checked={isMonitored}
+                            hasIssue={isMonitored && hasIssue}
+                            onClick={handleToggleMonitoring}
+                        />
+                    </div>
+
+                    {/* ON 상태: 콜아웃 */}
+                    {isMonitored && (
+                        isOutOfStock && !isPaused ? (
+                            <AlertCard
+                                type="out_of_stock"
+                                description={monitoring?.issueDescription ?? ''}
+                                isPaused={isPaused}
+                                isMonitored={isMonitored}
+                                onPause={() => setIsPauseModalOpen(true)}
+                            />
+                        ) : isPaused ? (
+                            <StatusHelper
+                                type={isOutOfStock ? 'warning' : 'paused'}
+                                title={isOutOfStock ? '재입고를 기다리고 있어요' : '판매 일시중지 중'}
+                                description={
+                                    <div>
+                                        <div>{isOutOfStock
+                                            ? '현재 쇼핑몰에서 품절된 상태예요. 매일 쇼핑몰을 확인하고 있고, 재입고되면 자동으로 판매를 재개해드릴게요.'
+                                            : '현재 판매가 일시중지된 상태예요. 가격·품절 변동은 계속 확인하고 있으니, 판매를 재개하고 싶을 때 언제든 다시 시작하실 수 있어요.'
+                                        }</div>
+                                        {monitoring?.lastCheckAt && (
+                                            <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginTop: spacing['2'] }}>
+                                                마지막 확인: {formatFullDate(monitoring.lastCheckAt)}
+                                            </div>
+                                        )}
+                                    </div>
+                                }
+                            />
+                        ) : (
+                            <StatusHelper
+                                type="watching"
+                                title="매일 가격·품절을 확인하고 있어요"
+                                description={
+                                    <div>
+                                        <div>품절되면 자동으로 판매를 일시중지하고, 원가가 변동되면 판매가를 자동으로 조정해드릴게요.</div>
+                                        {monitoring?.lastCheckAt && (
+                                            <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginTop: spacing['2'] }}>
+                                                마지막 확인: {formatFullDate(monitoring.lastCheckAt)}
+                                            </div>
+                                        )}
+                                    </div>
+                                }
+                            />
+                        )
+                    )}
+
+                    {/* OFF 상태 안내 */}
+                    {!isMonitored && (
+                        <div style={{
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            textAlign: 'center',
+                        }}>
+                            <Shield size={24} color={colors.text.muted} style={{ marginBottom: spacing['2'] }} />
+                            <div style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary, marginBottom: spacing['1'] }}>
+                                가격·품절 확인이 꺼져 있어요
+                            </div>
+                            <div style={{ fontSize: font.size.xs, color: colors.text.muted }}>
+                                토글을 켜면 매일 가격과 재고를 확인하고, 변동 시 자동으로 처리해요.
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ON 상태: 활동 기록 (페이지네이션) */}
+                    {isMonitored && monitoring?.activityLog && (
+                        <div style={{ flex: 1 }}>
+                            <ActivityLog logs={monitoring.activityLog} />
+                        </div>
+                    )}
+                </div>
+
+                {/* 가격 변동 이력 차트 (ON일 때만) */}
+                {isMonitored && monitoring?.priceHistory && monitoring.priceHistory.length > 0 && (
                     <div style={{
                         background: colors.bg.surface,
                         border: `1px solid ${colors.border.default}`,
@@ -548,145 +613,18 @@ export const ProductDetailPage: React.FC = () => {
                         padding: spacing['5'],
                         marginBottom: spacing['5'],
                     }}>
-                        {/* 헤더: 제목 + 토글 */}
                         <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginBottom: spacing['4'],
+                            fontSize: font.size.xs,
+                            fontWeight: 600,
+                            color: colors.text.muted,
+                            marginBottom: spacing['2'],
                         }}>
-                            <span style={{
-                                fontSize: font.size.sm,
-                                fontWeight: 700,
-                                color: colors.text.tertiary,
-                                letterSpacing: '0.3px',
-                            }}>
-                                가격 변동 이력 (최근 14일)
-                            </span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                                <MonitoringToggle checked onClick={handleToggleMonitoring} />
-                            </div>
+                            가격 변동 이력 (최근 14일)
                         </div>
                         <PriceHistorySection
                             history={monitoring.priceHistory}
                             hideHeader
                         />
-                    </div>
-                ) : (
-                    <div style={{
-                        position: 'relative',
-                        background: colors.bg.surface,
-                        border: `1px solid ${colors.border.default}`,
-                        borderRadius: radius.lg,
-                        overflow: 'hidden',
-                        marginBottom: spacing['5'],
-                        minHeight: '520px',
-                    }}>
-                        {/* 블러 처리된 더미 차트 배경 (실제 차트와 동일한 구조) */}
-                        <div style={{
-                            position: 'absolute',
-                            inset: 0,
-                            padding: spacing['5'],
-                            filter: 'blur(5px)',
-                            opacity: 0.3,
-                            pointerEvents: 'none',
-                        }}>
-                            <div style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.tertiary, marginBottom: spacing['4'] }}>
-                                가격 변동 이력 (최근 14일)
-                            </div>
-                            <svg viewBox="0 0 620 200" style={{ width: '100%', height: 'auto', display: 'block', marginBottom: spacing['4'] }}>
-                                <defs>
-                                    <linearGradient id="dummyGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor={colors.primary} stopOpacity="0.18" />
-                                        <stop offset="100%" stopColor={colors.primary} stopOpacity="0.02" />
-                                    </linearGradient>
-                                </defs>
-                                {/* Y축 그리드 + 라벨 */}
-                                {[0, 1, 2, 3, 4, 5].map(i => {
-                                    const y = 16 + (156 / 5) * (5 - i);
-                                    return (
-                                        <g key={i}>
-                                            <line x1="52" y1={y} x2="600" y2={y} stroke={colors.border.default} strokeWidth="0.7" strokeDasharray={i === 0 ? 'none' : '3 2'} />
-                                            <text x="44" y={y + 3.5} textAnchor="end" fontSize="10" fill={colors.text.muted} fontFamily={font.family.mono}>
-                                                {`${2 + i * 0.5}만`}
-                                            </text>
-                                        </g>
-                                    );
-                                })}
-                                {/* 라인 + 영역 */}
-                                <path d="M52,130 L100,128 L160,134 L220,132 L280,130 L340,126 L400,128 L460,80 L520,70 L580,68 L600,68 L600,172 L52,172 Z" fill="url(#dummyGrad)" />
-                                <path d="M52,130 L100,128 L160,134 L220,132 L280,130 L340,126 L400,128 L460,80 L520,70 L580,68 L600,68" fill="none" stroke={colors.primary} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-                                {/* X축 라벨 */}
-                                {['3/18', '3/21', '3/25', '3/28', '3/31'].map((l, i) => (
-                                    <text key={i} x={52 + i * 137} y={194} textAnchor="middle" fontSize="10.5" fill={colors.text.muted}>{l}</text>
-                                ))}
-                            </svg>
-                            {/* 더미 타임라인 행 */}
-                            {[1, 2, 3, 4, 5].map(i => (
-                                <div key={i} style={{
-                                    display: 'flex', alignItems: 'center', gap: spacing['3'],
-                                    padding: `${spacing['3']} 0`,
-                                    borderBottom: i < 5 ? `1px solid ${colors.bg.subtle}` : 'none',
-                                }}>
-                                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: i <= 2 ? colors.danger : colors.success }} />
-                                    <span style={{ fontSize: font.size.sm, color: colors.text.muted, width: '56px' }}>3/{31 - i + 1}</span>
-                                    <span style={{ fontSize: font.size.base, fontWeight: 700, color: colors.text.primary, flex: 1 }}>
-                                        ₩{(25000 + i * 3000).toLocaleString()}
-                                    </span>
-                                    <span style={{ fontSize: font.size.base, fontWeight: 700, color: i <= 2 ? colors.danger : colors.primary, width: '100px' }}>
-                                        ₩{(500 + i * 200).toLocaleString()}
-                                    </span>
-                                    <span style={{ fontSize: font.size.base, fontWeight: 700, color: i <= 2 ? colors.danger : colors.success, width: '56px' }}>
-                                        {i <= 2 ? `-${(5 + i)}%` : `${25 + i}%`}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* 오버레이 안내 */}
-                        <div style={{
-                            position: 'relative',
-                            zIndex: 1,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            minHeight: '520px',
-                            padding: spacing['5'],
-                            textAlign: 'center',
-                        }}>
-                            <Shield size={28} color={colors.primary} style={{ marginBottom: spacing['3'] }} />
-                            <div style={{
-                                fontSize: font.size.base,
-                                fontWeight: 600,
-                                color: colors.text.primary,
-                                marginBottom: spacing['1'],
-                            }}>
-                                가격·재고 자동 확인을 등록하면 매일 변동 이력을 확인할 수 있어요
-                            </div>
-                            <div style={{
-                                fontSize: font.size.sm,
-                                color: colors.text.tertiary,
-                                marginBottom: spacing['4'],
-                            }}>
-                                쇼핑몰 가격이 올라 역마진이 생기거나, 품절되면 바로 알려드려요.
-                            </div>
-                            <button
-                                onClick={() => setIsEnableModalOpen(true)}
-                                style={{
-                                    padding: `${spacing['2']} ${spacing['5']}`,
-                                    background: colors.primary,
-                                    color: colors.bg.surface,
-                                    border: 'none',
-                                    borderRadius: radius.md,
-                                    fontSize: font.size.base,
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                가격·재고 자동 확인 받기
-                            </button>
-                        </div>
                     </div>
                 )}
             </div>
@@ -696,9 +634,9 @@ export const ProductDetailPage: React.FC = () => {
                 isOpen={isEnableModalOpen}
                 onClose={() => setIsEnableModalOpen(false)}
                 onConfirm={handleEnable}
-                title="이 상품에 가격·재고 자동 확인을 등록할까요?"
-                description="매일 쇼핑몰의 가격과 재고를 자동으로 확인해서, 역마진이나 품절이 생기면 알려드려요."
-                confirmText="가격·재고 자동 확인 받기"
+                title="가격·품절 확인을 켤까요?"
+                description={MonitoringEnableDescription}
+                confirmText="켜기"
                 cancelText="취소"
                 type="info"
             />
@@ -706,9 +644,9 @@ export const ProductDetailPage: React.FC = () => {
                 isOpen={isDisableModalOpen}
                 onClose={() => setIsDisableModalOpen(false)}
                 onConfirm={handleDisable}
-                title="가격·재고 자동 확인을 해제할까요?"
-                description="해제하면 쇼핑몰 가격·재고 변동이 더 이상 확인되지 않아요."
-                confirmText="가격·재고 자동 확인 해제"
+                title="가격·품절 확인을 끌까요?"
+                description={MonitoringDisableDescription}
+                confirmText="끄기"
                 cancelText="취소"
             />
             <ConfirmModal
@@ -746,4 +684,140 @@ export const ProductDetailPage: React.FC = () => {
     );
 };
 
+// ── 활동 기록 타임라인 ──────────────────────────────────────────────────────
+
+const EVENT_STYLE: Record<MonitoringEventType, { color: string; bg: string; icon: React.ReactNode }> = {
+    monitoring_started: { color: colors.primary, bg: colors.primaryLight, icon: <Play size={14} /> },
+    price_changed: { color: colors.primary, bg: colors.primaryLight, icon: <TrendingUp size={14} /> },
+    out_of_stock: { color: '#FF9500', bg: '#FFF4E0', icon: <PauseCircle size={14} /> },
+    restocked: { color: colors.success, bg: colors.successLight, icon: <PackageCheck size={14} /> },
+    negative_margin: { color: colors.danger, bg: colors.dangerLight, icon: <AlertTriangle size={14} /> },
+    error: { color: colors.danger, bg: colors.dangerLight, icon: <AlertCircle size={14} /> },
+};
+
+function formatLogDate(iso: string): string {
+    const d = new Date(iso);
+    const yy = String(d.getFullYear()).slice(2);
+    return `${yy}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
+const ITEMS_PER_PAGE = 10;
+
+const ActivityLog: React.FC<{ logs: MonitoringActivityLog[] }> = ({ logs }) => {
+    const [page, setPage] = useState(0);
+    const totalPages = Math.max(1, Math.ceil(logs.length / ITEMS_PER_PAGE));
+    const pageLogs = logs.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+
+    if (logs.length === 0) {
+        return (
+            <div style={{
+                padding: `${spacing['4']} 0`,
+                textAlign: 'center',
+                fontSize: font.size.sm,
+                color: colors.text.muted,
+            }}>
+                아직 활동 기록이 없어요
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            {/* 칼럼 헤더 */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: spacing['3'],
+                padding: `${spacing['2']} 0`,
+                borderBottom: `1px solid ${colors.border.default}`,
+                marginBottom: spacing['1'],
+            }}>
+                <span style={{ width: '32px', flexShrink: 0 }} />
+                <span style={{ flex: 1, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted }}>활동 내역</span>
+                <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, paddingLeft: '8px' }}>날짜</span>
+            </div>
+            {/* 로그 항목 */}
+            <div>
+                {pageLogs.map((log, i) => {
+                    const evStyle = EVENT_STYLE[log.type];
+                    return (
+                        <div key={`${page}-${i}`} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: spacing['3'],
+                            padding: `${spacing['3']} 0`,
+                            borderBottom: i < pageLogs.length - 1 ? `1px solid ${colors.bg.subtle}` : 'none',
+                        }}>
+                            <div style={{
+                                width: '32px', height: '32px',
+                                borderRadius: radius.full,
+                                background: evStyle.bg,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                color: evStyle.color,
+                            }}>
+                                {evStyle.icon}
+                            </div>
+                            <div style={{
+                                flex: 1,
+                                fontSize: font.size.base,
+                                fontWeight: 500,
+                                color: colors.text.primary,
+                                lineHeight: '1.5',
+                                wordBreak: 'keep-all',
+                            }}>
+                                {log.description}
+                            </div>
+                            <span style={{
+                                fontSize: font.size.sm,
+                                color: colors.text.muted,
+                                width: '80px',
+                                flexShrink: 0,
+                                whiteSpace: 'nowrap',
+                                textAlign: 'left',
+                                paddingLeft: '8px',
+                            }}>
+                                {formatLogDate(log.date)}
+                            </span>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* 페이지 번호 */}
+            {totalPages > 1 && (
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: spacing['1'],
+                    paddingTop: spacing['3'],
+                }}>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setPage(i)}
+                            style={{
+                                width: '28px', height: '28px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: page === i ? colors.primary : 'none',
+                                color: page === i ? colors.bg.surface : colors.text.muted,
+                                border: page === i ? 'none' : `1px solid ${colors.border.default}`,
+                                borderRadius: radius.sm,
+                                fontSize: font.size.xs,
+                                fontWeight: page === i ? 700 : 500,
+                                cursor: 'pointer',
+                                transition: 'all 0.15s',
+                            }}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
 
