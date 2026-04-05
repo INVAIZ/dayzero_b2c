@@ -169,7 +169,7 @@ export default function AutoSourcingPage() {
                 createdAt: new Date().toISOString(),
             });
 
-            setSelectedAutoFilter(setting.provider);
+            setSelectedAutoFilter('전체');
         }
 
         navigate('/sourcing');

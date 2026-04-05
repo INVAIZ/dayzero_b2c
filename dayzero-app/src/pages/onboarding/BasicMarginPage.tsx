@@ -178,7 +178,6 @@ export default function BasicMarginPage() {
     const hasForwarderRate = forwarder !== '' && forwarder !== 'other';
     const activeForwarder = hasForwarderRate ? forwarder : '';
 
-    const [showComplete, setShowComplete] = useState(false);
     const [showCalculation, setShowCalculation] = useState(false);
     const [simBaseCost, setSimBaseCost] = useState(15000);
     const [simWeight, setSimWeight] = useState(0.3);
@@ -211,7 +210,7 @@ export default function BasicMarginPage() {
 
     const handleNext = () => {
         if (step < 3) setStep(step + 1);
-        else setShowComplete(true);
+        else transitionTo('/extension-install');
     };
 
     const feeJpy = Math.round(finalPriceJpy * PLATFORM_FEE_RATE);
@@ -705,7 +704,7 @@ export default function BasicMarginPage() {
                             onMouseDown={e => e.currentTarget.style.transform = 'scale(0.98)'}
                             onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
                         >
-                            {step === 3 ? '설정 완료' : '다음'}
+                            다음
                         </button>
                         {step > 1 && (
                             <button
@@ -769,98 +768,6 @@ export default function BasicMarginPage() {
                 </div>
             </OnboardingLayout>
 
-            {/* 완료 화면 */}
-            {showComplete && (
-                <div style={{
-                    position: 'fixed', inset: 0, zIndex: 50,
-                    background: colors.bg.surface,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    animation: 'completeFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                }}>
-                    <style>{`
-                        @keyframes completeFadeIn { from { opacity: 0; } to { opacity: 1; } }
-                        @keyframes riseUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-                        @keyframes checkCircle { to { stroke-dashoffset: 0; } }
-                        @keyframes checkMark { to { stroke-dashoffset: 0; } }
-                    `}</style>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '40px 24px', maxWidth: '440px', width: '100%' }}>
-                        <svg width="72" height="72" viewBox="0 0 72 72" fill="none"
-                            style={{ marginBottom: '32px', animation: 'riseUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both' }}>
-                            <circle cx="36" cy="36" r="33" stroke={colors.primary} strokeWidth="2.5" fill="none"
-                                strokeDasharray="207" strokeDashoffset="207"
-                                style={{ animation: 'checkCircle 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards' }} />
-                            <polyline points="22,36 31,46 50,26" stroke={colors.primary} strokeWidth="3" fill="none"
-                                strokeLinecap="round" strokeLinejoin="round"
-                                strokeDasharray="50" strokeDashoffset="50"
-                                style={{ animation: 'checkMark 0.35s cubic-bezier(0.4, 0, 0.2, 1) 0.6s forwards' }} />
-                        </svg>
-
-                        <h2 style={{
-                            fontSize: '26px', fontWeight: 800, color: colors.text.primary,
-                            margin: '0 0 8px', letterSpacing: '-0.5px',
-                            animation: 'riseUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both',
-                        }}>
-                            기본 설정이 완료됐어요
-                        </h2>
-                        <p style={{
-                            fontSize: font.size.base, color: colors.text.tertiary,
-                            margin: '0 0 40px', lineHeight: font.lineHeight.normal,
-                            animation: 'riseUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both',
-                        }}>
-                            아래 설정은 이후에 언제든 변경할 수 있어요.
-                        </p>
-
-                        <div style={{
-                            width: '100%', border: `1px solid ${colors.bg.subtle}`, borderRadius: radius.xl,
-                            overflow: 'hidden', marginBottom: '32px',
-                            animation: 'riseUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both',
-                        }}>
-                            {[
-                                { label: 'Qoo10 JP 연동', desc: state.storeName || '연동 완료' },
-                                { label: '배송지 및 기본 정보', desc: '출하지 · 반품지 설정 완료' },
-                                { label: '배송비 및 마진', desc: '작업비 · 배송비 · 마진 설정 완료' },
-                            ].map((item, i) => (
-                                <div key={i} style={{
-                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                    padding: `${spacing['3']} ${spacing['5']}`,
-                                    borderTop: i > 0 ? `1px solid ${colors.bg.subtle}` : 'none',
-                                    background: colors.bg.surface,
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'], flexShrink: 0 }}>
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                            <circle cx="8" cy="8" r="8" fill={colors.primaryLight} />
-                                            <polyline points="4.5,8 6.5,10.5 11.5,5.5" stroke={colors.primary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                                        </svg>
-                                        <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary, whiteSpace: 'nowrap' }}>{item.label}</span>
-                                    </div>
-                                    <span style={{ fontSize: font.size.sm, color: colors.text.muted, textAlign: 'right', minWidth: 0, wordBreak: 'keep-all' }}>{item.desc}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        <button
-                            onClick={() => transitionTo('/sourcing')}
-                            style={{
-                                width: '100%', height: '54px',
-                                background: colors.primary, color: colors.bg.surface,
-                                border: 'none', borderRadius: radius.lg,
-                                fontSize: '16px', fontWeight: font.weight.bold,
-                                cursor: 'pointer', letterSpacing: '-0.2px',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: spacing['2'],
-                                transition: 'background 0.15s, transform 0.1s',
-                                animation: 'riseUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both',
-                            }}
-                            onMouseEnter={e => e.currentTarget.style.background = '#1B64DA'}
-                            onMouseLeave={e => e.currentTarget.style.background = colors.primary}
-                            onMouseDown={e => e.currentTarget.style.transform = 'scale(0.98)'}
-                            onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-                        >
-                            수집 시작하기
-                            <ArrowRight size={18} />
-                        </button>
-                    </div>
-                </div>
-            )}
         </>
     );
 }

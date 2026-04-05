@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, LayoutList, PackageOpen, ChevronRight, ChevronDown, Settings } from 'lucide-react';
+import { Search, LayoutList, PackageOpen, ChevronDown, Settings } from 'lucide-react';
 import { useSourcingStore } from '../../store/useSourcingStore';
 import { colors, spacing, radius, font, zIndex as z } from '../../design/tokens';
 
@@ -77,19 +77,18 @@ export const Sidebar: React.FC = () => {
                     style={{
                         display: 'flex', alignItems: 'center', gap: spacing['3'], width: '100%',
                         padding: `${spacing['3']} ${spacing['3']}`,
-                        background: isSourcingActive ? colors.bg.surface : 'transparent',
+                        background: isSourcingActive ? colors.border.default : 'transparent',
                         border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: isSourcingActive ? colors.text.primary : colors.text.tertiary,
-                        fontWeight: isSourcingActive ? 700 : 500, fontSize: font.size.base,
+                        fontWeight: 500, fontSize: font.size.base,
                         transition: 'all 0.2s',
-                        boxShadow: isSourcingActive ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
+                        boxShadow: isSourcingActive ? 'none' : 'none',
                     }}
                     onMouseOver={e => { if (!isSourcingActive) e.currentTarget.style.background = colors.bg.subtle; }}
                     onMouseOut={e => { if (!isSourcingActive) e.currentTarget.style.background = 'transparent'; }}
                 >
                     <Search size={20} color={isSourcingActive ? colors.text.primary : colors.text.muted} />
                     수집하기
-                    {isSourcingActive && <ChevronRight size={16} color={colors.text.disabled} style={{ marginLeft: 'auto' }} />}
                 </button>
 
                 <button
@@ -97,19 +96,18 @@ export const Sidebar: React.FC = () => {
                     style={{
                         display: 'flex', alignItems: 'center', gap: spacing['3'], width: '100%',
                         padding: `${spacing['3']} ${spacing['3']}`,
-                        background: isEditingActive ? colors.bg.surface : 'transparent',
+                        background: isEditingActive ? colors.border.default : 'transparent',
                         border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: isEditingActive ? colors.text.primary : colors.text.tertiary,
-                        fontWeight: isEditingActive ? 700 : 500, fontSize: font.size.base,
+                        fontWeight: 500, fontSize: font.size.base,
                         transition: 'all 0.2s',
-                        boxShadow: isEditingActive ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
+                        boxShadow: isEditingActive ? 'none' : 'none',
                     }}
                     onMouseOver={e => { if (!isEditingActive) e.currentTarget.style.background = colors.bg.subtle; }}
                     onMouseOut={e => { if (!isEditingActive) e.currentTarget.style.background = 'transparent'; }}
                 >
                     <LayoutList size={20} color={isEditingActive ? colors.text.primary : colors.text.muted} />
                     수집된 상품
-                    {isEditingActive && <ChevronRight size={16} color={colors.text.disabled} style={{ marginLeft: 'auto' }} />}
                     {!isEditingActive && unprocessedProductCount > 0 && (
                         <div
                             id="sidebar-badge"
@@ -132,19 +130,18 @@ export const Sidebar: React.FC = () => {
                     style={{
                         display: 'flex', alignItems: 'center', gap: spacing['3'], width: '100%',
                         padding: `${spacing['3']} ${spacing['3']}`,
-                        background: isRegistrationActive ? colors.bg.surface : 'transparent',
+                        background: isRegistrationActive ? colors.border.default : 'transparent',
                         border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: isRegistrationActive ? colors.text.primary : colors.text.tertiary,
-                        fontWeight: isRegistrationActive ? 700 : 500, fontSize: font.size.base,
+                        fontWeight: 500, fontSize: font.size.base,
                         transition: 'all 0.2s',
-                        boxShadow: isRegistrationActive ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
+                        boxShadow: isRegistrationActive ? 'none' : 'none',
                     }}
                     onMouseOver={e => { if (!isRegistrationActive) e.currentTarget.style.background = colors.bg.subtle; }}
                     onMouseOut={e => { if (!isRegistrationActive) e.currentTarget.style.background = 'transparent'; }}
                 >
                     <PackageOpen size={20} color={isRegistrationActive ? colors.text.primary : colors.text.muted} />
                     판매 중인 상품
-                    {isRegistrationActive && <ChevronRight size={16} color={colors.text.disabled} style={{ marginLeft: 'auto' }} />}
                 </button>
 
                 {/* 구분선 */}
@@ -195,15 +192,15 @@ export const Sidebar: React.FC = () => {
                                         style={{
                                             display: 'flex', alignItems: 'center', width: '100%',
                                             padding: `10px ${spacing['3']}`,
-                                            background: active ? colors.bg.surface : 'transparent',
+                                            background: active ? colors.border.default : 'transparent',
                                             border: 'none', borderRadius: radius.md, cursor: 'pointer',
                                             color: active ? colors.text.primary : colors.text.tertiary,
-                                            fontWeight: active ? 700 : 500,
+                                            fontWeight: 500,
                                             fontSize: font.size.base, transition: 'all 0.15s', textAlign: 'left',
-                                            boxShadow: active ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
+                                            boxShadow: active ? 'none' : 'none',
                                         }}
                                         onMouseOver={e => { if (!active) e.currentTarget.style.background = colors.bg.subtle; }}
-                                        onMouseOut={e => { if (!active) e.currentTarget.style.background = active ? colors.bg.surface : 'transparent'; }}
+                                        onMouseOut={e => { if (!active) e.currentTarget.style.background = active ? colors.border.default : 'transparent'; }}
                                     >
                                         {item.label}
                                     </button>

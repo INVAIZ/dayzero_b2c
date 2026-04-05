@@ -32,6 +32,15 @@ export default function SourcingPage() {
         isOpen: false,
         scheduleId: null
     });
+    const [limitModal, setLimitModal] = useState(false);
+
+    const handleAddSchedule = () => {
+        if (schedules.length >= 10) {
+            setLimitModal(true);
+        } else {
+            navigate('/sourcing/auto');
+        }
+    };
 
 
     const handleDrop = (targetId: string) => {
@@ -97,7 +106,7 @@ export default function SourcingPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing['5'] }}>
                     <h2 style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary }}>등록된 자동 수집 목록</h2>
                     {schedules.length > 0 && (
-                        <button onClick={() => navigate('/sourcing/auto')} style={{ background: 'none', color: colors.primary, border: 'none', fontSize: font.size.md, fontWeight: font.weight.semibold, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: spacing['1'] }}>
+                        <button onClick={handleAddSchedule} style={{ background: 'none', color: schedules.length >= 10 ? colors.text.muted : colors.primary, border: 'none', fontSize: font.size.md, fontWeight: font.weight.semibold, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: spacing['1'] }}>
                             + 자동 수집 추가
                         </button>
                     )}
@@ -412,6 +421,17 @@ export default function SourcingPage() {
                 description="삭제된 설정은 복구할 수 없으며, 더 이상 매일 자동으로 상품을 수집하지 않게 됩니다."
                 confirmText="삭제하기"
                 cancelText="취소"
+            />
+
+            <ConfirmModal
+                isOpen={limitModal}
+                onClose={() => setLimitModal(false)}
+                onConfirm={() => setLimitModal(false)}
+                type="info"
+                title="자동 수집 한도에 도달했어요"
+                description={<>자동 수집은 최대 <strong>10건</strong>까지 등록할 수 있어요.<br />기존 자동 수집을 삭제한 후 새로 추가해 주세요.</>}
+                confirmText="확인"
+                cancelText="닫기"
             />
 
         </MainLayout>

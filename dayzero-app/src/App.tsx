@@ -3,6 +3,7 @@ import LoginPage from './pages/auth/LoginPage';
 import BasicInfoPage from './pages/onboarding/BasicInfoPage';
 import Qoo10ConnectPage from './pages/onboarding/Qoo10ConnectPage';
 import BasicMarginPage from './pages/onboarding/BasicMarginPage';
+import ExtensionInstallPage from './pages/onboarding/ExtensionInstallPage';
 import SourcingPage from './pages/SourcingPage';
 import UrlSourcingPage from './pages/sourcing/UrlSourcingPage';
 import AutoSourcingPage from './pages/sourcing/AutoSourcingPage';
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
   { path: '/basic-info', element: <BasicInfoPage /> },
   { path: '/qoo10-connect', element: <Qoo10ConnectPage /> },
   { path: '/basic-margin', element: <BasicMarginPage /> },
+  { path: '/extension-install', element: <ExtensionInstallPage /> },
 
   // Sourcing
   { path: '/sourcing', element: <SourcingPage /> },

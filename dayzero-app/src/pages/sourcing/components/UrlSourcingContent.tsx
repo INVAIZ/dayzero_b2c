@@ -1,22 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SOURCING_PROVIDERS, MOCK_URL_TO_PROVIDER } from '../../../types/sourcing';
-import type { SourcingProvider, SourcedProduct } from '../../../types/sourcing';
+import type { SourcedProduct, ParsedUrl } from '../../../types/sourcing';
 import { useSourcingStore } from '../../../store/useSourcingStore';
 import { useEditingStore } from '../../../store/useEditingStore';
 
 import { Link2, AlertCircle, Loader2, CheckCircle2, XCircle, ArrowRight, X } from 'lucide-react';
 import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
 import { colors, font, radius, spacing } from '../../../design/tokens';
-
-interface ParsedUrl {
-    id: string;
-    url: string;
-    provider: SourcingProvider | null;
-    status: 'idle' | 'running' | 'completed' | 'failed';
-    error?: string;
-    product?: SourcedProduct;
-}
 
 export const UrlSourcingContent = () => {
     const navigate = useNavigate();
@@ -62,9 +53,10 @@ export const UrlSourcingContent = () => {
     }, [urls, collectionStarted]);
 
     const validCount = parsedUrls.filter(p => !p.error).length;
-    const completedCount = parsedUrls.filter(p => p.status === 'completed' || p.status === 'failed').length;
+    const completedCount = parsedUrls.filter(p => p.status === 'completed' || p.status === 'failed' || p.status === 'blocked').length;
     const isAllCompleted = collectionStarted && completedCount === parsedUrls.length;
     const successCount = parsedUrls.filter(p => p.status === 'completed').length;
+    const blockedCount = parsedUrls.filter(p => p.status === 'blocked').length;
 
     const handleStartCollection = async () => {
         if (validCount === 0) return;
@@ -92,6 +84,9 @@ export const UrlSourcingContent = () => {
             ? validIndices[Math.floor(Math.random() * validIndices.length)]
             : -1;
 
+        // 판매 중 차단 시뮬레이션: 유효 URL이 2건 이상이면 마지막 1건을 차단
+        const blockedIdx = validIndices.length >= 2 ? validIndices[validIndices.length - 1] : -1;
+
         for (let i = 0; i < urlsSnapshot.length; i++) {
             const current = urlsSnapshot[i];
             if (current.error) continue;
@@ -100,9 +95,33 @@ export const UrlSourcingContent = () => {
 
             await new Promise(resolve => setTimeout(resolve, 2500 + Math.random() * 2500));
 
-            const isSuccess = true;
+            // 판매 중 차단 처리
+            if (i === blockedIdx) {
+                const blockedTitle = current.provider === '올리브영'
+                    ? '[단독기획] 닥터지 레드 블레미쉬 클리어 수딩 크림 70ml'
+                    : current.provider === '쿠팡'
+                        ? '퍼실 파워젤 세탁세제 리필 2.7L 3개'
+                        : '다이소 미니 선풍기 USB 충전식';
+                const blockedProduct: SourcedProduct = {
+                    id: `prod-blocked-${Date.now()}-${i}`,
+                    jobId: notifId,
+                    provider: current.provider || ('기타' as any),
+                    title: blockedTitle,
+                    thumbnailUrl: 'https://via.placeholder.com/300/F5F6F8/8B95A1?text=Product',
+                    originalPriceKrw: Math.floor(Math.random() * 20000) + 10000,
+                    optionCount: 1,
+                    sourceUrl: current.url,
+                    translationStatus: 'pending',
+                    qoo10Category: null,
+                    editStatus: 'pending',
+                };
+                setParsedUrls(prev => prev.map(p =>
+                    p.id === current.id ? { ...p, status: 'blocked', product: blockedProduct } : p
+                ));
+                updateNotification(notifId, { currentCount: successProcessed });
+                continue;
+            }
 
-            if (isSuccess) {
                 const kpopProviders = ['알라딘', 'Ktown4u', '케이타운포유', 'YES24', '메이크스타', '위버스샵', 'Weverse Shop', 'FANS', '팬스'];
                 const isKpop = kpopProviders.some(p => (current.provider || '').toLowerCase().includes(p.toLowerCase()));
 
@@ -284,11 +303,6 @@ export const UrlSourcingContent = () => {
                 ));
 
                 successProcessed++;
-            } else {
-                setParsedUrls(prev => prev.map(p =>
-                    p.id === current.id ? { ...p, status: 'failed', error: '제품의 상세 페이지 주소가 아닐 수 있어요. 상세 페이지에서 URL을 다시 복사해주세요.' } : p
-                ));
-            }
 
             updateNotification(notifId, { currentCount: successProcessed });
         }
@@ -357,13 +371,81 @@ export const UrlSourcingContent = () => {
         window.open(p.url, '_blank');
     };
 
+    const [extInstalled, setExtInstalled] = useState(() => sessionStorage.getItem('ext_installed') === 'true');
+
     return (
         <div style={{ animation: 'fadeInUp 0.4s ease', position: 'relative' }}>
+            {/* 수집 프로그램 상태 콜아웃 */}
+            {!collectionStarted && (
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: extInstalled ? colors.bg.info : colors.bg.faint,
+                        border: `1px solid ${extInstalled ? colors.primaryLightBorder : colors.border.default}`,
+                        borderRadius: radius.lg,
+                        padding: `${spacing['3']} ${spacing['5']}`,
+                        marginBottom: spacing['5'],
+                        gap: spacing['4'],
+                    }}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'], flex: 1 }}>
+                        <div style={{
+                            width: '28px', height: '28px', borderRadius: radius.full,
+                            background: extInstalled ? colors.primaryLight : colors.bg.subtle,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        }}>
+                            {extInstalled ? (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            ) : (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.text.muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                            )}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
+                            <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary }}>
+                                {extInstalled ? '수집 프로그램이 설치되어 있어요' : '수집 프로그램 미설치'}
+                            </span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.medium, color: colors.text.tertiary, lineHeight: font.lineHeight.normal }}>
+                                {extInstalled
+                                    ? '지원 쇼핑몰에서 상품을 둘러보면서 클릭 한 번으로 목록에 추가할 수 있어요'
+                                    : '프로그램을 설치하면 URL 복사 없이 쇼핑몰에서 바로 상품을 담을 수 있어요'
+                                }
+                            </span>
+                        </div>
+                    </div>
+                    {!extInstalled && (
+                        <button
+                            onClick={() => {
+                                window.open('https://chromewebstore.google.com/', '_blank');
+                                sessionStorage.setItem('ext_installed', 'true');
+                                setExtInstalled(true);
+                            }}
+                            style={{
+                                background: 'none', color: colors.text.tertiary,
+                                border: 'none', padding: 0,
+                                fontSize: font.size.sm, fontWeight: font.weight.semibold,
+                                cursor: 'pointer', whiteSpace: 'nowrap',
+                                textDecoration: 'none',
+                            }}
+                        >
+                            + 설치하기
+                        </button>
+                    )}
+                </div>
+            )}
+
             {/* Input Area */}
             {!collectionStarted && (
                 <div style={{ background: colors.bg.surface, borderRadius: radius.xl, border: `1px solid ${colors.border.default}`, padding: spacing['6'], marginBottom: spacing['6'], boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: spacing['2'] }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>{urls.length > 0 ? `수집할 URL 목록 (${urls.length}개)` : '수집할 URL 목록'}</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>{`수집할 URL 목록 (최대 20개)`}</span>
                     </div>
                     <div
                         onClick={() => inputRef.current?.focus()}
@@ -565,7 +647,10 @@ export const UrlSourcingContent = () => {
                                 {isCollecting ? '상품 정보를 수집하고 있어요' : '수집이 완료됐어요'}
                             </h2>
                             <span style={{ fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.primary }}>
-                                {completedCount} / {parsedUrls.length}건 완료
+                                {isAllCompleted && blockedCount > 0
+                                    ? `${successCount}건 수집 완료, ${blockedCount}건 판매 중 제외`
+                                    : `${completedCount} / ${parsedUrls.length}건 완료`
+                                }
                             </span>
                         </div>
                         <div style={{ width: '100%', height: '8px', background: colors.bg.subtle, borderRadius: radius.xs, overflow: 'hidden' }}>
@@ -591,8 +676,9 @@ export const UrlSourcingContent = () => {
                                     gap: spacing['4'],
                                     padding: spacing['4'],
                                     borderRadius: radius.lg,
-                                    background: item.status === 'failed' ? colors.dangerBg : colors.bg.page,
+                                    background: item.status === 'failed' ? colors.dangerBg : item.status === 'blocked' ? colors.bg.subtle : colors.bg.page,
                                     border: `1px solid ${item.status === 'failed' ? colors.dangerLight : colors.border.default}`,
+                                    opacity: item.status === 'blocked' ? 0.75 : 1,
                                     transition: 'all 0.3s ease'
                                 }}
                             >
@@ -608,6 +694,14 @@ export const UrlSourcingContent = () => {
                                         </div>
                                     )}
                                     {item.status === 'failed' && <XCircle size={20} color={colors.danger} />}
+                                    {item.status === 'blocked' && (
+                                        <div style={{ width: 20, height: 20, borderRadius: radius.full, border: `1.5px solid ${colors.text.muted}`, display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.bg.subtle }}>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={colors.text.muted} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Content */}
@@ -626,11 +720,18 @@ export const UrlSourcingContent = () => {
 
                                     {item.product ? (() => {
                                         return (
-                                            <div style={{ fontSize: font.size.sm, color: colors.text.secondary, display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                                                <span style={{ color: colors.text.muted }}>원가</span>
-                                                <span style={{ fontWeight: font.weight.semibold }}>₩{item.product.originalPriceKrw.toLocaleString()}</span>
-                                                <span style={{ color: colors.border.default, margin: '0 4px' }}>|</span>
-                                                <span style={{ color: colors.text.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '240px' }}>{item.url}</span>
+                                            <div style={{ fontSize: font.size.sm, color: colors.text.secondary, display: 'flex', flexDirection: 'column', gap: spacing['1'] }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                                                    <span style={{ color: colors.text.muted }}>원가</span>
+                                                    <span style={{ fontWeight: font.weight.semibold }}>₩{item.product.originalPriceKrw.toLocaleString()}</span>
+                                                    <span style={{ color: colors.border.default, margin: '0 4px' }}>|</span>
+                                                    <span style={{ color: colors.text.muted, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '240px' }}>{item.url}</span>
+                                                </div>
+                                                {item.status === 'blocked' && (
+                                                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.muted }}>
+                                                        이미 판매 중인 상품입니다
+                                                    </span>
+                                                )}
                                             </div>
                                         );
                                     })() : (

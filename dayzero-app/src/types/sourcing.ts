@@ -45,7 +45,7 @@ export interface ParsedUrl {
     id: string;
     url: string;
     provider: SourcingProvider | null;
-    status: 'idle' | 'running' | 'completed' | 'failed';
+    status: 'idle' | 'running' | 'completed' | 'failed' | 'blocked';
     error?: string;
     product?: SourcedProduct;
 }

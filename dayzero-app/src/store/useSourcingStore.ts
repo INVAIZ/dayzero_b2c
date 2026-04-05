@@ -91,7 +91,7 @@ export const useSourcingStore = create<SourcingState>()(
                 jobs: state.jobs.map((job) => job.id === id ? { ...job, ...updates } : job)
             })),
 
-            addSchedule: (schedule) => set((state) => ({ schedules: [...state.schedules, schedule] })),
+            addSchedule: (schedule) => set((state) => ({ schedules: [schedule, ...state.schedules] })),
 
             updateSchedule: (id, updates) => set((state) => ({
                 schedules: state.schedules.map((s) => s.id === id ? { ...s, ...updates } : s)
