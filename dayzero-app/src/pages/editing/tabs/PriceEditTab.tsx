@@ -48,10 +48,6 @@ const calcRowStyle: React.CSSProperties = {
     padding: '11px 0',
 };
 
-const subAmountStyle: React.CSSProperties = {
-    fontSize: font.size['2xs+'], color: colors.text.muted, marginTop: '1px',
-};
-
 const KSE_RATES: [number, number][] = [
     [0.10, 490], [0.25, 560], [0.50, 620], [0.75, 700],
     [1.00, 750], [1.25, 780], [1.50, 830], [1.75, 880],
@@ -438,7 +434,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
     const settlementJpy = salePriceJpy - qoo10FeeJpy;
     const profitJpy = settlementJpy - totalCostJpy;
     const profitKrw = Math.round(profitJpy * EXCHANGE_RATE);
-    const effectiveMarginPct = settlementJpy > 0 ? Math.round(profitJpy / settlementJpy * 100) : 0;
+
     const isProfit = profitKrw > 0;
 
     // ── 확인 모달 내용 ───────────────────────────────────────────────────
@@ -893,7 +889,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                 }}>
                     <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
                         <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>1건 판매 시 순이익</span>
-                        <span style={{ fontSize: font.size.lg, fontWeight: 700, color: isProfit ? colors.successDark : colors.danger }}>
+                        <span style={{ fontSize: font.size.base, fontWeight: 700, color: isProfit ? colors.successDark : colors.danger }}>
                             {isProfit ? '+' : '−'}₩{Math.abs(profitKrw).toLocaleString()}
                         </span>
                     </div>

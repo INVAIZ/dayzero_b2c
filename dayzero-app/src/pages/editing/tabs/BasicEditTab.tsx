@@ -352,83 +352,86 @@ const OptionRow: React.FC<{
 }> = ({ option, imageUrl, isTranslating, onChange, onDelete }) => {
     const [confirmOpen, setConfirmOpen] = useState(false);
     const needsTranslation = hasKorean(option.nameKo);
-    const hasNameJa = !isTranslating && (!!option.nameJa || !needsTranslation);
+    const nameJaHasKorean = !!option.nameJa && hasKorean(option.nameJa);
+    const hasNameJa = !isTranslating && (!!option.nameJa || !needsTranslation) && !nameJaHasKorean;
 
     return (
-        <div style={{
-            display: 'grid', gridTemplateColumns: '44px 1fr 90px 36px',
-            alignItems: 'center', gap: spacing['3'],
-            paddingBottom: spacing['3'],
-            marginBottom: spacing['3'],
-            borderBottom: `1px solid ${colors.border.default}`,
-        }}>
-            <img src={imageUrl} alt=""
-                onError={handleImgError}
-                style={{
-                    width: '44px', height: '44px',
-                    borderRadius: radius.md, objectFit: 'cover',
-                    border: `1px solid ${colors.border.default}`, flexShrink: 0,
-                }} />
+        <div style={{ paddingBottom: spacing['3'], marginBottom: spacing['3'], borderBottom: `1px solid ${colors.border.default}` }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '44px 1fr 90px 36px', alignItems: 'center', gap: spacing['3'] }}>
+                <img src={imageUrl} alt=""
+                    onError={handleImgError}
+                    style={{
+                        width: '44px', height: '44px',
+                        borderRadius: radius.md, objectFit: 'cover',
+                        border: `1px solid ${colors.border.default}`, flexShrink: 0,
+                    }} />
 
-            {/* 옵션명 */}
-            <div style={{ minWidth: 0 }}>
-                {isTranslating ? (
-                    <div style={{
-                        ...inputBase,
-                        display: 'flex', alignItems: 'center', gap: '6px',
-                        background: colors.primaryLight,
-                        borderColor: colors.primaryBorder,
-                    }}>
-                        <Loader2 size={13} color={colors.primary} className="spin" style={{ flexShrink: 0 }} />
-                        <span className="ai-processing" style={{ fontWeight: 500 }}>번역하고 있어요...</span>
-                    </div>
-                ) : (
-                    <input
-                        key={option.nameJa ? 'ja' : 'empty'}
-                        className={option.nameJa ? 'content-fade-in' : undefined}
-                        value={option.nameJa ?? ''}
-                        onChange={e => onChange('nameJa', e.target.value)}
-                        placeholder={option.nameKo || '옵션명 입력'}
-                        style={{ ...inputBase, ...(!hasNameJa ? warningBorderStyle : {}) }}
-                        onFocus={handleWarningFocus}
-                        onBlur={createWarningBlur(hasNameJa)}
-                    />
-                )}
+                {/* 옵션명 */}
+                <div style={{ minWidth: 0 }}>
+                    {isTranslating ? (
+                        <div style={{
+                            ...inputBase,
+                            display: 'flex', alignItems: 'center', gap: '6px',
+                            background: colors.primaryLight,
+                            borderColor: colors.primaryBorder,
+                        }}>
+                            <Loader2 size={13} color={colors.primary} className="spin" style={{ flexShrink: 0 }} />
+                            <span className="ai-processing" style={{ fontWeight: 500 }}>번역하고 있어요...</span>
+                        </div>
+                    ) : (
+                        <input
+                            key={option.nameJa ? 'ja' : 'empty'}
+                            className={option.nameJa ? 'content-fade-in' : undefined}
+                            value={option.nameJa ?? ''}
+                            onChange={e => onChange('nameJa', e.target.value)}
+                            placeholder={option.nameKo || '옵션명 입력'}
+                            style={{ ...inputBase, ...(!hasNameJa ? warningBorderStyle : {}) }}
+                            onFocus={handleWarningFocus}
+                            onBlur={createWarningBlur(hasNameJa)}
+                        />
+                    )}
+                </div>
+
+                <input
+                    type="number" min={0}
+                    value={option.stock}
+                    onChange={e => onChange('stock', Number(e.target.value))}
+                    className="stock-input"
+                    style={{ ...inputBase, textAlign: 'left' }}
+                    onFocus={e => (e.target.style.borderColor = colors.primary)}
+                    onBlur={e => (e.target.style.borderColor = colors.border.default)}
+                />
+
+                <button
+                    onClick={() => setConfirmOpen(true)}
+                    style={{
+                        ...ghostButtonBase,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: colors.text.muted, borderRadius: radius.sm,
+                        padding: '6px', width: '100%', transition: 'color 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.color = colors.danger)}
+                    onMouseLeave={e => (e.currentTarget.style.color = colors.text.muted)}
+                >
+                    <Trash2 size={14} />
+                </button>
+
+                <ConfirmModal
+                    isOpen={confirmOpen}
+                    onClose={() => setConfirmOpen(false)}
+                    onConfirm={onDelete}
+                    title="옵션을 삭제할까요?"
+                    description={`"${option.nameKo || option.nameJa || '이 옵션'}"을 삭제하면 복구할 수 없습니다.`}
+                    confirmText="삭제하기"
+                    cancelText="취소"
+                />
             </div>
-
-            <input
-                type="number" min={0}
-                value={option.stock}
-                onChange={e => onChange('stock', Number(e.target.value))}
-                className="stock-input"
-                style={{ ...inputBase, textAlign: 'left' }}
-                onFocus={e => (e.target.style.borderColor = colors.primary)}
-                onBlur={e => (e.target.style.borderColor = colors.border.default)}
-            />
-
-            <button
-                onClick={() => setConfirmOpen(true)}
-                style={{
-                    ...ghostButtonBase,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: colors.text.muted, borderRadius: radius.sm,
-                    padding: '6px', width: '100%', transition: 'color 0.15s',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = colors.danger)}
-                onMouseLeave={e => (e.currentTarget.style.color = colors.text.muted)}
-            >
-                <Trash2 size={14} />
-            </button>
-
-            <ConfirmModal
-                isOpen={confirmOpen}
-                onClose={() => setConfirmOpen(false)}
-                onConfirm={onDelete}
-                title="옵션을 삭제할까요?"
-                description={`"${option.nameKo || option.nameJa || '이 옵션'}"을 삭제하면 복구할 수 없습니다.`}
-                confirmText="삭제하기"
-                cancelText="취소"
-            />
+            {!isTranslating && nameJaHasKorean && (
+                <p style={{ margin: `${spacing['1']} 0 0`, paddingLeft: '56px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: font.size.xs, color: colors.warningIcon }}>
+                    <Info size={11} style={{ flexShrink: 0 }} />
+                    한국어가 포함되어 있어요. 한국어를 지우거나 번역해 주세요.
+                </p>
+            )}
         </div>
     );
 };
@@ -468,6 +471,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
 
     const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const composingRef = useRef(false);
     const titleRef = useRef(titleJa);
     const descRef = useRef(descJa);
     const optionsRef = useRef(options);
@@ -511,7 +515,11 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
     // 외부(일괄 번역 등)에서 store가 변경됐을 때 로컬 상태 동기화
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
-        setTitleJa(product.titleJa ? stripPrefix(product.titleJa) : stripPrefix(product.titleKo));
+        if (composingRef.current) return;
+        const incoming = product.titleJa ? stripPrefix(product.titleJa) : stripPrefix(product.titleKo);
+        if (incoming !== titleRef.current) {
+            setTitleJa(incoming);
+        }
     }, [product.titleJa]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -521,7 +529,8 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
-        if (product.descriptionJa) {
+        if (composingRef.current) return;
+        if (product.descriptionJa && product.descriptionJa !== descRef.current) {
             setDescJa(product.descriptionJa);
             setDescMode('ja');
         }
@@ -596,11 +605,16 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
 
     const handleTranslateOptions = () => {
         if (options.length === 0) return;
-        const ids = new Set(options.map(o => o.id));
+        const targets = options.filter(o => {
+            if (o.nameJa && !hasKorean(o.nameJa)) return false;
+            if (!hasKorean(o.nameKo) && !o.nameJa) return false;
+            return true;
+        });
+        if (targets.length === 0) return;
+        const ids = new Set(targets.map(o => o.id));
         setTranslatingOptionIds(ids);
-        const snapshot = [...options];
         let cumulativeDelay = 0;
-        snapshot.forEach((opt, i) => {
+        targets.forEach((opt, i) => {
             cumulativeDelay += 1200 + Math.random() * 600;
             const delay = cumulativeDelay;
             setTimeout(() => {
@@ -611,12 +625,10 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                     next.delete(opt.id);
                     return next;
                 });
-                // 마지막 옵션 완료 시 즉시 저장 (ref 동기화 지연 우회)
-                if (i === snapshot.length - 1) {
-                    const translatedOptions = snapshot.map(o => ({
-                        ...o,
-                        nameJa: mockTranslateOpt(o.nameKo),
-                    }));
+                // 마지막 대상 완료 시 즉시 저장 (ref 동기화 지연 우회)
+                if (i === targets.length - 1) {
+                    const targetIds = new Set(targets.map(o => o.id));
+                    const translatedOptions = options.map(o => targetIds.has(o.id) ? { ...o, nameJa: mockTranslateOpt(o.nameKo) } : o);
                     updateProduct(product.id, { options: translatedOptions });
                 }
             }, delay);
@@ -632,7 +644,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
 
         const currentHasJaTitle = !!titleRef.current && titleRef.current !== stripPrefix(product.titleKo) && !hasKorean(titleRef.current);
         const currentOptions = optionsRef.current;
-        const currentAllOptionsDone = currentOptions.length === 0 || currentOptions.every(o => !!o.nameJa || !hasKorean(o.nameKo));
+        const currentAllOptionsDone = currentOptions.length === 0 || currentOptions.every(o => (!!o.nameJa && !hasKorean(o.nameJa)) || !hasKorean(o.nameKo));
         const currentDescJa = descRef.current;
         const currentIsDescDone = !!currentDescJa && !hasKorean(currentDescJa);
         const total = [!currentHasJaTitle, !currentAllOptionsDone && currentOptions.length > 0, !currentIsDescDone].filter(Boolean).length;
@@ -665,11 +677,16 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
             setBatchStep(step);
             setBatchStepLabel('상품 옵션을 번역하고 있어요...');
             await new Promise<void>(resolve => {
-                const ids = new Set(currentOptions.map(o => o.id));
+                const targets = currentOptions.filter(o => {
+                    if (o.nameJa && !hasKorean(o.nameJa)) return false;
+                    if (!hasKorean(o.nameKo) && !o.nameJa) return false;
+                    return true;
+                });
+                if (targets.length === 0) { resolve(); return; }
+                const ids = new Set(targets.map(o => o.id));
                 setTranslatingOptionIds(ids);
-                const snapshot = [...currentOptions];
                 let cumulativeDelay = 0;
-                snapshot.forEach((opt, i) => {
+                targets.forEach((opt, i) => {
                     cumulativeDelay += 1200 + Math.random() * 600;
                     const delay = cumulativeDelay;
                     setTimeout(() => {
@@ -680,11 +697,9 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                             next.delete(opt.id);
                             return next;
                         });
-                        if (i === snapshot.length - 1) {
-                            const translatedOptions = snapshot.map(o => ({
-                                ...o,
-                                nameJa: mockTranslateOpt(o.nameKo),
-                            }));
+                        if (i === targets.length - 1) {
+                            const targetIds = new Set(targets.map(o => o.id));
+                            const translatedOptions = currentOptions.map(o => targetIds.has(o.id) ? { ...o, nameJa: mockTranslateOpt(o.nameKo) } : o);
                             updateProduct(product.id, { options: translatedOptions });
                             resolve();
                         }
@@ -764,7 +779,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
         product.thumbnails[idx]?.url ?? product.thumbnailUrl;
 
     const isTranslatingAnyOption = translatingOptionIds.size > 0;
-    const allOptionsDone = options.length === 0 || options.every(o => !!o.nameJa || !hasKorean(o.nameKo));
+    const allOptionsDone = options.length === 0 || options.every(o => (!!o.nameJa && !hasKorean(o.nameJa)) || !hasKorean(o.nameKo));
     const titleJaHasKorean = hasKorean(titleJa);
     const descJaHasKorean = hasKorean(descJa);
     const hasJaTitle = !!titleJa && titleJa !== stripPrefix(product.titleKo) && !titleJaHasKorean;
@@ -1078,10 +1093,10 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                         }
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                        {saveSection === 'title' && saveStatus === 'saving' && (
+                        {!hideProgress && saveSection === 'title' && saveStatus === 'saving' && (
                             <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>저장 중...</span>
                         )}
-                        {saveSection === 'title' && saveStatus === 'saved' && (
+                        {!hideProgress && saveSection === 'title' && saveStatus === 'saved' && (
                             <span style={{ fontSize: font.size.xs, color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>
                         )}
                         <div
@@ -1138,11 +1153,12 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                         </div>
                     ) : (
                         <input
-                            key={hasJaTitle ? 'ja' : 'empty'}
                             className={hasJaTitle ? 'content-fade-in' : undefined}
                             type="text"
                             value={titleJa}
-                            onChange={e => { setTitleJa(e.target.value); triggerSave('title'); }}
+                            onChange={e => { setTitleJa(e.target.value); if (!composingRef.current) triggerSave('title'); }}
+                            onCompositionStart={() => { composingRef.current = true; }}
+                            onCompositionEnd={e => { composingRef.current = false; setTitleJa((e.target as HTMLInputElement).value); triggerSave('title'); }}
                             placeholder={titleJa ? '일본어 상품명을 수정하세요' : 'AI 번역 버튼을 눌러 자동 번역하거나 직접 입력하세요'}
                             style={{ ...inputBase, ...(!hasJaTitle ? warningBorderStyle : {}) }}
                             onFocus={handleWarningFocus}
@@ -1152,7 +1168,9 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                     {!hasJaTitle && (
                         <p style={{ margin: `${spacing['1']} 0 0`, display: 'flex', alignItems: 'center', gap: '4px', fontSize: font.size.xs, color: colors.warningIcon }}>
                             <Info size={12} style={{ flexShrink: 0 }} />
-                            현재 한국어 원본이에요. AI 번역 버튼을 누르면 일본어로 번역하고, Qoo10 가이드라인에 맞게 자동 수정해 드려요.
+                            {titleJaHasKorean && product.translationStatus === 'completed'
+                                ? '한국어가 포함되어 있어요. 한국어를 지우거나 AI 번역 버튼을 눌러 번역해 주세요.'
+                                : '현재 한국어 원본이에요. AI 번역 버튼을 누르면 일본어로 번역하고, Qoo10 가이드라인에 맞게 자동 수정해 드려요.'}
                         </p>
                     )}
                 </div>
@@ -1175,10 +1193,10 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                         </span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                        {saveSection === 'options' && saveStatus === 'saving' && (
+                        {!hideProgress && saveSection === 'options' && saveStatus === 'saving' && (
                             <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>저장 중...</span>
                         )}
-                        {saveSection === 'options' && saveStatus === 'saved' && (
+                        {!hideProgress && saveSection === 'options' && saveStatus === 'saved' && (
                             <span style={{ fontSize: font.size.xs, color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>
                         )}
                     <div
@@ -1274,10 +1292,10 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                         }
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                        {saveSection === 'desc' && saveStatus === 'saving' && (
+                        {!hideProgress && saveSection === 'desc' && saveStatus === 'saving' && (
                             <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>저장 중...</span>
                         )}
-                        {saveSection === 'desc' && saveStatus === 'saved' && (
+                        {!hideProgress && saveSection === 'desc' && saveStatus === 'saved' && (
                             <span style={{ fontSize: font.size.xs, color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>
                         )}
                         <AIButton loading={isWritingDesc} onClick={handleWriteDesc} label={hasDescContent ? 'AI 재작성' : 'AI 작성'} loadingLabel="작성 중..." icon={<PenLine size={13} />} />
@@ -1355,9 +1373,11 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                 if (descMode === 'ko') {
                                     setDescKo(e.target.value);
                                 } else {
-                                    if (e.target.value.length <= MAX_DESC) { setDescJa(e.target.value); triggerSave('desc'); }
+                                    if (e.target.value.length <= MAX_DESC) { setDescJa(e.target.value); if (!composingRef.current) triggerSave('desc'); }
                                 }
                             }}
+                            onCompositionStart={() => { composingRef.current = true; }}
+                            onCompositionEnd={e => { composingRef.current = false; if (descMode === 'ja') { setDescJa((e.target as HTMLTextAreaElement).value); triggerSave('desc'); } }}
                             placeholder={
                                 descMode === 'ko' ? '수정 후 AI 번역 버튼을 눌러 일본어로 변환하세요' :
                                 product.translationStatus === 'completed' ? '일본어 상세설명을 수정하세요' :
@@ -1384,7 +1404,9 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 {hasDescContent && !isDescDone && !isWritingDesc && !isTranslatingDesc && (
                     <p style={{ margin: `${spacing['1']} 0 0`, display: 'flex', alignItems: 'flex-start', gap: '4px', fontSize: font.size.xs, color: colors.warningIcon }}>
                         <Info size={12} style={{ flexShrink: 0, marginTop: '1px' }} />
-                        한국어 초안이에요. AI 번역 버튼을 눌러 일본어로 변환하세요.
+                        {descJaHasKorean && product.translationStatus === 'completed'
+                            ? '한국어가 포함되어 있어요. 한국어를 지우거나 AI 번역 버튼을 눌러 번역해 주세요.'
+                            : '한국어 초안이에요. AI 번역 버튼을 눌러 일본어로 변환하세요.'}
                     </p>
                 )}
             </div>

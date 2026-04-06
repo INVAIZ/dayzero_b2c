@@ -101,7 +101,10 @@ export const ProductListItem: React.FC<Props> = ({
     const titleDone = !!product.titleJa && !hasKorean(product.titleJa);
     const optionsDone = product.options.length === 0 || product.options.every(o => !!o.nameJa || !hasKorean(o.nameKo));
     const descDone = !!product.descriptionJa;
+    const thumbnailDone = product.thumbnailTranslated;
+    const detailPageDone = product.detailPageTranslated;
     const allDone = titleDone && optionsDone && descDone;
+    const allFullyDone = allDone && thumbnailDone && detailPageDone;
     const displayTitle = product.titleJa
         ? stripPrefix(product.titleJa)
         : stripPrefix(product.titleKo);
@@ -243,47 +246,79 @@ export const ProductListItem: React.FC<Props> = ({
                 </div>
                 {/* 남은 할 일 칩 (미완료 항목만 표시) */}
                 {!isProcessing && (() => {
-                    if (allDone) {
-                        return (
-                            <div style={{ display: 'flex', marginTop: '5px', paddingLeft: '26px' }}>
-                                <span style={{
-                                    display: 'inline-flex', alignItems: 'center', gap: '3px',
-                                    padding: '2px 8px', borderRadius: radius.full,
-                                    fontSize: font.size.xs, fontWeight: 600,
-                                    background: colors.successLight, color: colors.success,
-                                }}>
-                                    <Check size={10} strokeWidth={3} />
-                                    등록 준비 완료
-                                </span>
-                            </div>
-                        );
-                    }
-                    const allItems = [
-                        { label: '상품명 번역', done: titleDone },
-                        { label: '옵션 번역', done: optionsDone },
-                        { label: '상세설명 작성 및 번역', done: descDone },
+                    const requiredItems = [
+                        { label: '상품명 번역', done: titleDone, required: true },
+                        { label: '옵션 번역', done: optionsDone, required: true },
+                        { label: '상세설명 작성 및 번역', done: descDone, required: true },
                     ];
+                    const optionalItems = [
+                        { label: '썸네일 이미지 번역', done: thumbnailDone, required: false },
+                        { label: '상세페이지 번역', done: detailPageDone, required: false },
+                    ];
+                    const tooltipTitle = allFullyDone
+                        ? '모든 편집이 완료되었어요!'
+                        : allDone
+                            ? '필수 편집은 완료! 추가 편집도 가능해요.'
+                            : '등록하기 전에 편집이 필요해요.';
                     const tooltipContent = (
-                        <div style={{ minWidth: '210px' }}>
+                        <div style={{ minWidth: '230px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: font.size.sm, fontWeight: 700, marginBottom: '10px' }}>
                                 <Info size={13} style={{ flexShrink: 0 }} />
-                                등록하기 전에 편집이 필요해요.
+                                {tooltipTitle}
                             </div>
-                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {allItems.map(item => (
-                                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-                                        <span style={{ fontSize: font.size.xs, fontWeight: 500, color: item.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)', whiteSpace: 'nowrap' }}>
-                                            {item.label}
-                                        </span>
+                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                {requiredItems.map(item => (
+                                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <span style={{
+                                                fontSize: '10px', fontWeight: 700, color: colors.primary,
+                                                background: 'rgba(49,130,246,0.15)', padding: '1px 5px',
+                                                borderRadius: '3px', flexShrink: 0,
+                                            }}>필수</span>
+                                            <span style={{ fontSize: font.size.xs, fontWeight: 500, color: item.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)', whiteSpace: 'nowrap' }}>
+                                                {item.label}
+                                            </span>
+                                        </div>
                                         {item.done
                                             ? <Check size={12} strokeWidth={2.5} color={colors.success} style={{ flexShrink: 0 }} />
                                             : <AlertCircle size={12} strokeWidth={2} color={colors.warningIcon} style={{ flexShrink: 0 }} />
                                         }
                                     </div>
                                 ))}
+                                <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '4px 0' }} />
+                                {optionalItems.map(item => (
+                                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                                        <span style={{ fontSize: font.size.xs, fontWeight: 500, color: item.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.65)', whiteSpace: 'nowrap' }}>
+                                            {item.label}
+                                        </span>
+                                        {item.done
+                                            ? <Check size={12} strokeWidth={2.5} color={colors.success} style={{ flexShrink: 0 }} />
+                                            : <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '1.5px solid rgba(255,255,255,0.3)', flexShrink: 0 }} />
+                                        }
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     );
+                    if (allDone) {
+                        return (
+                            <div style={{ display: 'flex', marginTop: '5px', paddingLeft: '26px' }}>
+                                <span
+                                    onMouseMove={(e) => showTooltip(e, tooltipContent)}
+                                    onMouseLeave={hideTooltip}
+                                    style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '3px',
+                                        padding: '2px 8px', borderRadius: radius.full,
+                                        fontSize: font.size.xs, fontWeight: 600,
+                                        background: colors.successLight, color: colors.success,
+                                        cursor: 'default',
+                                    }}>
+                                    <Check size={10} strokeWidth={3} />
+                                    등록 준비 완료
+                                </span>
+                            </div>
+                        );
+                    }
                     return (
                         <div style={{ display: 'flex', marginTop: '5px', paddingLeft: '26px' }}>
                             <span

@@ -908,7 +908,7 @@ export default function AutoSourcingPage() {
                                             <tr style={{ background: colors.bg.page, borderBottom: `1px solid ${colors.border.default}`, color: colors.text.muted }}>
                                                 <th style={{ padding: `${spacing['4']} ${spacing['3']}`, fontWeight: font.weight.semibold, width: '70px', whiteSpace: 'nowrap', textAlign: 'center' }}>이미지</th>
                                                 <th style={{ padding: `${spacing['4']} ${spacing['3']}`, fontWeight: font.weight.semibold, whiteSpace: 'nowrap' }}>상품명</th>
-                                                <th style={{ padding: `${spacing['4']} ${spacing['3']}`, fontWeight: font.weight.semibold, width: '100px', textAlign: 'right', whiteSpace: 'nowrap' }}>원가</th>
+                                                <th style={{ padding: `${spacing['4']} ${spacing['3']}`, fontWeight: font.weight.semibold, width: '100px', textAlign: 'left', whiteSpace: 'nowrap' }}>원가</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -927,7 +927,7 @@ export default function AutoSourcingPage() {
                                                             <td style={{ padding: spacing['3'], color: colors.text.primary, fontWeight: font.weight.medium, lineHeight: '1.4' }}>
                                                                 {realisticTitle}
                                                             </td>
-                                                            <td style={{ padding: spacing['3'], color: colors.text.secondary, fontWeight: font.weight.medium, width: '100px', textAlign: 'right' }}>
+                                                            <td style={{ padding: spacing['3'], color: colors.text.secondary, fontWeight: font.weight.medium, width: '100px', textAlign: 'left' }}>
                                                                 ₩{price.toLocaleString()}
                                                             </td>
                                                         </tr>

@@ -34,7 +34,7 @@ export default function RegistrationEditPage() {
     const [pendingLeave, setPendingLeave] = useState<(() => void) | null>(null);
     const [isDirty, setIsDirty] = useState(false);
     const isDirtyRef = useRef(false);
-    const initialSavedAtRef = useRef<string | null>(null);
+
 
     // 등록 스토어에서 결과 조회
     const result = useMemo(() => {
