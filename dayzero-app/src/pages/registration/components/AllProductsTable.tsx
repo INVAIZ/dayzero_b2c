@@ -7,7 +7,8 @@ import { stripPrefix } from '../../../utils/editing';
 import { handleImgError } from '../../../utils/image';
 import type { RegistrationResult } from '../../../types/registration';
 import { FloatingTooltip, type TooltipData } from '../../../components/common/FloatingTooltip';
-import { calcMarginPercent } from '../../../utils/margin';
+import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
+import { calcExpectedProfit, getMarginRate } from '../../../utils/margin';
 import { formatShortDate } from '../../../utils/formatDate';
 import { EXCHANGE_RATE } from '../../../mock/categoryMap';
 
@@ -52,6 +53,8 @@ export const AllProductsTable: React.FC<Props> = ({
     onToggleMonitoring,
     emptyMessage = '등록된 상품이 없어요',
 }) => {
+    const { state: onboarding } = useOnboarding();
+    const marginRate = getMarginRate(onboarding);
     const [tooltip, setTooltip] = useState<TooltipData | null>(null);
     const [dateSortDir, setDateSortDir] = useState<'asc' | 'desc' | null>('desc');
     const [page, setPage] = useState(0);
@@ -117,9 +120,9 @@ export const AllProductsTable: React.FC<Props> = ({
                     {hasSelection && selectedIds.length > 0 ? `${selectedIds.length}건 선택` : '상품명'}
                 </div>
                 <div style={{ width: '72px', flexShrink: 0, ...colHeader }}>판매가</div>
-                <div style={{ width: '56px', flexShrink: 0, ...colHeader }}>마진율</div>
+                <div style={{ width: '72px', flexShrink: 0, ...colHeader }}>예상 수익</div>
                 {showMonitoring && (
-                    <div style={{ width: '100px', flexShrink: 0, ...colHeader }}>가격·품절 확인</div>
+                    <div style={{ width: '100px', flexShrink: 0, ...colHeader, marginLeft: spacing['6'] }}>가격·품절 확인</div>
                 )}
                 <div
                     onClick={toggleDateSort}
@@ -148,8 +151,6 @@ export const AllProductsTable: React.FC<Props> = ({
             }}>
                 {pagedResults.map((r, i) => {
                     const isSelected = selectedIds.includes(r.id);
-                    // 판매가 자동 조정이므로 마진율은 항상 원래 원가 기준
-                    const margin = calcMarginPercent(r.product.originalPriceKrw, r.product.salePriceJpy);
                     const isTranslated = !!r.product.titleJa;
                     const displayTitle = r.product.titleJa
                         ? stripPrefix(r.product.titleJa)
@@ -309,36 +310,17 @@ export const AllProductsTable: React.FC<Props> = ({
                                 </span>
                             </div>
 
-                            {/* 마진율 */}
                             {(() => {
-                                const salePriceKrw = Math.round(r.product.salePriceJpy * EXCHANGE_RATE);
-                                const profit = salePriceKrw - r.product.originalPriceKrw;
+                                const profit = calcExpectedProfit(r.product.salePriceJpy, marginRate);
                                 return (
                                     <div
                                         style={{
-                                            width: '56px', flexShrink: 0,
+                                            width: '72px', flexShrink: 0,
                                             fontSize: font.size.base, fontWeight: 600,
-                                            color: margin <= 5 ? colors.danger : colors.success,
-                                            cursor: 'default',
+                                            color: profit > 0 ? colors.success : colors.danger,
                                         }}
-                                        onMouseMove={(e) => {
-                                            setTooltip({
-                                                x: e.clientX, y: e.clientY,
-                                                content: (
-                                                    <div>
-                                                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px' }}>
-                                                            1건 판매 시 예상 수익
-                                                        </div>
-                                                        <div style={{ fontSize: font.size.lg, fontWeight: 700, color: profit >= 0 ? colors.success : colors.danger }}>
-                                                            {profit >= 0 ? '+' : ''}₩{profit.toLocaleString()}
-                                                        </div>
-                                                    </div>
-                                                ),
-                                            });
-                                        }}
-                                        onMouseLeave={() => setTooltip(null)}
                                     >
-                                        {margin.toFixed(1)}%
+                                        {profit >= 0 ? '+' : ''}{profit.toLocaleString()}원
                                     </div>
                                 );
                             })()}
@@ -346,12 +328,12 @@ export const AllProductsTable: React.FC<Props> = ({
                             {/* 가격·품절 확인 토글 */}
                             {showMonitoring && (
                                 <div
-                                    style={{ width: '100px', flexShrink: 0, display: 'flex', alignItems: 'center' }}
+                                    style={{ width: '100px', flexShrink: 0, display: 'flex', alignItems: 'center', marginLeft: spacing['6'] }}
                                     onClick={e => e.stopPropagation()}
                                 >
                                     {(() => {
                                         const isOos = isMonitored && monitoringResult === 'out_of_stock';
-                                        const isError = isMonitored && monitoringResult === 'negative_margin'; // 소싱처 오류로 간주
+                                        const isError = isMonitored && monitoringResult === 'negative_margin';
                                         const oosOrange = '#FF9500';
                                         const toggleBg = !isMonitored
                                             ? colors.border.light

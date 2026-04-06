@@ -59,7 +59,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         marginType: '%',
         marginValue: 30,
         domesticShipping: 0,
-        prepCost: 500,
+        prepCost: 0,
         intlShipping: 0,
         exchangeRateMode: 'realtime',
         fixedExchangeRate: 9.2,

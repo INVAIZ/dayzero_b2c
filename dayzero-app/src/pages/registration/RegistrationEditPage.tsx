@@ -32,6 +32,7 @@ export default function RegistrationEditPage() {
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
     const [pendingLeave, setPendingLeave] = useState<(() => void) | null>(null);
+    const [isDirty, setIsDirty] = useState(false);
     const isDirtyRef = useRef(false);
     const initialSavedAtRef = useRef<string | null>(null);
 
@@ -72,19 +73,34 @@ export default function RegistrationEditPage() {
     // 편집 스토어에서 임시 상품 조회 (selector로 불필요한 리렌더 방지)
     const product = useEditingStore(s => s.products.find(p => p.id === tempProductId));
 
-    // 변경 감지: 마운트 시점의 lastSavedAt을 기록하고, 이후 변경되면 dirty
+    // 변경 감지
+    const snapshotKey = (p: typeof product) => p ? JSON.stringify({
+        titleKo: p.titleKo, titleJa: p.titleJa,
+        descriptionKo: p.descriptionKo, descriptionJa: p.descriptionJa,
+        salePriceJpy: p.salePriceJpy, originalPriceKrw: p.originalPriceKrw,
+        qoo10CategoryId: p.qoo10CategoryId, weightKg: p.weightKg,
+    }) : '';
+
+    const snapshotRef = useRef<string | null>(null);
     useEffect(() => {
         if (!product) return;
-        if (initialSavedAtRef.current === null) {
-            initialSavedAtRef.current = product.lastSavedAt ?? '__none__';
+        const key = snapshotKey(product);
+        if (snapshotRef.current === null) {
+            snapshotRef.current = key;
             return;
         }
-        if (product.lastSavedAt !== initialSavedAtRef.current) {
+        if (key !== snapshotRef.current) {
             isDirtyRef.current = true;
+            setIsDirty(true);
         }
-    }, [product?.lastSavedAt]);
+    }, [product]);
 
-    // 이탈 방어: 뒤로가기 시도
+    const markClean = () => {
+        isDirtyRef.current = false;
+        setIsDirty(false);
+        snapshotRef.current = snapshotKey(product);
+    };
+
     const handleBack = () => {
         if (isDirtyRef.current) {
             setPendingLeave(() => () => navigate(`/registration/${resultId}`));
@@ -94,15 +110,12 @@ export default function RegistrationEditPage() {
         }
     };
 
-    // 저장
     const handleSave = () => {
         if (!product || !resultId) return;
-        // 원래 ID로 복원해서 저장
         const savedProduct = { ...product, id: result!.product.id };
         updateRegisteredProduct(resultId, savedProduct);
-        isDirtyRef.current = false;
+        markClean();
         setIsSaveModalOpen(false);
-        navigate(`/registration/${resultId}`);
     };
 
     if (!result || !product) {
@@ -219,19 +232,23 @@ export default function RegistrationEditPage() {
 
                     {/* 저장하기 */}
                     <button
-                        onClick={() => setIsSaveModalOpen(true)}
+                        onClick={() => isDirty && setIsSaveModalOpen(true)}
+                        disabled={!isDirty}
                         style={{
                             display: 'flex', alignItems: 'center', gap: spacing['2'],
                             padding: `${spacing['2']} ${spacing['4']}`,
-                            background: colors.primary, color: colors.bg.surface,
+                            background: isDirty ? colors.primary : colors.border.default,
+                            color: isDirty ? colors.bg.surface : colors.text.muted,
                             border: 'none', borderRadius: radius.md,
                             fontSize: font.size.sm, fontWeight: 600,
-                            cursor: 'pointer', flexShrink: 0,
-                            marginLeft: spacing['3'],
+                            cursor: isDirty ? 'pointer' : 'not-allowed',
+                            flexShrink: 0,
+                            marginLeft: spacing['10'],
                             transition: 'background 0.2s',
+                            opacity: isDirty ? 1 : 0.6,
                         }}
-                        onMouseEnter={e => { e.currentTarget.style.background = colors.primaryHover; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = colors.primary; }}
+                        onMouseEnter={e => { if (isDirty) e.currentTarget.style.background = colors.primaryHover; }}
+                        onMouseLeave={e => { if (isDirty) e.currentTarget.style.background = colors.primary; }}
                     >
                         저장하기
                     </button>
@@ -250,7 +267,7 @@ export default function RegistrationEditPage() {
                     <EditingTabBar activeTab={activeTab} onChange={setActiveTab} />
 
                     {activeTab === 'basic' && <BasicEditTab product={product} hideProgress />}
-                    {activeTab === 'price' && <PriceEditTab product={product} />}
+                    {activeTab === 'price' && <PriceEditTab product={product} autoSave={false} onChanged={() => { isDirtyRef.current = true; setIsDirty(true); }} />}
                     {activeTab === 'images' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['12'] }}>
                             <ThumbnailEditTab product={product} />

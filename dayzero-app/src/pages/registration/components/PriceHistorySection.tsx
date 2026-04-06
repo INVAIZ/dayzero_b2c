@@ -2,14 +2,26 @@ import { useState, useCallback } from 'react';
 import { colors, font, spacing, radius, shadow } from '../../../design/tokens';
 import { ANIM } from '../../../design/animations';
 import { formatShortDate, formatTooltipDate } from '../../../utils/formatDate';
+import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
+import { calcExpectedProfit, getMarginRate } from '../../../utils/margin';
 import type { RegistrationResult } from '../../../types/registration';
 
 interface Props {
     history: NonNullable<RegistrationResult['monitoring']>['priceHistory'];
+    salePriceJpy?: number;
     hideHeader?: boolean;
 }
 
-export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) => {
+export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hideHeader }) => {
+    const { state: onboarding } = useOnboarding();
+    const marginRate = getMarginRate(onboarding);
+
+    const calcProfit = useCallback((sourcePriceKrw: number) => {
+        if (!salePriceJpy || !history?.length) return 0;
+        const baseProfit = calcExpectedProfit(salePriceJpy, marginRate);
+        const costDelta = sourcePriceKrw - history[0].sourcePriceKrw;
+        return baseProfit - costDelta;
+    }, [salePriceJpy, marginRate, history]);
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
         if (!history) return;
@@ -148,7 +160,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
                     {hPoint && hEntry && history.length > 1 && (
                         <circle cx={hPoint.x} cy={hPoint.y} r="6"
                             fill={colors.bg.surface}
-                            stroke={hEntry.marginPercent < 0 || hEntry.stockStatus === 'out_of_stock'
+                            stroke={calcProfit(hEntry.sourcePriceKrw) <= 0 || hEntry.stockStatus === 'out_of_stock'
                                 ? colors.danger : colors.primary}
                             strokeWidth="2.5"
                         />
@@ -199,15 +211,18 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
                             }}>
                                 ₩{hEntry.sourcePriceKrw.toLocaleString()}
                             </span>
-                            <span style={{
-                                fontSize: font.size.xs,
-                                fontWeight: 600,
-                                color: hEntry.marginPercent < 0 ? colors.danger
-                                    : hEntry.marginPercent < 10 ? colors.warningIcon
-                                        : colors.success,
-                            }}>
-                                마진 {hEntry.marginPercent.toFixed(1)}%
-                            </span>
+                            {(() => {
+                                const p = calcProfit(hEntry.sourcePriceKrw);
+                                return (
+                                    <span style={{
+                                        fontSize: font.size.xs,
+                                        fontWeight: 600,
+                                        color: p <= 0 ? colors.danger : colors.success,
+                                    }}>
+                                        수익 {p >= 0 ? '+' : ''}₩{p.toLocaleString()}
+                                    </span>
+                                );
+                            })()}
                         </div>
                         {hEntry.stockStatus === 'out_of_stock' && (
                             <div style={{
@@ -237,11 +252,12 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
                     <span style={{ width: '8px', flexShrink: 0 }} />
                     <span style={{ flex: 1, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left' }}>원가</span>
                     <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left' }}>변동</span>
-                    <span style={{ width: '60px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left' }}>마진율</span>
+                    <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left' }}>예상 수익</span>
                     <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left', paddingLeft: '8px' }}>날짜</span>
                 </div>
                 {history.slice(-5).reverse().map((entry, i) => {
-                    const isIssue = entry.marginPercent < 0 || entry.stockStatus === 'out_of_stock';
+                    const profit = calcProfit(entry.sourcePriceKrw);
+                    const isIssue = profit <= 0 || entry.stockStatus === 'out_of_stock';
                     const priceChangeFromBase = entry.sourcePriceKrw - history[0].sourcePriceKrw;
                     const changeColor = priceChangeFromBase > 0 ? colors.danger : colors.primary;
                     return (
@@ -320,14 +336,12 @@ export const PriceHistorySection: React.FC<Props> = ({ history, hideHeader }) =>
                                 fontSize: font.size.base,
                                 fontWeight: entry.stockStatus === 'out_of_stock' ? 500 : 700,
                                 color: entry.stockStatus === 'out_of_stock' ? colors.text.muted
-                                    : entry.marginPercent < 0 ? colors.danger
-                                        : entry.marginPercent < 10 ? colors.warningIcon
-                                            : colors.success,
-                                width: '60px',
+                                    : profit <= 0 ? colors.danger : colors.success,
+                                width: '80px',
                                 textAlign: 'left',
                                 flexShrink: 0,
                             }}>
-                                {entry.stockStatus === 'out_of_stock' ? '–' : `${entry.marginPercent.toFixed(1)}%`}
+                                {entry.stockStatus === 'out_of_stock' ? '–' : `${profit >= 0 ? '+' : ''}₩${profit.toLocaleString()}`}
                             </span>
                             <span style={{
                                 fontSize: font.size.sm,

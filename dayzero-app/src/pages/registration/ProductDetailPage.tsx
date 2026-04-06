@@ -14,6 +14,8 @@ import { stripPrefix } from '../../utils/editing';
 import { handleImgError } from '../../utils/image';
 import { formatFullDate } from '../../utils/formatDate';
 import { calcMarginPercent } from '../../utils/margin';
+import { useOnboarding } from '../../components/onboarding/OnboardingContext';
+import { calcExpectedProfit, getMarginRate } from '../../utils/margin';
 import { useRegistrationStore } from '../../store/useRegistrationStore';
 import { PriceHistorySection } from './components/PriceHistorySection';
 import { NavButton, MonitoringToggle, InfoCard, InfoRow, AlertCard, StatusHelper } from './components/ProductDetailWidgets';
@@ -24,6 +26,8 @@ export const ProductDetailPage: React.FC = () => {
     const { resultId } = useParams<{ resultId: string }>();
     const navigate = useNavigate();
     const { jobs, enableMonitoring, disableMonitoring, pauseSales, resumeSales, deleteResults } = useRegistrationStore();
+    const { state: onboarding } = useOnboarding();
+    const marginRate = getMarginRate(onboarding);
 
     const [isEnableModalOpen, setIsEnableModalOpen] = useState(false);
     const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
@@ -74,12 +78,13 @@ export const ProductDetailPage: React.FC = () => {
         ? stripPrefix(product.titleJa)
         : stripPrefix(product.titleKo);
 
-    // 마진 계산
+    // 수익 계산
     const currentSourcePrice = monitoring?.currentSourcePriceKrw ?? product.originalPriceKrw;
     const currentMargin = calcMarginPercent(currentSourcePrice, product.salePriceJpy);
-    const originalMargin = calcMarginPercent(product.originalPriceKrw, product.salePriceJpy);
+    const expectedProfit = calcExpectedProfit(product.salePriceJpy, marginRate);
     const priceChanged = currentSourcePrice !== product.originalPriceKrw;
     const priceDiff = currentSourcePrice - product.originalPriceKrw;
+    const currentProfit = expectedProfit - priceDiff;
 
     // 역마진 판단: 실제 마진 기준 (모니터링 상태 + 현재 마진 5% 이하)
     const isNegativeMargin = checkResult === 'negative_margin' && currentMargin <= 5;
@@ -407,9 +412,9 @@ export const ProductDetailPage: React.FC = () => {
                     >
                         <InfoRow label="판매가" value={`¥${product.salePriceJpy.toLocaleString()}`} highlight />
                         <InfoRow
-                            label="마진율"
-                            value={`${currentMargin.toFixed(1)}%`}
-                            valueColor={currentMargin < 0 ? colors.danger : currentMargin < 10 ? colors.warningIcon : colors.success}
+                            label="예상 수익"
+                            value={`${currentProfit >= 0 ? '+' : ''}₩${currentProfit.toLocaleString()}`}
+                            valueColor={currentProfit <= 0 ? colors.danger : colors.success}
                             highlight
                         />
                         <InfoRow
@@ -489,9 +494,9 @@ export const ProductDetailPage: React.FC = () => {
                             />
                         )}
                         <InfoRow
-                            label="최초 마진율"
-                            value={`${originalMargin.toFixed(1)}%`}
-                            valueColor={originalMargin < 10 ? colors.warningIcon : colors.text.primary}
+                            label="최초 예상 수익"
+                            value={`${expectedProfit >= 0 ? '+' : ''}₩${expectedProfit.toLocaleString()}`}
+                            valueColor={expectedProfit <= 0 ? colors.danger : colors.success}
                             highlight
                         />
                     </InfoCard>
@@ -623,6 +628,7 @@ export const ProductDetailPage: React.FC = () => {
                         </div>
                         <PriceHistorySection
                             history={monitoring.priceHistory}
+                            salePriceJpy={product.salePriceJpy}
                             hideHeader
                         />
                     </div>

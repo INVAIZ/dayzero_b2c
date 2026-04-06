@@ -5,11 +5,14 @@ import { useEditingStore } from '../../../store/useEditingStore';
 import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
 import { EXCHANGE_RATE } from '../../../mock/categoryMap';
 import { colors, font, radius, shadow, spacing, zIndex } from '../../../design/tokens';
+import { QOO10_FEE_RATE } from '../../../constants/fees';
 import { ConfirmModal } from '../../../components/common/ConfirmModal';
 import { SourceTag } from '../../../components/common/SourceTag';
 
 interface Props {
     product: ProductDetail;
+    autoSave?: boolean;
+    onChanged?: () => void;
 }
 
 // ── 공통 스타일 상수 ────────────────────────────────────────────────────────
@@ -59,8 +62,6 @@ const lookupKseRate = (kg: number): number => {
     for (const [limit, fee] of KSE_RATES) if (kg <= limit) return fee;
     return KSE_RATES[KSE_RATES.length - 1][1];
 };
-
-const QOO10_FEE_RATE = 0.108;
 
 const SOURCE_TOOLTIPS: Record<string, string> = {
     ai_weight: '상품 무게 정보가 없어 AI가 예측한 무게입니다.',
@@ -123,7 +124,7 @@ const SectionDivider = () => (
     <div style={{ height: '1px', background: colors.border.default, margin: `${spacing['6']} 0` }} />
 );
 
-type EditingField = null | 'originalPrice' | 'domestic' | 'prep' | 'weight';
+type EditingField = null | 'originalPrice' | 'domestic' | 'prep' | 'weight' | 'salePrice';
 
 // ── 비용 행 (읽기 모드 — 호버 시 연필, 태그 호버 시 툴팁) ──────────────────
 const CostRow: React.FC<{
@@ -221,7 +222,7 @@ const CostEditRow: React.FC<{
 };
 
 // ── 메인 컴포넌트 ──────────────────────────────────────────────────────────
-export const PriceEditTab: React.FC<Props> = ({ product }) => {
+export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChanged }) => {
     const { updateProduct } = useEditingStore();
     const { state: onboarding } = useOnboarding();
 
@@ -321,6 +322,12 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
     }, []);
 
     const triggerSave = useCallback(() => {
+        if (!autoSave) {
+            // 명시적 저장 모드: 즉시 store 업데이트, 상태 표시 없음
+            updateProduct(product.id, { salePriceJpy: priceRef.current });
+            onChanged?.();
+            return;
+        }
         if (saveTimer.current) clearTimeout(saveTimer.current);
         if (savedTimer.current) clearTimeout(savedTimer.current);
         setSaveStatus('saving');
@@ -329,7 +336,7 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
             setSaveStatus('saved');
             savedTimer.current = setTimeout(() => setSaveStatus('idle'), 2000);
         }, 2000);
-    }, [product.id, updateProduct]);
+    }, [product.id, updateProduct, autoSave, onChanged]);
 
     // ── 계산 ──────────────────────────────────────────────────────────────
     const totalCostKrw = originalPrice + domesticShipping + prepCost;
@@ -363,7 +370,14 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
         else if (field === 'domestic') setEditInput(String(domesticShipping));
         else if (field === 'prep') setEditInput(String(prepCost));
         else if (field === 'weight') setEditInput(String(weight));
+        else if (field === 'salePrice') setEditInput(String(salePriceJpy));
         setEditingField(field);
+    };
+
+    const handleSaveSalePrice = () => {
+        const v = Number(editInput) || 0;
+        handlePriceChange(v);
+        setEditingField(null);
     };
 
     const cancelEditing = () => {
@@ -466,14 +480,31 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
                 .price-input::-webkit-outer-spin-button,
                 .price-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
                 .price-input { -moz-appearance: textfield; }
+                .margin-slider::-webkit-slider-thumb {
+                    -webkit-appearance: none; appearance: none;
+                    width: 18px; height: 18px; border-radius: 50%; border: none;
+                    background: var(--slider-color, ${colors.primary});
+                    cursor: pointer;
+                    box-shadow: 0 0 0 8px color-mix(in srgb, var(--slider-color, ${colors.primary}) 15%, transparent);
+                    transition: box-shadow 0.2s;
+                }
+                .margin-slider::-webkit-slider-thumb:hover {
+                    box-shadow: 0 0 0 12px color-mix(in srgb, var(--slider-color, ${colors.primary}) 20%, transparent);
+                }
+                .margin-slider::-moz-range-thumb {
+                    width: 18px; height: 18px; border-radius: 50%; border: none;
+                    background: var(--slider-color, ${colors.primary});
+                    cursor: pointer;
+                    box-shadow: 0 0 0 8px color-mix(in srgb, var(--slider-color, ${colors.primary}) 15%, transparent);
+                }
             `}</style>
 
             {/* ── 원가 구조 ── */}
             <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
                 <SectionLabel><span style={sectionBadgeStyle}>1</span>국내 비용</SectionLabel>
                 <div style={{ fontSize: font.size.xs }}>
-                    {saveStatus === 'saving' && <span style={{ color: colors.text.muted }}>저장 중...</span>}
-                    {saveStatus === 'saved' && <span style={{ color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>}
+                    {autoSave && saveStatus === 'saving' && <span style={{ color: colors.text.muted }}>저장 중...</span>}
+                    {autoSave && saveStatus === 'saved' && <span style={{ color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>}
                 </div>
             </div>
 
@@ -646,45 +677,125 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
                 <SectionLabel><span style={sectionBadgeStyle}>3</span>판매가 설정</SectionLabel>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 120px', gap: spacing['3'], alignItems: 'start' }}>
-                <div>
-                    <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginBottom: spacing['2'] }}>
-                        Qoo10 판매가
-                    </div>
-                    <div style={{ position: 'relative' }}>
-                        <span style={{ position: 'absolute', left: spacing['3'], top: '50%', transform: 'translateY(-50%)', fontSize: font.size.base, fontWeight: 700, color: colors.primary, pointerEvents: 'none' }}>¥</span>
+            {/* 마진율 — 설정 페이지와 동일한 디자인 */}
+            <div style={{ marginBottom: spacing['4'] }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing['3'] }}>
+                    <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary }}>마진율</span>
+                    <div style={{ position: 'relative', width: '76px', flexShrink: 0 }}>
                         <input
-                            type="text" inputMode="decimal" className="price-input" value={salePriceJpy}
-                            onChange={e => handlePriceChange(Number(e.target.value))}
-                            onFocus={e => e.target.select()}
-                            style={{ ...priceInputBase, paddingLeft: '28px', borderColor: colors.primary, color: colors.primary, fontWeight: 700 }}
-                        />
-                    </div>
-                    <div style={{ marginTop: '5px', fontSize: font.size.xs, color: colors.text.muted }}>
-                        ≈ ₩{Math.round(salePriceJpy * EXCHANGE_RATE).toLocaleString()}
-                    </div>
-                </div>
-
-                <div style={{ paddingTop: '30px', color: colors.text.muted, fontSize: font.size.lg, userSelect: 'none' }}>↔</div>
-
-                <div>
-                    <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginBottom: spacing['2'] }}>
-                        마진율
-                    </div>
-                    <div style={{ position: 'relative' }}>
-                        <input
-                            type="text" inputMode="decimal" className="price-input" value={marginRate}
+                            type="number" className="price-input" value={marginRate}
                             onChange={e => handleMarginChange(Number(e.target.value))}
-                            onFocus={e => { e.target.select(); e.target.style.borderColor = colors.primary; }}
-                            onBlur={e => { e.target.style.borderColor = colors.border.default; }}
-                            style={priceInputBase}
+                            style={{
+                                ...priceInputBase,
+                                width: '76px', padding: '8px 24px 8px 8px',
+                                textAlign: 'right', fontWeight: 600,
+                                fontSize: font.size.sm,
+                            }}
                         />
-                        <span style={{ position: 'absolute', right: spacing['3'], top: '50%', transform: 'translateY(-50%)', fontSize: font.size.sm, fontWeight: 600, color: colors.text.muted, pointerEvents: 'none' }}>%</span>
-                    </div>
-                    <div style={{ marginTop: '5px', fontSize: font.size.xs, color: colors.text.muted }}>
-                        추천 30~40%
+                        <span style={{
+                            position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)',
+                            fontSize: font.size.sm, color: colors.text.muted, fontWeight: 500,
+                            pointerEvents: 'none',
+                        }}>%</span>
                     </div>
                 </div>
+
+                {(() => {
+                    const pct = Math.max(0, Math.min(100, ((marginRate - 5) / (60 - 5)) * 100));
+                    const sliderColor = marginRate < 15 ? colors.danger
+                        : marginRate <= 40 ? colors.primary
+                        : marginRate <= 50 ? '#E67E22' : colors.danger;
+                    return (
+                        <div>
+                            <input
+                                type="range" min={5} max={60} step={5}
+                                value={marginRate}
+                                onChange={e => handleMarginChange(Number(e.target.value))}
+                                className="margin-slider"
+                                style={{
+                                    '--slider-color': sliderColor,
+                                    width: '100%', height: '4px', appearance: 'none', WebkitAppearance: 'none',
+                                    background: `linear-gradient(to right, ${sliderColor} ${pct}%, ${colors.border.default} ${pct}%)`,
+                                    borderRadius: radius.full, outline: 'none', cursor: 'pointer',
+                                    transition: 'background 0.3s ease',
+                                } as React.CSSProperties}
+                            />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
+                                <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>5%</span>
+                                <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>60%</span>
+                            </div>
+                        </div>
+                    );
+                })()}
+            </div>
+
+            {/* 판매가 합계 */}
+            <div style={{
+                ...flexBetween,
+                padding: `${spacing['3']} ${spacing['4']}`,
+                background: colors.primaryLight,
+                borderRadius: radius.lg,
+                border: `1px solid ${colors.primaryLightBorder}`,
+                marginTop: spacing['8'],
+            }}>
+                <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={costSummaryBadgeStyle}>1</span>
+                        <span style={{ fontSize: font.size.xs, color: colors.primary, fontWeight: 600 }}>+</span>
+                        <span style={costSummaryBadgeStyle}>2</span>
+                        <span style={{ fontSize: font.size.xs, color: colors.primary, fontWeight: 600 }}>+</span>
+                        <span style={costSummaryBadgeStyle}>3</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.primary, marginLeft: '4px' }}>Qoo10 판매가</span>
+                    </div>
+                    <div style={{ fontSize: font.size.xs, color: colors.primary, opacity: 0.7, marginTop: '2px' }}>
+                        전체 비용 + 마진 (전체 비용 × 마진율)
+                    </div>
+                </div>
+                {editingField === 'salePrice' ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <span style={{ fontSize: font.size.sm, color: colors.primary, fontWeight: 600 }}>¥</span>
+                            <input
+                                ref={el => el?.select()}
+                                type="text" inputMode="decimal" className="price-input"
+                                value={editInput}
+                                onChange={e => setEditInput(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter') handleSaveSalePrice(); if (e.key === 'Escape') cancelEditing(); }}
+                                style={{
+                                    width: '90px', textAlign: 'right',
+                                    padding: '0 0 3px', fontSize: font.size.sm, fontWeight: 600,
+                                    color: colors.primary, background: 'transparent',
+                                    border: 'none', borderBottom: `2px solid ${colors.primary}`,
+                                    outline: 'none', fontFamily: 'inherit',
+                                }}
+                                autoFocus
+                            />
+                        </div>
+                        <button onClick={handleSaveSalePrice} style={{ padding: '4px 12px', borderRadius: radius.md, background: colors.primary, border: 'none', fontSize: font.size.xs, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>저장</button>
+                        <button onClick={cancelEditing} style={{ padding: '4px 10px', borderRadius: radius.md, background: 'none', border: `1px solid ${colors.primaryLightBorder}`, fontSize: font.size.xs, color: colors.primary, cursor: 'pointer' }}>취소</button>
+                    </div>
+                ) : (
+                    <div
+                        onClick={() => startEditing('salePrice')}
+                        style={{ textAlign: 'right', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                        onMouseEnter={e => { const pencil = e.currentTarget.querySelector('.sale-pencil') as HTMLElement; if (pencil) pencil.style.opacity = '0.6'; }}
+                        onMouseLeave={e => { const pencil = e.currentTarget.querySelector('.sale-pencil') as HTMLElement; if (pencil) pencil.style.opacity = '0'; }}
+                    >
+                        <Pencil size={10} color={colors.primary} className="sale-pencil" style={{ opacity: 0, transition: 'opacity 0.15s', flexShrink: 0 }} />
+                        <div>
+                            <span style={{
+                                fontSize: font.size.base, fontWeight: 700, color: colors.primary,
+                                textDecoration: 'underline', textDecorationStyle: 'dotted',
+                                textUnderlineOffset: '3px', textDecorationColor: colors.primary,
+                            }}>
+                                ¥{salePriceJpy.toLocaleString()}
+                            </span>
+                            <div style={{ fontSize: font.size.xs, color: colors.primary, opacity: 0.7, marginTop: '2px' }}>
+                                ≈ ₩{Math.round(salePriceJpy * EXCHANGE_RATE).toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <SectionDivider />
@@ -694,78 +805,104 @@ export const PriceEditTab: React.FC<Props> = ({ product }) => {
                 <SectionLabel><span style={sectionBadgeStyle}>4</span>수익 계산</SectionLabel>
             </div>
 
-            <div style={{
-                borderRadius: radius.lg,
-                border: `1.5px solid ${isProfit ? colors.successBorder : colors.dangerLight}`,
-                background: isProfit ? colors.successBg : colors.dangerBg,
-                overflow: 'hidden',
-            }}>
-                <div style={{ padding: `0 ${spacing['4']}` }}>
-                    <div style={calcRowStyle}>
-                        <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>판매가</span>
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{Math.round(salePriceJpy * EXCHANGE_RATE).toLocaleString()}</div>
-                            <div style={subAmountStyle}>¥{salePriceJpy.toLocaleString()}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['4'] }}>
+                {/* ── 투입 비용 ── */}
+                <div style={{ borderRadius: radius.lg, border: `1px solid ${colors.border.default}`, overflow: 'hidden' }}>
+                    <div style={{
+                        padding: `${spacing['3']} ${spacing['4']}`,
+                        background: colors.bg.subtle,
+                        borderBottom: `1px solid ${colors.border.default}`,
+                    }}>
+                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>투입 비용</span>
+                    </div>
+                    <div style={{ padding: `0 ${spacing['4']}` }}>
+                        <div style={calcRowStyle}>
+                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>구매 원가</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{originalPrice.toLocaleString()}</span>
+                        </div>
+                        <Divider />
+                        <div style={calcRowStyle}>
+                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>국내 배송비</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{domesticShipping.toLocaleString()}</span>
+                        </div>
+                        <Divider />
+                        <div style={calcRowStyle}>
+                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>작업비</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{prepCost.toLocaleString()}</span>
+                        </div>
+                        <Divider />
+                        <div style={calcRowStyle}>
+                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>해외 배송비</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}</span>
                         </div>
                     </div>
-                    <Divider />
-                    <div style={calcRowStyle}>
-                        <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>
-                            Qoo10 수수료
-                            <span style={{ fontSize: font.size.xs, color: colors.text.muted, marginLeft: '4px' }}>10.8%</span>
-                        </span>
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.danger }}>−₩{Math.round(qoo10FeeJpy * EXCHANGE_RATE).toLocaleString()}</div>
-                            <div style={subAmountStyle}>¥{qoo10FeeJpy.toLocaleString()}</div>
-                        </div>
-                    </div>
-                    <Divider />
-                    <div style={calcRowStyle}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>정산금액</span>
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>₩{Math.round(settlementJpy * EXCHANGE_RATE).toLocaleString()}</div>
-                            <div style={subAmountStyle}>¥{settlementJpy.toLocaleString()}</div>
-                        </div>
-                    </div>
-                    <Divider />
-                    <div style={calcRowStyle}>
-                        <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>
-                            총 비용
-                            <span style={{ fontSize: font.size.xs, color: colors.text.muted, marginLeft: '4px' }}>원가+배송</span>
-                        </span>
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.danger }}>−₩{Math.round(totalCostJpy * EXCHANGE_RATE).toLocaleString()}</div>
-                            <div style={subAmountStyle}>¥{Math.round(totalCostJpy).toLocaleString()}</div>
-                        </div>
+                    <div style={{
+                        ...flexBetween,
+                        padding: `${spacing['3']} ${spacing['4']}`,
+                        background: colors.bg.subtle,
+                        borderTop: `1px solid ${colors.border.default}`,
+                    }}>
+                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>합계</span>
+                        <span style={{ fontSize: font.size.base, fontWeight: 700, color: colors.text.primary }}>₩{Math.round(totalCostJpy * EXCHANGE_RATE).toLocaleString()}</span>
                     </div>
                 </div>
 
+                {/* ── 판매 정산 ── */}
+                <div style={{ borderRadius: radius.lg, border: `1px solid ${colors.border.default}`, overflow: 'hidden' }}>
+                    <div style={{
+                        padding: `${spacing['3']} ${spacing['4']}`,
+                        background: colors.bg.subtle,
+                        borderBottom: `1px solid ${colors.border.default}`,
+                    }}>
+                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>판매 정산</span>
+                    </div>
+                    <div style={{ padding: `0 ${spacing['4']}` }}>
+                        <div style={calcRowStyle}>
+                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>
+                                판매가
+                                <span style={{ fontSize: font.size.xs, color: colors.text.muted, marginLeft: '4px' }}>¥{salePriceJpy.toLocaleString()}</span>
+                            </span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{Math.round(salePriceJpy * EXCHANGE_RATE).toLocaleString()}</span>
+                        </div>
+                        <Divider />
+                        <div style={calcRowStyle}>
+                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>
+                                Qoo10 수수료
+                                <span style={{ fontSize: font.size.xs, color: colors.text.muted, marginLeft: '4px' }}>10.8%</span>
+                            </span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.danger }}>−₩{Math.round(qoo10FeeJpy * EXCHANGE_RATE).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div style={{
+                        ...flexBetween,
+                        padding: `${spacing['3']} ${spacing['4']}`,
+                        background: colors.bg.subtle,
+                        borderTop: `1px solid ${colors.border.default}`,
+                    }}>
+                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>정산금액</span>
+                        <span style={{ fontSize: font.size.base, fontWeight: 700, color: colors.text.primary }}>₩{Math.round(settlementJpy * EXCHANGE_RATE).toLocaleString()}</span>
+                    </div>
+                </div>
+
+                {/* ── 남는 돈 ── */}
                 <div style={{
-                    ...flexBetween,
+                    borderRadius: radius.lg,
+                    border: `1.5px solid ${isProfit ? colors.successBorder : colors.dangerLight}`,
+                    background: isProfit ? colors.successBg : colors.dangerBg,
                     padding: `${spacing['4']} ${spacing['4']}`,
-                    background: isProfit ? colors.successLight : colors.dangerLight,
-                    borderTop: `1px solid ${isProfit ? colors.successBorder : colors.dangerLight}`,
                 }}>
-                    <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>순이익 (건당)</span>
-                    {isProfit ? (
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: font.size.base, fontWeight: 700, color: colors.successDark, lineHeight: 1.2 }}>
-                                +₩{profitKrw.toLocaleString()}
-                            </div>
-                            <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginTop: '3px' }}>
-                                정산 대비 {effectiveMarginPct}%
-                            </div>
-                        </div>
-                    ) : (
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: font.size.base, fontWeight: 700, color: colors.danger, lineHeight: 1.2 }}>
-                                −₩{Math.abs(profitKrw).toLocaleString()}
-                            </div>
-                            <div style={{ fontSize: font.size.xs, color: colors.danger, marginTop: '3px' }}>
-                                역마진 — 판매가를 올려야 합니다
-                            </div>
-                        </div>
-                    )}
+                    <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
+                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>1건 판매 시 순이익</span>
+                        <span style={{ fontSize: font.size.lg, fontWeight: 700, color: isProfit ? colors.successDark : colors.danger }}>
+                            {isProfit ? '+' : '−'}₩{Math.abs(profitKrw).toLocaleString()}
+                        </span>
+                    </div>
+                    <div style={{ fontSize: font.size.xs, color: colors.text.muted, textAlign: 'right' }}>
+                        {isProfit
+                            ? `정산 ₩${Math.round(settlementJpy * EXCHANGE_RATE).toLocaleString()} − 비용 ₩${Math.round(totalCostJpy * EXCHANGE_RATE).toLocaleString()}`
+                            : '역마진 — 판매가를 올리거나 비용을 줄여야 합니다'
+                        }
+                    </div>
                 </div>
             </div>
 

@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 import { Package, TrendingUp, Coins } from 'lucide-react';
 import { colors, font, spacing, radius } from '../../../design/tokens';
+import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
+import { EXCHANGE_RATE } from '../../../mock/categoryMap';
+import { calcExpectedProfit, getMarginRate } from '../../../utils/margin';
 import type { RegistrationResult } from '../../../types/registration';
 
 interface Props {
@@ -8,38 +11,39 @@ interface Props {
 }
 
 export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
+    const { state: onboarding } = useOnboarding();
+    const marginRate = getMarginRate(onboarding);
+
     const stats = useMemo(() => {
         const acc = results.reduce(
             (a, r) => {
                 if (r.salesStatus === 'paused') return a;
-                const sale = r.product.salePriceJpy / 0.11;
-                const cost = r.product.originalPriceKrw;
-                const margin = cost > 0 ? ((sale - cost) / sale) * 100 : 0;
+                const profit = calcExpectedProfit(r.product.salePriceJpy, marginRate);
                 const cr = r.monitoring?.status === 'active' ? r.monitoring.lastCheckResult : undefined;
                 return {
                     count: a.count + 1,
                     totalRevenue: a.totalRevenue + r.product.salePriceJpy,
-                    marginSum: a.marginSum + margin,
+                    profitSum: a.profitSum + profit,
                     negativeMarginCount: a.negativeMarginCount + (cr === 'negative_margin' ? 1 : 0),
                     outOfStockCount: a.outOfStockCount + (cr === 'out_of_stock' ? 1 : 0),
                 };
             },
-            { count: 0, totalRevenue: 0, marginSum: 0, negativeMarginCount: 0, outOfStockCount: 0 }
+            { count: 0, totalRevenue: 0, profitSum: 0, negativeMarginCount: 0, outOfStockCount: 0 }
         );
-        const avgMargin = acc.count > 0 ? acc.marginSum / acc.count : 0;
-        return { ...acc, avgMargin };
-    }, [results]);
+        const avgProfit = acc.count > 0 ? Math.round(acc.profitSum / acc.count) : 0;
+        return { ...acc, avgProfit };
+    }, [results, marginRate]);
 
-    const { count, totalRevenue, avgMargin } = stats;
+    const { count, totalRevenue, avgProfit } = stats;
 
     // 더미: 지난 달 대비 변동 (프로토타입용, 상품 없을 때는 표시 안 함)
     const hasDiff = count > 0;
     const prevProductCount = Math.max(1, Math.round(count * 0.75));
-    const prevMargin = Math.max(5, avgMargin - 3.2);
+    const prevProfit = Math.max(500, avgProfit - 1200);
     const prevRevenue = Math.round(totalRevenue * 0.8);
 
     const productDiff = count - prevProductCount;
-    const marginDiff = avgMargin - prevMargin;
+    const profitDiff = avgProfit - prevProfit;
     const revenuePct = prevRevenue > 0 ? Math.round(((totalRevenue - prevRevenue) / prevRevenue) * 100) : 0;
 
     return (
@@ -51,24 +55,24 @@ export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
             animation: 'summaryFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
         }}>
             <StatCard
-                label="등록된 상품 수"
+                label="판매 중인 상품 수"
                 icon={<Package size={18} color={colors.text.muted} />}
                 value={count.toLocaleString()}
                 diffText={hasDiff ? `+${productDiff}건` : undefined}
                 diffPositive={productDiff >= 0}
             />
             <StatCard
-                label="평균 마진율"
+                label="평균 예상 수익"
                 icon={<TrendingUp size={18} color={colors.text.muted} />}
-                value={`${avgMargin.toFixed(1)}%`}
-                diffText={hasDiff ? `${marginDiff >= 0 ? '+' : ''}${marginDiff.toFixed(1)}%p` : undefined}
-                diffPositive={marginDiff >= 0}
+                value={`₩${avgProfit.toLocaleString()}`}
+                diffText={hasDiff ? `${profitDiff >= 0 ? '+' : ''}₩${profitDiff.toLocaleString()}` : undefined}
+                diffPositive={profitDiff >= 0}
             />
             <StatCard
                 label="총 예상 월 매출"
                 icon={<Coins size={18} color={colors.text.muted} />}
                 value={`¥${totalRevenue.toLocaleString()}`}
-                subValue={`₩${Math.round(totalRevenue / 0.11).toLocaleString()}`}
+                subValue={`₩${Math.round(totalRevenue * EXCHANGE_RATE).toLocaleString()}`}
                 diffText={hasDiff ? `${revenuePct >= 0 ? '+' : ''}${revenuePct}%` : undefined}
                 diffPositive={revenuePct >= 0}
             />
