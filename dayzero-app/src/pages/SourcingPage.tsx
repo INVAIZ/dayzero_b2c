@@ -7,15 +7,7 @@ import { Link2, Zap, Clock, LayoutGrid, Package, Check, Trash2, GripVertical } f
 import { UrlSourcingContent } from './sourcing/components/UrlSourcingContent';
 import { colors, font, radius, spacing } from '../design/tokens';
 import { ConfirmModal } from '../components/common/ConfirmModal';
-
-const formatLastRun = (dateString?: string) => {
-    if (!dateString) return '아직 실행되지 않음';
-    const date = new Date(dateString);
-    const yy = String(date.getFullYear()).slice(2);
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    return `${yy}.${mm}.${dd}`;
-};
+import { formatShortDate } from '../utils/formatDate';
 
 
 export default function SourcingPage() {
@@ -33,6 +25,7 @@ export default function SourcingPage() {
         scheduleId: null
     });
     const [limitModal, setLimitModal] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(10);
 
     const handleAddSchedule = () => {
         if (schedules.length >= 10) {
@@ -97,6 +90,9 @@ export default function SourcingPage() {
         () => selectedFilter === '전체' ? schedules : schedules.filter(s => s.provider === selectedFilter),
         [schedules, selectedFilter]
     );
+    const clampedVisible = Math.min(visibleCount, filteredSchedules.length);
+    const visibleSchedules = filteredSchedules.slice(0, clampedVisible);
+    const hasMore = filteredSchedules.length > visibleCount;
 
     const renderSchedules = () => {
         const filters = ['전체', ...availableProviders];
@@ -117,7 +113,7 @@ export default function SourcingPage() {
                         {filters.map(filter => (
                             <button
                                 key={filter}
-                                onClick={() => setSelectedFilter(filter)}
+                                onClick={() => { setSelectedFilter(filter); setVisibleCount(10); }}
                                 style={{
                                     padding: filter === '전체' ? `${spacing['2']} ${spacing['4']}` : (selectedFilter === filter ? `${spacing['2']} ${spacing['4']}` : spacing['2']),
                                     borderRadius: radius.full,
@@ -241,7 +237,7 @@ export default function SourcingPage() {
                     </div>
                 ) : (
                     <div key={selectedFilter} style={{ display: 'flex', flexDirection: 'column', gap: spacing['3'], animation: 'fadeInUp 0.3s ease' }}>
-                        {filteredSchedules.map(schedule => {
+                        {visibleSchedules.map(schedule => {
                             const isHovered = hoveredId === schedule.id;
                             return (
                                 <div
@@ -297,7 +293,7 @@ export default function SourcingPage() {
                                                 에 수집해요.
                                             </div>
                                             <div style={{ fontSize: font.size.sm, color: colors.text.tertiary }}>
-                                                마지막 실행: {formatLastRun(schedule.lastRunAt)}
+                                                마지막 실행: {schedule.lastRunAt ? formatShortDate(schedule.lastRunAt) : '아직 실행되지 않음'}
                                             </div>
                                         </div>
                                     </div>
@@ -325,6 +321,27 @@ export default function SourcingPage() {
                                 </div>
                             );
                         })}
+                        {hasMore && (
+                            <button
+                                onClick={() => setVisibleCount(v => v + 10)}
+                                style={{
+                                    width: '100%',
+                                    padding: `${spacing['3']} 0`,
+                                    background: 'none',
+                                    border: `1px solid ${colors.border.default}`,
+                                    borderRadius: radius.lg,
+                                    fontSize: font.size.base,
+                                    fontWeight: font.weight.medium,
+                                    color: colors.text.tertiary,
+                                    cursor: 'pointer',
+                                    transition: 'background 0.15s, color 0.15s',
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = colors.bg.subtle; e.currentTarget.style.color = colors.text.secondary; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = colors.text.tertiary; }}
+                            >
+                                더 보기 ({filteredSchedules.length - visibleCount}건 더)
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
