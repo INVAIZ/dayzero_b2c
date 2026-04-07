@@ -479,7 +479,7 @@ export const UrlSourcingContent = () => {
                             }}>
                                 {!p.error ? (
                                     <>
-                                        {p.provider && <img src={SOURCING_PROVIDERS.find(s => s.name === p.provider)?.logo} alt={p.provider} style={{ width: 16, height: 16, borderRadius: 4 }} />}
+                                        {p.provider && <img src={SOURCING_PROVIDERS.find(s => s.name === p.provider)?.logo} alt={p.provider} style={{ width: 16, height: 16, borderRadius: radius.xs }} />}
                                         <span style={{ color: colors.text.primary, fontSize: font.size.sm, fontWeight: font.weight.semibold, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.url}</span>
                                         <CheckCircle2 size={14} color={colors.success} />
                                     </>

@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react';
 import PasswordInput from './PasswordInput';
 import { useAuthForm } from '../../hooks/useAuthForm';
 import { mockLogin, mockGoogleLogin } from '../../mock/authMock';
+import { colors, font, radius } from '../../design/tokens';
 
 interface LoginFormProps {
   onSwitchToSignup: () => void;
@@ -65,18 +66,18 @@ export default function LoginForm({ onSwitchToSignup, onSuccess, onToast }: Logi
       <div style={{ marginBottom: '16px' }}>
         <label style={{
           display: 'block',
-          fontSize: '14px',
-          fontWeight: 600,
-          color: '#191F28',
+          fontSize: font.size.md,
+          fontWeight: font.weight.semibold,
+          color: colors.text.primary,
           marginBottom: '8px',
           fontFamily: 'Pretendard, sans-serif',
         }}>
           이메일
         </label>
         <div style={{
-          background: '#F5F6F8',
-          borderRadius: '12px',
-          border: emailError ? '1.5px solid #F04452' : '1.5px solid transparent',
+          background: colors.bg.subtle,
+          borderRadius: radius.lg,
+          border: emailError ? `1.5px solid ${colors.danger}` : '1.5px solid transparent',
           transition: 'border-color 0.18s ease',
         }}>
           <input
@@ -85,7 +86,7 @@ export default function LoginForm({ onSwitchToSignup, onSuccess, onToast }: Logi
             onChange={e => handleEmailChange(e.target.value)}
             onBlur={() => setEmailError(validateEmail(email))}
             onFocus={e => {
-              if (!emailError) e.currentTarget.parentElement!.style.borderColor = '#3182F6';
+              if (!emailError) e.currentTarget.parentElement!.style.borderColor = colors.primary;
             }}
             onBlurCapture={e => {
               if (!emailError) e.currentTarget.parentElement!.style.borderColor = 'transparent';
@@ -97,15 +98,15 @@ export default function LoginForm({ onSwitchToSignup, onSuccess, onToast }: Logi
               outline: 'none',
               background: 'transparent',
               padding: '14px 16px',
-              fontSize: '15px',
-              color: '#191F28',
+              fontSize: font.size.base,
+              color: colors.text.primary,
               fontFamily: 'Pretendard, sans-serif',
-              borderRadius: '12px',
+              borderRadius: radius.lg,
             }}
           />
         </div>
         {emailError && (
-          <p style={{ marginTop: '6px', fontSize: '13px', color: '#F04452', fontFamily: 'Pretendard, sans-serif' }}>
+          <p style={{ marginTop: '6px', fontSize: font.size.sm, color: colors.danger, fontFamily: 'Pretendard, sans-serif' }}>
             {emailError}
           </p>
         )}
@@ -115,18 +116,18 @@ export default function LoginForm({ onSwitchToSignup, onSuccess, onToast }: Logi
       <div style={{ marginBottom: '12px' }}>
         <label style={{
           display: 'block',
-          fontSize: '14px',
-          fontWeight: 600,
-          color: '#191F28',
+          fontSize: font.size.md,
+          fontWeight: font.weight.semibold,
+          color: colors.text.primary,
           marginBottom: '8px',
           fontFamily: 'Pretendard, sans-serif',
         }}>
           비밀번호
         </label>
         <div style={{
-          background: '#F5F6F8',
-          borderRadius: '12px',
-          border: passwordError ? '1.5px solid #F04452' : '1.5px solid transparent',
+          background: colors.bg.subtle,
+          borderRadius: radius.lg,
+          border: passwordError ? `1.5px solid ${colors.danger}` : '1.5px solid transparent',
           position: 'relative',
           transition: 'border-color 0.18s ease',
         }}>
@@ -138,7 +139,7 @@ export default function LoginForm({ onSwitchToSignup, onSuccess, onToast }: Logi
           />
         </div>
         {passwordError && (
-          <p style={{ marginTop: '6px', fontSize: '13px', color: '#F04452', fontFamily: 'Pretendard, sans-serif' }}>
+          <p style={{ marginTop: '6px', fontSize: font.size.sm, color: colors.danger, fontFamily: 'Pretendard, sans-serif' }}>
             {passwordError}
           </p>
         )}
@@ -150,7 +151,7 @@ export default function LoginForm({ onSwitchToSignup, onSuccess, onToast }: Logi
           type="button"
           className="btn-link"
           onClick={handleForgotPassword}
-          style={{ fontSize: '13px', color: '#B0B8C1' }}
+          style={{ fontSize: font.size.sm, color: colors.text.disabled }}
         >
           비밀번호를 잊으셨나요?
         </button>
@@ -170,19 +171,19 @@ export default function LoginForm({ onSwitchToSignup, onSuccess, onToast }: Logi
       {/* 회원가입 */}
       <div style={{
         marginTop: '16px',
-        background: '#F5F6F8',
-        borderRadius: '12px',
+        background: colors.bg.subtle,
+        borderRadius: radius.lg,
         padding: '14px',
         textAlign: 'center',
       }}>
-        <span style={{ fontSize: '14px', color: '#8B95A1', fontFamily: 'Pretendard, sans-serif' }}>
-          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 600 }}>DayZero</span>가 처음이에요{' '}
+        <span style={{ fontSize: font.size.md, color: colors.text.muted, fontFamily: 'Pretendard, sans-serif' }}>
+          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: font.weight.semibold }}>DayZero</span>가 처음이에요{' '}
         </span>
         <button
           type="button"
           className="btn-link"
           onClick={onSwitchToSignup}
-          style={{ color: '#3182F6', fontWeight: 700, fontSize: '14px' }}
+          style={{ color: colors.primary, fontWeight: font.weight.bold, fontSize: font.size.md }}
         >
           가입하기
         </button>
@@ -190,9 +191,9 @@ export default function LoginForm({ onSwitchToSignup, onSuccess, onToast }: Logi
 
       {/* 구분선 */}
       <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0 20px' }}>
-        <div style={{ flex: 1, height: '1px', background: '#E5E8EB' }} />
-        <span style={{ padding: '0 14px', fontSize: '13px', color: '#C4CAD4' }}>또는</span>
-        <div style={{ flex: 1, height: '1px', background: '#E5E8EB' }} />
+        <div style={{ flex: 1, height: '1px', background: colors.border.default }} />
+        <span style={{ padding: '0 14px', fontSize: font.size.sm, color: colors.text.placeholder }}>또는</span>
+        <div style={{ flex: 1, height: '1px', background: colors.border.default }} />
       </div>
 
       {/* Google */}
@@ -205,8 +206,8 @@ export default function LoginForm({ onSwitchToSignup, onSuccess, onToast }: Logi
             width: '48px',
             height: '48px',
             borderRadius: '50%',
-            border: '1.5px solid #E5E8EB',
-            background: '#FFFFFF',
+            border: `1.5px solid ${colors.border.default}`,
+            background: colors.bg.surface,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -214,12 +215,12 @@ export default function LoginForm({ onSwitchToSignup, onSuccess, onToast }: Logi
             transition: 'background 0.15s, border-color 0.15s, transform 0.1s',
           }}
           onMouseEnter={e => {
-            e.currentTarget.style.background = '#F7F8FA';
-            e.currentTarget.style.borderColor = '#D1D6DB';
+            e.currentTarget.style.background = colors.bg.faint;
+            e.currentTarget.style.borderColor = colors.border.light;
           }}
           onMouseLeave={e => {
-            e.currentTarget.style.background = '#FFFFFF';
-            e.currentTarget.style.borderColor = '#E5E8EB';
+            e.currentTarget.style.background = colors.bg.surface;
+            e.currentTarget.style.borderColor = colors.border.default;
           }}
         >
           <svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -95,7 +95,7 @@ export const AllProductsTable: React.FC<Props> = ({
                     <ShoppingBag size={24} color={colors.text.muted} />
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: font.size.base, fontWeight: 600, color: colors.text.secondary, marginBottom: spacing['1'] }}>
+                    <div style={{ fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.text.secondary, marginBottom: spacing['1'] }}>
                         {emptyMessage}
                     </div>
                     <div style={{ fontSize: font.size.sm, color: colors.text.muted }}>
@@ -129,7 +129,7 @@ export const AllProductsTable: React.FC<Props> = ({
                     style={{
                         width: '64px', flexShrink: 0,
                         display: 'flex', alignItems: 'center', gap: '3px',
-                        fontSize: font.size.xs, fontWeight: 600,
+                        fontSize: font.size.xs, fontWeight: font.weight.semibold,
                         color: colors.text.muted,
                         cursor: 'pointer', userSelect: 'none',
                     }}
@@ -176,7 +176,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                 animation: `rowSlideIn 0.3s ease ${Math.min(i * 0.04, 0.4)}s both`,
                             }}
                             onMouseEnter={e => {
-                                if (!isSelected) e.currentTarget.style.background = isIssueRow ? '#FDE8EA' : colors.bg.faint;
+                                if (!isSelected) e.currentTarget.style.background = isIssueRow ? colors.dangerLight : colors.bg.faint;
                             }}
                             onMouseLeave={e => {
                                 if (!isSelected) e.currentTarget.style.background = isIssueRow ? colors.dangerBg : colors.bg.surface;
@@ -211,7 +211,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                         alignItems: 'center',
                                         gap: '4px',
                                         fontSize: font.size.xs,
-                                        fontWeight: 600,
+                                        fontWeight: font.weight.semibold,
                                         color: colors.warningIcon,
                                         background: colors.warningLight,
                                         padding: '3px 8px',
@@ -227,7 +227,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                         alignItems: 'center',
                                         gap: '4px',
                                         fontSize: font.size.xs,
-                                        fontWeight: 600,
+                                        fontWeight: font.weight.semibold,
                                         color: colors.primary,
                                         background: colors.primaryLight,
                                         padding: '3px 8px',
@@ -247,10 +247,10 @@ export const AllProductsTable: React.FC<Props> = ({
                                     x: e.clientX, y: e.clientY,
                                     content: (
                                         <div>
-                                            <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: 500 }}>
+                                            <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: font.weight.medium }}>
                                                 한국어 원문
                                             </div>
-                                            <div style={{ fontSize: font.size.md, fontWeight: 600, lineHeight: '1.4' }}>
+                                            <div style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, lineHeight: '1.4' }}>
                                                 {stripPrefix(r.product.titleKo)}
                                             </div>
                                         </div>
@@ -261,11 +261,11 @@ export const AllProductsTable: React.FC<Props> = ({
                                 <img
                                     src={getProviderLogo(r.product.provider)}
                                     alt={r.product.provider}
-                                    style={{ width: '18px', height: '18px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
+                                    style={{ width: '18px', height: '18px', borderRadius: radius.xs, objectFit: 'cover', flexShrink: 0 }}
                                 />
                                 <span style={{
                                     fontSize: font.size.base,
-                                    fontWeight: 600,
+                                    fontWeight: font.weight.semibold,
                                     color: colors.text.primary,
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
@@ -292,7 +292,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                                 <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px' }}>
                                                     한화 환산 (¥1 = ₩{EXCHANGE_RATE})
                                                 </div>
-                                                <div style={{ fontSize: font.size.lg, fontWeight: 700 }}>
+                                                <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold }}>
                                                     약 ₩{krw.toLocaleString()}
                                                 </div>
                                             </div>
@@ -302,7 +302,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                 onMouseLeave={() => setTooltip(null)}
                             >
                                 <span style={{
-                                    fontSize: font.size.base, fontWeight: 700, color: colors.text.primary,
+                                    fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary,
                                     textDecoration: 'underline', textDecorationStyle: 'dotted',
                                     textUnderlineOffset: '3px', textDecorationColor: colors.text.muted,
                                 }}>
@@ -316,7 +316,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                     <div
                                         style={{
                                             width: '72px', flexShrink: 0,
-                                            fontSize: font.size.base, fontWeight: 600,
+                                            fontSize: font.size.base, fontWeight: font.weight.semibold,
                                             color: profit > 0 ? colors.success : colors.danger,
                                         }}
                                     >
@@ -334,7 +334,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                     {(() => {
                                         const isOos = isMonitored && monitoringResult === 'out_of_stock';
                                         const isError = isMonitored && monitoringResult === 'negative_margin';
-                                        const oosOrange = '#FF9500';
+                                        const oosOrange = colors.orange;
                                         const toggleBg = !isMonitored
                                             ? colors.border.light
                                             : isError
@@ -347,7 +347,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                                     <PackageX size={14} color={oosOrange} />
-                                                    <span style={{ fontWeight: 700, fontSize: font.size.sm }}>품절 감지 — 판매 자동 일시중지</span>
+                                                    <span style={{ fontWeight: font.weight.bold, fontSize: font.size.sm }}>품절 감지 — 판매 자동 일시중지</span>
                                                 </div>
                                                 <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>
                                                     재입고되면 자동으로 판매를 재개해요.
@@ -357,7 +357,7 @@ export const AllProductsTable: React.FC<Props> = ({
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                                     <AlertTriangle size={14} color={colors.danger} />
-                                                    <span style={{ fontWeight: 700, fontSize: font.size.sm }}>쇼핑몰 접근 불가</span>
+                                                    <span style={{ fontWeight: font.weight.bold, fontSize: font.size.sm }}>쇼핑몰 접근 불가</span>
                                                 </div>
                                                 <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>
                                                     상품 페이지가 삭제되었거나 접근할 수 없어요.<br />
@@ -491,7 +491,7 @@ export const AllProductsTable: React.FC<Props> = ({
 
 const colHeader: React.CSSProperties = {
     fontSize: font.size.xs,
-    fontWeight: 600,
+    fontWeight: font.weight.semibold,
     color: colors.text.muted,
     whiteSpace: 'nowrap',
 };

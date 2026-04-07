@@ -117,7 +117,7 @@ export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss })
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
                         fontSize: font.size.base,
-                        fontWeight: 700,
+                        fontWeight: font.weight.bold,
                         color: colors.text.primary,
                         marginBottom: '3px',
                     }}>
@@ -126,13 +126,13 @@ export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss })
                     <div style={{
                         fontSize: font.size.sm,
                         color: colors.text.tertiary,
-                        fontWeight: 500,
+                        fontWeight: font.weight.medium,
                     }}>
                         {isDone ? (
                             <span>{job.totalCount}건 모두 등록 완료</span>
                         ) : (
                             <>
-                                <span style={{ color: colors.primary, fontWeight: 700 }}>{job.currentCount}</span>
+                                <span style={{ color: colors.primary, fontWeight: font.weight.bold }}>{job.currentCount}</span>
                                 <span>/{job.totalCount}건 완료</span>
                             </>
                         )}
@@ -142,7 +142,7 @@ export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss })
                 {/* 퍼센트 */}
                 <div style={{
                     fontSize: font.size.lg,
-                    fontWeight: 700,
+                    fontWeight: font.weight.bold,
                     color: isDone ? colors.success : colors.primary,
                     fontVariantNumeric: 'tabular-nums',
                     flexShrink: 0,
@@ -152,7 +152,7 @@ export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss })
                     textAlign: 'right',
                 }}>
                     {percent}
-                    <span style={{ fontSize: font.size.xs, fontWeight: 600, marginLeft: '1px' }}>%</span>
+                    <span style={{ fontSize: font.size.xs, fontWeight: font.weight.semibold, marginLeft: '1px' }}>%</span>
                 </div>
             </div>
 
@@ -198,7 +198,7 @@ export const RegistrationProgressSection: React.FC<Props> = ({ job, onDismiss })
                     <span style={{
                         fontSize: font.size.sm,
                         color: colors.text.muted,
-                        fontWeight: 500,
+                        fontWeight: font.weight.medium,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',

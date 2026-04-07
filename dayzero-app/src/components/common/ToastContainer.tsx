@@ -1,5 +1,6 @@
 import React from 'react';
 import { useToastStore } from '../../store/useToastStore';
+import { colors, font, radius } from '../../design/tokens';
 
 export const ToastContainer: React.FC = () => {
     const { toasts } = useToastStore();
@@ -22,14 +23,14 @@ export const ToastContainer: React.FC = () => {
                 <div
                     key={toast.id}
                     style={{
-                        background: '#FFFFFF',
-                        color: '#191F28',
+                        background: colors.bg.surface,
+                        color: colors.text.primary,
                         padding: '16px 20px',
-                        borderRadius: '16px 16px 4px 16px', // Tail pointing down-right
-                        fontSize: '15px',
-                        fontWeight: 600,
+                        borderRadius: `${radius.xl} ${radius.xl} ${radius.xs} ${radius.xl}`, // Tail pointing down-right
+                        fontSize: font.size.base,
+                        fontWeight: font.weight.semibold,
                         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-                        border: '1px solid #E5E8EB',
+                        border: `1px solid ${colors.border.default}`,
                         display: 'flex',
                         alignItems: 'flex-start', // Align items to top since we have two lines
                         gap: '12px',
@@ -46,9 +47,9 @@ export const ToastContainer: React.FC = () => {
                         right: '12px',
                         width: '12px',
                         height: '12px',
-                        background: '#FFFFFF',
-                        borderBottom: '1px solid #E5E8EB',
-                        borderRight: '1px solid #E5E8EB',
+                        background: colors.bg.surface,
+                        borderBottom: `1px solid ${colors.border.default}`,
+                        borderRight: `1px solid ${colors.border.default}`,
                         transform: 'rotate(45deg)',
                         zIndex: -1,
                     }} />
@@ -56,7 +57,7 @@ export const ToastContainer: React.FC = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', lineHeight: '1.4' }}>
                         <span>{toast.message}</span>
                         {toast.details && (
-                            <span style={{ fontSize: '14px', fontWeight: 500, color: '#4E5968' }}>
+                            <span style={{ fontSize: font.size.md, fontWeight: font.weight.medium, color: colors.text.secondary }}>
                                 {toast.details}
                             </span>
                         )}

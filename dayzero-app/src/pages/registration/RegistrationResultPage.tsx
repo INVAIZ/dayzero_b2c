@@ -143,7 +143,7 @@ export const RegistrationResultPage: React.FC = () => {
                     <div>
                         <h1 style={{
                             fontSize: font.size['2xl'],
-                            fontWeight: 700,
+                            fontWeight: font.weight.bold,
                             color: colors.text.primary,
                             margin: 0,
                             marginBottom: spacing['2'],
@@ -157,7 +157,7 @@ export const RegistrationResultPage: React.FC = () => {
                                 alignItems: 'center',
                                 gap: '5px',
                                 fontSize: font.size.xs,
-                                fontWeight: 600,
+                                fontWeight: font.weight.semibold,
                                 color: colors.text.secondary,
                                 background: colors.bg.subtle,
                                 padding: '4px 10px',
@@ -412,7 +412,7 @@ const HeaderButton: React.FC<{
             border: `1px solid ${colors.border.default}`,
             borderRadius: radius.md,
             fontSize: font.size.sm,
-            fontWeight: 500,
+            fontWeight: font.weight.medium,
             color: colors.text.secondary,
             cursor: 'pointer',
             transition: 'border-color 0.15s',

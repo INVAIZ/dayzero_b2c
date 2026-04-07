@@ -3,7 +3,7 @@ import { colors, radius } from '../../design/tokens';
 import { AIIcon } from './AIIcon';
 
 export const SOURCE_TAG_STYLES: Record<string, { bg: string; color: string }> = {
-    ai: { bg: colors.primary, color: '#fff' },
+    ai: { bg: colors.primary, color: colors.white },
     crawled: { bg: colors.border.light, color: colors.text.secondary },
 };
 

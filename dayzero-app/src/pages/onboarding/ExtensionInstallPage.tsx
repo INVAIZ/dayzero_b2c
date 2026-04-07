@@ -56,7 +56,7 @@ export default function ExtensionInstallPage() {
                         <div style={{ textAlign: 'center', marginBottom: spacing['8'] }}>
                             <h1
                                 style={{
-                                    fontSize: '24px',
+                                    fontSize: font.size['xl+'],
                                     fontWeight: font.weight.semibold,
                                     color: colors.text.primary,
                                     margin: `0 0 ${spacing['3']}`,
@@ -104,13 +104,13 @@ export default function ExtensionInstallPage() {
                                     { brand: '코스알엑스', name: '어드밴스드 스네일 96 에센스 100ml', discount: '41%', price: '11,900원' },
                                 ].map((item, i) => (
                                     <div key={i} className={`demo-card demo-card-${i}`} style={{
-                                        flex: 1, background: colors.bg.surface, borderRadius: '4px',
+                                        flex: 1, background: colors.bg.surface, borderRadius: radius.xs,
                                         display: 'flex', flexDirection: 'column', position: 'relative',
                                         overflow: 'hidden',
                                     }}>
                                         {/* 상품 이미지 */}
                                         <div style={{
-                                            flex: 1, background: '#ECEEF0',
+                                            flex: 1, background: colors.bg.subtle,
                                             borderRadius: '4px 4px 0 0',
                                         }} />
                                         {/* 상품 정보 */}
@@ -142,7 +142,7 @@ export default function ExtensionInstallPage() {
                                                 alignItems: 'center', justifyContent: 'center',
                                                 boxShadow: '0 2px 8px rgba(49, 130, 246, 0.35)',
                                             }}>
-                                                <img src="/dayzero-icon.png" alt="" style={{ width: '13px', height: '13px', borderRadius: '2px' }} />
+                                                <img src="/dayzero-icon.png" alt="" style={{ width: '13px', height: '13px', borderRadius: radius['2xs'] }} />
                                             </div>
                                         </div>
                                         {/* 수집 완료 체크 */}
@@ -154,7 +154,7 @@ export default function ExtensionInstallPage() {
                                             boxShadow: '0 1px 4px rgba(49, 130, 246, 0.35)',
                                         }}>
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                                <polyline points="20 6 9 17 4 12" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                <polyline points="20 6 9 17 4 12" stroke={colors.white} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
                                         </div>
                                     </div>
@@ -168,10 +168,10 @@ export default function ExtensionInstallPage() {
                                 padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '5px',
                                 boxShadow: '0 2px 8px rgba(49, 130, 246, 0.3)',
                             }}>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={colors.white} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" />
                                 </svg>
-                                <span className="demo-badge-num" style={{ color: '#fff', fontSize: '11px', fontWeight: 700, minWidth: '8px', textAlign: 'center' }} />
+                                <span className="demo-badge-num" style={{ color: colors.white, fontSize: font.size['2xs+'], fontWeight: font.weight.bold, minWidth: '8px', textAlign: 'center' }} />
                             </div>
                             {/* 커서 (macOS 화살표) */}
                             <div className="demo-cursor" style={{
@@ -179,7 +179,7 @@ export default function ExtensionInstallPage() {
                                 filter: 'drop-shadow(2px 2px 3px rgba(0,0,0,0.3))',
                             }}>
                                 <svg width="20" height="24" viewBox="0 0 20 24" fill="none">
-                                    <path d="M2.5 1L2.5 19L7 14L10.5 21L13 19.5L9.5 12.5L15 12L2.5 1Z" fill="#191F28" stroke="white" strokeWidth="2" strokeLinejoin="round" />
+                                    <path d="M2.5 1L2.5 19L7 14L10.5 21L13 19.5L9.5 12.5L15 12L2.5 1Z" fill={colors.text.primary} stroke="white" strokeWidth="2" strokeLinejoin="round" />
                                 </svg>
                             </div>
                         </div>
@@ -274,7 +274,7 @@ export default function ExtensionInstallPage() {
                             <ExternalLink size={28} color={colors.primary} />
                         </div>
                         <h2 style={{
-                            fontSize: '24px', fontWeight: font.weight.semibold,
+                            fontSize: font.size['xl+'], fontWeight: font.weight.semibold,
                             color: colors.text.primary, margin: `0 0 ${spacing['2']}`,
                             lineHeight: '1.4', letterSpacing: '-0.5px', wordBreak: 'keep-all' as const,
                         }}>
@@ -326,7 +326,7 @@ export default function ExtensionInstallPage() {
                         <div style={{ height: spacing['6'] }} />
 
                         <h2 style={{
-                            fontSize: font.size.xl, fontWeight: 800,
+                            fontSize: font.size.xl, fontWeight: font.weight.extrabold,
                             color: colors.text.primary, textAlign: 'center',
                             margin: `0 0 ${spacing['3']}`, lineHeight: 1.4, letterSpacing: '-0.5px',
                         }}>
@@ -340,7 +340,7 @@ export default function ExtensionInstallPage() {
                         </p>
 
                         <div style={{
-                            width: '96px', height: '96px', borderRadius: '48px',
+                            width: '96px', height: '96px', borderRadius: radius.full,
                             background: colors.bg.surface,
                             boxShadow: '0 16px 32px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -557,7 +557,7 @@ export default function ExtensionInstallPage() {
                         </svg>
 
                         <h2 style={{
-                            fontSize: '26px', fontWeight: 800, color: colors.text.primary,
+                            fontSize: font.size['2xl-'], fontWeight: font.weight.extrabold, color: colors.text.primary,
                             margin: '0 0 8px', letterSpacing: '-0.5px',
                             animation: 'riseUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both',
                         }}>
@@ -606,13 +606,13 @@ export default function ExtensionInstallPage() {
                                 width: '100%', height: '54px',
                                 background: colors.primary, color: colors.bg.surface,
                                 border: 'none', borderRadius: radius.lg,
-                                fontSize: '16px', fontWeight: font.weight.bold,
+                                fontSize: font.size['base+'], fontWeight: font.weight.bold,
                                 cursor: 'pointer', letterSpacing: '-0.2px',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: spacing['2'],
                                 transition: 'background 0.15s, transform 0.1s',
                                 animation: 'riseUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both',
                             }}
-                            onMouseEnter={e => e.currentTarget.style.background = '#1B64DA'}
+                            onMouseEnter={e => e.currentTarget.style.background = colors.primaryDark}
                             onMouseLeave={e => e.currentTarget.style.background = colors.primary}
                             onMouseDown={e => e.currentTarget.style.transform = 'scale(0.98)'}
                             onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}

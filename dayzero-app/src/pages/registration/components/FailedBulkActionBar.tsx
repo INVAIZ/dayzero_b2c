@@ -96,7 +96,7 @@ export const BulkActionBar: React.FC<Props> = ({
                         onClick={onEnableMonitoring}
                         icon={<Bell size={16} />}
                         label={`가격·품절 확인 켜기 (${unmonitoredCount})`}
-                        color="#FFFFFF"
+                        color={colors.white}
                         bg={colors.primary}
                     />
                 )}
@@ -144,7 +144,7 @@ export const BulkActionBar: React.FC<Props> = ({
                         border: '1px solid rgba(255,255,255,0.2)',
                         borderRadius: radius.md,
                         fontSize: font.size.md,
-                        fontWeight: 600,
+                        fontWeight: font.weight.semibold,
                         cursor: 'pointer',
                     }}
                 >
@@ -179,7 +179,7 @@ const ActionButton = ({
                 padding: `${spacing['2']} ${spacing['4']}`,
                 color,
                 fontSize: font.size.md,
-                fontWeight: 600,
+                fontWeight: font.weight.semibold,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',

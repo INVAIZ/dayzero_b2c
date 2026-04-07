@@ -79,15 +79,15 @@ export const BulkActionBar: React.FC<Props> = ({
                         gap: spacing['2'],
                         padding: `${spacing['2']} ${spacing['4']}`,
                         background: translateCount > 0 ? colors.primary : 'rgba(255,255,255,0.1)',
-                        color: translateCount > 0 ? '#FFFFFF' : 'rgba(255,255,255,0.3)',
+                        color: translateCount > 0 ? colors.white : 'rgba(255,255,255,0.3)',
                         border: 'none',
                         borderRadius: radius.md,
                         fontSize: font.size.md,
-                        fontWeight: 600,
+                        fontWeight: font.weight.semibold,
                         cursor: translateCount > 0 ? 'pointer' : 'default',
                     }}
                 >
-                    <AIIcon size={16} color="#fff" />
+                    <AIIcon size={16} color={colors.white} />
                     AI로 편집하기 ({translateCount})
                 </button>
                 {translateCount === 0 && selectedCount > 0 && (
@@ -99,8 +99,8 @@ export const BulkActionBar: React.FC<Props> = ({
                     }}>
                         <div style={{
                             position: 'relative', left: '-50%',
-                            background: colors.text.primary, color: '#fff',
-                            fontSize: font.size.xs, fontWeight: 500,
+                            background: colors.text.primary, color: colors.white,
+                            fontSize: font.size.xs, fontWeight: font.weight.medium,
                             padding: '5px 10px',
                             borderRadius: radius.md, whiteSpace: 'nowrap',
                             animation: 'tooltipFadeIn 0.15s ease',
@@ -124,11 +124,11 @@ export const BulkActionBar: React.FC<Props> = ({
                     gap: spacing['2'],
                     padding: `${spacing['2']} ${spacing['4']}`,
                     background: registerCount > 0 ? colors.primary : 'rgba(255,255,255,0.1)',
-                    color: registerCount > 0 ? '#FFFFFF' : 'rgba(255,255,255,0.3)',
+                    color: registerCount > 0 ? colors.white : 'rgba(255,255,255,0.3)',
                     border: 'none',
                     borderRadius: radius.md,
                     fontSize: font.size.md,
-                    fontWeight: 600,
+                    fontWeight: font.weight.semibold,
                     cursor: registerCount > 0 ? 'pointer' : 'default',
                     opacity: registerCount > 0 ? 1 : 0.5,
                 }}
@@ -149,7 +149,7 @@ export const BulkActionBar: React.FC<Props> = ({
                     border: '1px solid rgba(255,255,255,0.2)',
                     borderRadius: radius.md,
                     fontSize: font.size.md,
-                    fontWeight: 600,
+                    fontWeight: font.weight.semibold,
                     cursor: 'pointer',
                 }}
             >

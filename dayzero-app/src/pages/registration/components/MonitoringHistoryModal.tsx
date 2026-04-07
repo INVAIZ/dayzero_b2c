@@ -65,7 +65,7 @@ export const MonitoringHistoryModal: React.FC<Props> = ({ isOpen, onClose, resul
                             <Shield size={18} color={colors.primary} />
                             <span style={{
                                 fontSize: font.size.lg,
-                                fontWeight: 700,
+                                fontWeight: font.weight.bold,
                                 color: colors.text.primary,
                             }}>
                                 가격·품절 확인 기록
@@ -181,7 +181,7 @@ const DailyCheckRow: React.FC<{
         <div style={{
             width: '72px',
             fontSize: font.size.sm,
-            fontWeight: 500,
+            fontWeight: font.weight.medium,
             color: colors.text.secondary,
             flexShrink: 0,
         }}>
@@ -213,19 +213,19 @@ const DailyCheckRow: React.FC<{
                 <StatusTag icon={<CheckCircle size={10} />} label={`정상 ${normalCount}`} color={colors.primary} bg={colors.bg.info} />
             )}
             {priceUpCount > 0 && (
-                <StatusTag icon={<TrendingUp size={10} />} label={`가격 상승 ${priceUpCount}`} color="#E67E22" bg="#FFF3E0" />
+                <StatusTag icon={<TrendingUp size={10} />} label={`가격 상승 ${priceUpCount}`} color={colors.orangeIcon} bg={colors.orangeLight} />
             )}
             {priceDownCount > 0 && (
-                <StatusTag icon={<TrendingDown size={10} />} label={`가격 하락 ${priceDownCount}`} color="#E67E22" bg="#FFF3E0" />
+                <StatusTag icon={<TrendingDown size={10} />} label={`가격 하락 ${priceDownCount}`} color={colors.orangeIcon} bg={colors.orangeLight} />
             )}
             {outOfStockCount > 0 && (
-                <StatusTag icon={<PackageX size={10} />} label={`품절 ${outOfStockCount}`} color="#FF9500" bg="#FEF0E0" />
+                <StatusTag icon={<PackageX size={10} />} label={`품절 ${outOfStockCount}`} color={colors.orange} bg={colors.orangeLight} />
             )}
             {issueCount > 0 && (
                 <StatusTag icon={<AlertTriangle size={10} />} label={`문제 ${issueCount}`} color={colors.danger} bg={colors.dangerLight} />
             )}
             {resumeCount > 0 && (
-                <StatusTag icon={<Play size={10} />} label={`판매 재개 ${resumeCount}`} color={colors.success} bg="#E8F5E9" />
+                <StatusTag icon={<Play size={10} />} label={`판매 재개 ${resumeCount}`} color={colors.success} bg={colors.successLight} />
             )}
         </div>
     </div>
@@ -242,7 +242,7 @@ const StatusTag: React.FC<{
         alignItems: 'center',
         gap: '3px',
         fontSize: font.size.xs,
-        fontWeight: 700,
+        fontWeight: font.weight.bold,
         color,
         background: bg,
         padding: '3px 8px',

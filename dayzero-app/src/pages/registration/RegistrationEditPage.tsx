@@ -136,9 +136,9 @@ export default function RegistrationEditPage() {
                             onClick={() => navigate('/registration')}
                             style={{
                                 padding: `${spacing['2']} ${spacing['4']}`,
-                                background: colors.primary, color: '#fff',
+                                background: colors.primary, color: colors.white,
                                 border: 'none', borderRadius: radius.md,
-                                fontSize: font.size.base, fontWeight: 600, cursor: 'pointer',
+                                fontSize: font.size.base, fontWeight: font.weight.semibold, cursor: 'pointer',
                             }}
                         >
                             목록으로 돌아가기
@@ -219,10 +219,10 @@ export default function RegistrationEditPage() {
                             <img
                                 src={getProviderLogo(product.provider)}
                                 alt={product.provider}
-                                style={{ width: '18px', height: '18px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
+                                style={{ width: '18px', height: '18px', borderRadius: radius.xs, objectFit: 'cover', flexShrink: 0 }}
                             />
                             <span style={{
-                                fontSize: font.size.base, fontWeight: 700, color: colors.text.primary,
+                                fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary,
                                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                             }}>
                                 {displayTitle}
@@ -240,7 +240,7 @@ export default function RegistrationEditPage() {
                             background: isDirty ? colors.primary : colors.border.default,
                             color: isDirty ? colors.bg.surface : colors.text.muted,
                             border: 'none', borderRadius: radius.md,
-                            fontSize: font.size.sm, fontWeight: 600,
+                            fontSize: font.size.sm, fontWeight: font.weight.semibold,
                             cursor: isDirty ? 'pointer' : 'not-allowed',
                             flexShrink: 0,
                             marginLeft: spacing['10'],

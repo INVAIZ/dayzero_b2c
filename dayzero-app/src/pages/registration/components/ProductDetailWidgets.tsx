@@ -45,7 +45,7 @@ export const MonitoringToggle: React.FC<{
     const bg = !checked
         ? colors.border.light
         : hasIssue
-            ? '#FF9500'
+            ? colors.orange
             : colors.primary;
 
     return (
@@ -75,7 +75,7 @@ export const MonitoringToggle: React.FC<{
                 alignItems: 'center',
                 justifyContent: 'center',
             }}>
-                <Shield size={12} color={checked ? (hasIssue ? '#FF9500' : colors.primary) : colors.text.muted} />
+                <Shield size={12} color={checked ? (hasIssue ? colors.orange : colors.primary) : colors.text.muted} />
             </div>
         </button>
     );
@@ -102,7 +102,7 @@ export const InfoCard: React.FC<{
         }}>
             <span style={{
                 fontSize: font.size.sm,
-                fontWeight: 700,
+                fontWeight: font.weight.bold,
                 color: colors.text.tertiary,
                 textTransform: 'uppercase',
                 letterSpacing: '0.3px',
@@ -136,7 +136,7 @@ export const InfoRow: React.FC<{
         <span style={{
             fontSize: font.size.sm,
             color: colors.text.tertiary,
-            fontWeight: 500,
+            fontWeight: font.weight.medium,
         }}>
             {label}
         </span>
@@ -213,7 +213,7 @@ export const AlertCard: React.FC<{
                 }
                 <span style={{
                     fontSize: font.size.base,
-                    fontWeight: 700,
+                    fontWeight: font.weight.bold,
                     color: colors.text.primary,
                 }}>
                     {getTitle()}
@@ -234,7 +234,7 @@ export const AlertCard: React.FC<{
                     style={{
                         fontSize: font.size.sm,
                         color: colors.primary,
-                        fontWeight: 600,
+                        fontWeight: font.weight.semibold,
                         textDecoration: 'underline',
                         textUnderlineOffset: '3px',
                         cursor: 'pointer',
@@ -249,7 +249,7 @@ export const AlertCard: React.FC<{
                     style={{
                         fontSize: font.size.sm,
                         color: colors.primary,
-                        fontWeight: 600,
+                        fontWeight: font.weight.semibold,
                         textDecoration: 'underline',
                         textUnderlineOffset: '3px',
                         cursor: 'pointer',
@@ -271,9 +271,9 @@ export const StatusHelper: React.FC<{
 }> = ({ type, title, description }) => {
     const isPaused = type === 'paused';
     const isWarning = type === 'warning';
-    const bgColor = isWarning ? '#FFF8EE' : colors.bg.info;
-    const borderColor = isWarning ? '#FFD99A' : colors.primaryLightBorder;
-    const iconColor = isWarning ? '#FF9500' : colors.primary;
+    const bgColor = isWarning ? colors.orangeBg : colors.bg.info;
+    const borderColor = isWarning ? colors.orangeBorder : colors.primaryLightBorder;
+    const iconColor = isWarning ? colors.orange : colors.primary;
     return (
         <div style={{
             background: bgColor,
@@ -295,7 +295,7 @@ export const StatusHelper: React.FC<{
                 }
                 <span style={{
                     fontSize: font.size.base,
-                    fontWeight: 700,
+                    fontWeight: font.weight.bold,
                     color: colors.text.primary,
                 }}>
                     {title}

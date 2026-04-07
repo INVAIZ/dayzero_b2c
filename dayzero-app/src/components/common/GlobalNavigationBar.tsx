@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bell, User } from 'lucide-react';
 import { useSourcingStore } from '../../store/useSourcingStore';
+import { colors, font, radius } from '../../design/tokens';
 
 type NavItem = '수집' | '편집' | '등록' | '내 상품' | '설정';
 
@@ -37,8 +38,8 @@ export const GlobalNavigationBar: React.FC = () => {
                 left: 0,
                 right: 0,
                 height: '60px',
-                background: '#FFFFFF',
-                borderBottom: '1px solid #E5E8EB',
+                background: colors.bg.surface,
+                borderBottom: `1px solid ${colors.border.default}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -71,9 +72,9 @@ export const GlobalNavigationBar: React.FC = () => {
                                         display: 'flex',
                                         alignItems: 'center',
                                         position: 'relative',
-                                        fontSize: '15px',
-                                        fontWeight: isActive ? 700 : 500,
-                                        color: isActive ? '#191F28' : '#8B95A1',
+                                        fontSize: font.size.base,
+                                        fontWeight: isActive ? font.weight.bold : font.weight.medium,
+                                        color: isActive ? colors.text.primary : colors.text.muted,
                                         transition: 'color 0.2s ease'
                                     }}
                                 >
@@ -83,12 +84,12 @@ export const GlobalNavigationBar: React.FC = () => {
                                     {count > 0 && (
                                         <div style={{
                                             marginLeft: '6px',
-                                            background: '#F2F4F6',
-                                            color: '#4E5968',
-                                            fontSize: '11px',
-                                            fontWeight: 700,
+                                            background: colors.bg.subtle,
+                                            color: colors.text.secondary,
+                                            fontSize: font.size['2xs+'],
+                                            fontWeight: font.weight.bold,
                                             padding: '2px 6px',
-                                            borderRadius: '10px',
+                                            borderRadius: radius.img,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -105,7 +106,7 @@ export const GlobalNavigationBar: React.FC = () => {
                                             left: 0,
                                             right: 0,
                                             height: '3px',
-                                            background: '#191F28',
+                                            background: colors.text.primary,
                                             borderTopLeftRadius: '3px',
                                             borderTopRightRadius: '3px'
                                         }} />
@@ -128,7 +129,7 @@ export const GlobalNavigationBar: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#4E5968'
+                        color: colors.text.secondary
                     }}>
                         <Bell size={22} strokeWidth={1.5} />
                         {/* Unread Badge - Mock 3 notifications */}
@@ -136,13 +137,13 @@ export const GlobalNavigationBar: React.FC = () => {
                             position: 'absolute',
                             top: '2px',
                             right: '0px',
-                            background: '#F04452',
+                            background: colors.danger,
                             color: 'white',
-                            fontSize: '10px',
-                            fontWeight: 700,
+                            fontSize: font.size['2xs'],
+                            fontWeight: font.weight.bold,
                             padding: '2px 5px',
-                            borderRadius: '10px',
-                            border: '1.5px solid #FFFFFF'
+                            borderRadius: radius.img,
+                            border: `1.5px solid ${colors.bg.surface}`
                         }}>
                             3
                         </div>
@@ -153,13 +154,13 @@ export const GlobalNavigationBar: React.FC = () => {
                         width: '32px',
                         height: '32px',
                         borderRadius: '50%',
-                        background: '#E5E8EB',
+                        background: colors.border.default,
                         border: 'none',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#8B95A1',
+                        color: colors.text.muted,
                         padding: 0
                     }}>
                         <User size={18} strokeWidth={2} />
@@ -175,11 +176,11 @@ export const GlobalNavigationBar: React.FC = () => {
                     left: '50%',
                     transform: 'translateX(-50%)',
                     background: 'rgba(25, 31, 40, 0.9)',
-                    color: '#FFFFFF',
+                    color: colors.white,
                     padding: '12px 24px',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: 500,
+                    borderRadius: radius.md,
+                    fontSize: font.size.md,
+                    fontWeight: font.weight.medium,
                     zIndex: 2000,
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                     animation: 'fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'

@@ -140,7 +140,7 @@ export default function BasicInfoPage() {
                         transition: 'opacity 0.6s ease, transform 0.6s ease',
                     }}>
                         <p style={{
-                            fontSize: '24px', fontWeight: font.weight.semibold,
+                            fontSize: font.size['xl+'], fontWeight: font.weight.semibold,
                             color: colors.text.primary, lineHeight: '1.4',
                             wordBreak: 'keep-all', margin: '0 0 10px', letterSpacing: '-0.5px',
                             opacity: introLine >= 1 ? 1 : 0,
@@ -150,7 +150,7 @@ export default function BasicInfoPage() {
                             일본에 상품을 보내려면
                         </p>
                         <p style={{
-                            fontSize: '24px', fontWeight: font.weight.semibold,
+                            fontSize: font.size['xl+'], fontWeight: font.weight.semibold,
                             color: colors.text.primary, lineHeight: '1.4',
                             wordBreak: 'keep-all', margin: '0 0 10px', letterSpacing: '-0.5px',
                             opacity: introLine >= 2 ? 1 : 0,
@@ -160,11 +160,11 @@ export default function BasicInfoPage() {
                             몇 가지{' '}
                             <span style={{
                                 display: 'inline-flex', alignItems: 'center', gap: '9px',
-                                padding: '6px 16px', borderRadius: '10px',
-                                border: '2px solid #D9D9D9',
-                                background: '#FFFFFF',
+                                padding: '6px 16px', borderRadius: radius.img,
+                                border: `2px solid ${colors.border.default}`,
+                                background: colors.bg.surface,
                                 verticalAlign: 'middle',
-                                fontSize: '20px', fontWeight: font.weight.semibold,
+                                fontSize: font.size['lg+'], fontWeight: font.weight.semibold,
                                 margin: '0 4px',
                                 position: 'relative', top: '-2px',
                             }}>
@@ -174,7 +174,7 @@ export default function BasicInfoPage() {
                             가 필요해요.
                         </p>
                         <p style={{
-                            fontSize: '24px', fontWeight: font.weight.semibold,
+                            fontSize: font.size['xl+'], fontWeight: font.weight.semibold,
                             color: colors.text.primary, lineHeight: '1.4',
                             wordBreak: 'keep-all', margin: '0 0 10px', letterSpacing: '-0.5px',
                             opacity: introLine >= 3 ? 1 : 0,
@@ -209,7 +209,7 @@ export default function BasicInfoPage() {
                 {step === 1 && (
                     <div style={{ animation: 'fadeSlideIn 0.3s ease' }}>
                         <h2 style={{
-                            fontSize: '26px',
+                            fontSize: font.size['2xl-'],
                             fontWeight: font.weight.bold,
                             color: colors.text.primary,
                             textAlign: 'center',
@@ -449,7 +449,7 @@ export default function BasicInfoPage() {
                 {step === 2 && (
                     <div style={{ animation: 'fadeSlideIn 0.3s ease' }}>
                         <h2 style={{
-                            fontSize: '26px',
+                            fontSize: font.size['2xl-'],
                             fontWeight: font.weight.bold,
                             color: colors.text.primary,
                             textAlign: 'center',
@@ -514,7 +514,7 @@ export default function BasicInfoPage() {
                             color: colors.bg.surface,
                             border: 'none',
                             borderRadius: radius.lg,
-                            fontSize: '16px',
+                            fontSize: font.size['base+'],
                             fontWeight: font.weight.semibold,
                             cursor: !isValid ? 'not-allowed' : 'pointer',
                             display: 'flex',

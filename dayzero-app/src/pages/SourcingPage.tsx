@@ -164,7 +164,7 @@ export default function SourcingPage() {
                 {schedules.length === 0 ? (
                     <div style={{
                         background: colors.bg.surface,
-                        borderRadius: '24px',
+                        borderRadius: radius.full,
                         border: `1px solid ${colors.border.default}`,
                         padding: '60px 40px',
                         textAlign: 'center',

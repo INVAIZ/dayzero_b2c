@@ -23,17 +23,17 @@ const flexBetween: React.CSSProperties = {
 const sectionBadgeStyle: React.CSSProperties = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
     width: '20px', height: '20px',
-    background: colors.primary, color: '#fff', borderRadius: radius.full,
-    fontSize: font.size.xs, fontWeight: 700,
+    background: colors.primary, color: colors.white, borderRadius: radius.full,
+    fontSize: font.size.xs, fontWeight: font.weight.bold,
     marginRight: '7px', flexShrink: 0,
 };
 
 const costSummaryBadgeStyle: React.CSSProperties = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
     width: '18px', height: '18px',
-    background: '#fff', color: colors.primary,
+    background: colors.white, color: colors.primary,
     border: `1.5px solid ${colors.primary}`, borderRadius: radius.full,
-    fontSize: font.size['2xs'], fontWeight: 700,
+    fontSize: font.size['2xs'], fontWeight: font.weight.bold,
 };
 
 const summaryRowStyle: React.CSSProperties = {
@@ -92,7 +92,7 @@ const FloatingTooltip: React.FC<{
     return (
         <div ref={ref} style={{
             position: 'fixed', left: adjusted.x, top: adjusted.y, zIndex: zIndex.toast,
-            background: colors.text.primary, color: '#fff',
+            background: colors.text.primary, color: colors.white,
             borderRadius: radius.lg, padding: `${spacing['3']} ${spacing['4']}`,
             boxShadow: shadow.lg, pointerEvents: 'none', maxWidth: '340px', fontSize: font.size.sm,
             animation: 'koIn 0.12s ease',
@@ -107,7 +107,7 @@ const FloatingTooltip: React.FC<{
 
 // ── 섹션 레이블 ─────────────────────────────────────────────────────────────
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary }}>
+    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>
         {children}
     </span>
 );
@@ -157,7 +157,7 @@ const CostRow: React.FC<{
                 />
                 {hasTag && <SourceTag source={source!} />}
                 <span style={{
-                    fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary,
+                    fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary,
                     textDecoration: hasTag ? 'underline' : 'none',
                     textDecorationStyle: 'dotted',
                     textUnderlineOffset: '3px',
@@ -200,7 +200,7 @@ const CostEditRow: React.FC<{
                             onFocus={e => e.target.select()}
                             style={{
                                 width: '90px', textAlign: 'right',
-                                padding: '0 0 3px', fontSize: font.size.sm, fontWeight: 600,
+                                padding: '0 0 3px', fontSize: font.size.sm, fontWeight: font.weight.semibold,
                                 color: colors.primary, background: 'transparent',
                                 border: 'none', borderBottom: `2px solid ${colors.primary}`,
                                 outline: 'none', fontFamily: 'inherit',
@@ -208,7 +208,7 @@ const CostEditRow: React.FC<{
                         />
                         {suffix && <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>{suffix}</span>}
                     </div>
-                    <button onClick={onSave} style={{ padding: '4px 12px', borderRadius: radius.md, background: colors.primary, border: 'none', fontSize: font.size.xs, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>저장</button>
+                    <button onClick={onSave} style={{ padding: '4px 12px', borderRadius: radius.md, background: colors.primary, border: 'none', fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.white, cursor: 'pointer' }}>저장</button>
                     <button onClick={onCancel} style={{ padding: '4px 10px', borderRadius: radius.md, background: 'none', border: `1px solid ${colors.border.default}`, fontSize: font.size.xs, color: colors.text.secondary, cursor: 'pointer' }}>취소</button>
                 </div>
             </div>
@@ -577,9 +577,9 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                 </div>
                 {/* 합계 행 */}
                 <div style={summaryRowStyle}>
-                    <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary }}>국내 비용 소계</span>
+                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>국내 비용 소계</span>
                     <div style={{ textAlign: 'right' }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>
                             ₩{totalCostKrw.toLocaleString()}
                         </span>
                         <div style={{ fontSize: font.size['2xs+'], color: colors.text.muted, marginTop: '2px' }}>
@@ -622,12 +622,12 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                 </div>
                 {/* 해외 배송비 합계 행 */}
                 <div style={summaryRowStyle}>
-                    <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary }}>
+                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>
                         해외 배송비
-                        <span style={{ fontSize: font.size.xs, fontWeight: 400, color: colors.text.muted, marginLeft: '4px' }}>KSE SAGAWA 기준</span>
+                        <span style={{ fontSize: font.size.xs, fontWeight: font.weight.regular, color: colors.text.muted, marginLeft: '4px' }}>KSE SAGAWA 기준</span>
                     </span>
                     <div style={{ textAlign: 'right' }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}</span>
                         <div style={{ fontSize: font.size['2xs+'], color: colors.text.muted, marginTop: '2px' }}>
                             ≈ ¥{intlShipping.toLocaleString()}
                         </div>
@@ -648,16 +648,16 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                 <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <span style={costSummaryBadgeStyle}>1</span>
-                        <span style={{ fontSize: font.size.xs, color: colors.primary, fontWeight: 600 }}>+</span>
+                        <span style={{ fontSize: font.size.xs, color: colors.primary, fontWeight: font.weight.semibold }}>+</span>
                         <span style={costSummaryBadgeStyle}>2</span>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.primary, marginLeft: '4px' }}>전체 비용 합계</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.primary, marginLeft: '4px' }}>전체 비용 합계</span>
                     </div>
                     <div style={{ fontSize: font.size.xs, color: colors.primary, opacity: 0.7, marginTop: '2px' }}>
                         국내 비용 + 해외 배송비 · 상품 구매에 드는 총 비용
                     </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: font.size.base, fontWeight: 700, color: colors.primary }}>
+                    <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.primary }}>
                         ₩{Math.round(totalCostJpy * EXCHANGE_RATE).toLocaleString()}
                     </span>
                     <div style={{ fontSize: font.size.xs, color: colors.primary, opacity: 0.7, marginTop: '2px' }}>
@@ -676,7 +676,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
             {/* 마진율 — 설정 페이지와 동일한 디자인 */}
             <div style={{ marginBottom: spacing['4'] }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing['3'] }}>
-                    <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary }}>마진율</span>
+                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>마진율</span>
                     <div style={{ position: 'relative', width: '76px', flexShrink: 0 }}>
                         <input
                             type="number" className="price-input" value={marginRate}
@@ -684,13 +684,13 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                             style={{
                                 ...priceInputBase,
                                 width: '76px', padding: '8px 24px 8px 8px',
-                                textAlign: 'right', fontWeight: 600,
+                                textAlign: 'right', fontWeight: font.weight.semibold,
                                 fontSize: font.size.sm,
                             }}
                         />
                         <span style={{
                             position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)',
-                            fontSize: font.size.sm, color: colors.text.muted, fontWeight: 500,
+                            fontSize: font.size.sm, color: colors.text.muted, fontWeight: font.weight.medium,
                             pointerEvents: 'none',
                         }}>%</span>
                     </div>
@@ -700,7 +700,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                     const pct = Math.max(0, Math.min(100, ((marginRate - 5) / (60 - 5)) * 100));
                     const sliderColor = marginRate < 15 ? colors.danger
                         : marginRate <= 40 ? colors.primary
-                        : marginRate <= 50 ? '#E67E22' : colors.danger;
+                        : marginRate <= 50 ? colors.orangeIcon : colors.danger;
                     return (
                         <div>
                             <input
@@ -737,11 +737,11 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                 <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <span style={costSummaryBadgeStyle}>1</span>
-                        <span style={{ fontSize: font.size.xs, color: colors.primary, fontWeight: 600 }}>+</span>
+                        <span style={{ fontSize: font.size.xs, color: colors.primary, fontWeight: font.weight.semibold }}>+</span>
                         <span style={costSummaryBadgeStyle}>2</span>
-                        <span style={{ fontSize: font.size.xs, color: colors.primary, fontWeight: 600 }}>+</span>
+                        <span style={{ fontSize: font.size.xs, color: colors.primary, fontWeight: font.weight.semibold }}>+</span>
                         <span style={costSummaryBadgeStyle}>3</span>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.primary, marginLeft: '4px' }}>Qoo10 판매가</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.primary, marginLeft: '4px' }}>Qoo10 판매가</span>
                     </div>
                     <div style={{ fontSize: font.size.xs, color: colors.primary, opacity: 0.7, marginTop: '2px' }}>
                         전체 비용 + 마진 (전체 비용 × 마진율)
@@ -750,7 +750,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                 {editingField === 'salePrice' ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                            <span style={{ fontSize: font.size.sm, color: colors.primary, fontWeight: 600 }}>¥</span>
+                            <span style={{ fontSize: font.size.sm, color: colors.primary, fontWeight: font.weight.semibold }}>¥</span>
                             <input
                                 ref={el => el?.select()}
                                 type="text" inputMode="decimal" className="price-input"
@@ -759,7 +759,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                                 onKeyDown={e => { if (e.key === 'Enter') handleSaveSalePrice(); if (e.key === 'Escape') cancelEditing(); }}
                                 style={{
                                     width: '90px', textAlign: 'right',
-                                    padding: '0 0 3px', fontSize: font.size.sm, fontWeight: 600,
+                                    padding: '0 0 3px', fontSize: font.size.sm, fontWeight: font.weight.semibold,
                                     color: colors.primary, background: 'transparent',
                                     border: 'none', borderBottom: `2px solid ${colors.primary}`,
                                     outline: 'none', fontFamily: 'inherit',
@@ -767,7 +767,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                                 autoFocus
                             />
                         </div>
-                        <button onClick={handleSaveSalePrice} style={{ padding: '4px 12px', borderRadius: radius.md, background: colors.primary, border: 'none', fontSize: font.size.xs, fontWeight: 600, color: '#fff', cursor: 'pointer' }}>저장</button>
+                        <button onClick={handleSaveSalePrice} style={{ padding: '4px 12px', borderRadius: radius.md, background: colors.primary, border: 'none', fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.white, cursor: 'pointer' }}>저장</button>
                         <button onClick={cancelEditing} style={{ padding: '4px 10px', borderRadius: radius.md, background: 'none', border: `1px solid ${colors.primaryLightBorder}`, fontSize: font.size.xs, color: colors.primary, cursor: 'pointer' }}>취소</button>
                     </div>
                 ) : (
@@ -780,7 +780,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         <Pencil size={10} color={colors.primary} className="sale-pencil" style={{ opacity: 0, transition: 'opacity 0.15s', flexShrink: 0 }} />
                         <div>
                             <span style={{
-                                fontSize: font.size.base, fontWeight: 700, color: colors.primary,
+                                fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.primary,
                                 textDecoration: 'underline', textDecorationStyle: 'dotted',
                                 textUnderlineOffset: '3px', textDecorationColor: colors.primary,
                             }}>
@@ -809,27 +809,27 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         background: colors.bg.subtle,
                         borderBottom: `1px solid ${colors.border.default}`,
                     }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>투입 비용</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>투입 비용</span>
                     </div>
                     <div style={{ padding: `0 ${spacing['4']}` }}>
                         <div style={calcRowStyle}>
                             <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>구매 원가</span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{originalPrice.toLocaleString()}</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>₩{originalPrice.toLocaleString()}</span>
                         </div>
                         <Divider />
                         <div style={calcRowStyle}>
                             <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>국내 배송비</span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{domesticShipping.toLocaleString()}</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>₩{domesticShipping.toLocaleString()}</span>
                         </div>
                         <Divider />
                         <div style={calcRowStyle}>
                             <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>작업비</span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{prepCost.toLocaleString()}</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>₩{prepCost.toLocaleString()}</span>
                         </div>
                         <Divider />
                         <div style={calcRowStyle}>
                             <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>해외 배송비</span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}</span>
                         </div>
                     </div>
                     <div style={{
@@ -838,8 +838,8 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         background: colors.bg.subtle,
                         borderTop: `1px solid ${colors.border.default}`,
                     }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>합계</span>
-                        <span style={{ fontSize: font.size.base, fontWeight: 700, color: colors.text.primary }}>₩{Math.round(totalCostJpy * EXCHANGE_RATE).toLocaleString()}</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>합계</span>
+                        <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary }}>₩{Math.round(totalCostJpy * EXCHANGE_RATE).toLocaleString()}</span>
                     </div>
                 </div>
 
@@ -850,7 +850,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         background: colors.bg.subtle,
                         borderBottom: `1px solid ${colors.border.default}`,
                     }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>판매 정산</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>판매 정산</span>
                     </div>
                     <div style={{ padding: `0 ${spacing['4']}` }}>
                         <div style={calcRowStyle}>
@@ -858,7 +858,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                                 판매가
                                 <span style={{ fontSize: font.size.xs, color: colors.text.muted, marginLeft: '4px' }}>¥{salePriceJpy.toLocaleString()}</span>
                             </span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>₩{Math.round(salePriceJpy * EXCHANGE_RATE).toLocaleString()}</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>₩{Math.round(salePriceJpy * EXCHANGE_RATE).toLocaleString()}</span>
                         </div>
                         <Divider />
                         <div style={calcRowStyle}>
@@ -866,7 +866,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                                 Qoo10 수수료
                                 <span style={{ fontSize: font.size.xs, color: colors.text.muted, marginLeft: '4px' }}>10.8%</span>
                             </span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.danger }}>−₩{Math.round(qoo10FeeJpy * EXCHANGE_RATE).toLocaleString()}</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.danger }}>−₩{Math.round(qoo10FeeJpy * EXCHANGE_RATE).toLocaleString()}</span>
                         </div>
                     </div>
                     <div style={{
@@ -875,8 +875,8 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         background: colors.bg.subtle,
                         borderTop: `1px solid ${colors.border.default}`,
                     }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>정산금액</span>
-                        <span style={{ fontSize: font.size.base, fontWeight: 700, color: colors.text.primary }}>₩{Math.round(settlementJpy * EXCHANGE_RATE).toLocaleString()}</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>정산금액</span>
+                        <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary }}>₩{Math.round(settlementJpy * EXCHANGE_RATE).toLocaleString()}</span>
                     </div>
                 </div>
 
@@ -888,8 +888,8 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                     padding: `${spacing['4']} ${spacing['4']}`,
                 }}>
                     <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>1건 판매 시 순이익</span>
-                        <span style={{ fontSize: font.size.base, fontWeight: 700, color: isProfit ? colors.successDark : colors.danger }}>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>1건 판매 시 순이익</span>
+                        <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: isProfit ? colors.successDark : colors.danger }}>
                             {isProfit ? '+' : '−'}₩{Math.abs(profitKrw).toLocaleString()}
                         </span>
                     </div>

@@ -242,11 +242,11 @@ export default function SettingsPage() {
                                     fontSize: font.size.base, fontWeight: font.weight.semibold,
                                     cursor: hasChanges ? 'pointer' : 'default',
                                     background: hasChanges ? colors.primary : colors.bg.subtle,
-                                    color: hasChanges ? '#FFFFFF' : colors.text.muted,
+                                    color: hasChanges ? colors.white : colors.text.muted,
                                     transition: 'all 0.2s',
                                     opacity: hasChanges ? 1 : 0.6,
                                 }}
-                                onMouseOver={e => { if (hasChanges) e.currentTarget.style.background = '#2563EB'; }}
+                                onMouseOver={e => { if (hasChanges) e.currentTarget.style.background = colors.primaryDark; }}
                                 onMouseOut={e => { if (hasChanges) e.currentTarget.style.background = colors.primary; }}
                             >
                                 저장하기
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                     transform: 'translateX(-50%)',
                     zIndex: zIndex.toast, display: 'flex', alignItems: 'center', gap: spacing['2'],
                     padding: `${spacing['3']} ${spacing['6']}`,
-                    background: colors.text.primary, color: '#FFFFFF',
+                    background: colors.text.primary, color: colors.white,
                     borderRadius: radius.lg, fontSize: font.size.base, fontWeight: font.weight.semibold,
                     boxShadow: shadow.lg, animation: 'toastSlideIn 0.25s ease forwards',
                 }}>
@@ -311,8 +311,8 @@ export default function SettingsPage() {
                             <button onClick={() => blocker.proceed?.()} style={{ flex: 1, padding: `${spacing['3']} ${spacing['4']}`, borderRadius: radius.md, border: `1px solid ${colors.border.default}`, background: colors.bg.surface, fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.text.secondary, cursor: 'pointer' }}
                                 onMouseOver={e => e.currentTarget.style.background = colors.bg.subtle}
                                 onMouseOut={e => e.currentTarget.style.background = colors.bg.surface}>나가기</button>
-                            <button onClick={handleSaveAndLeave} style={{ flex: 1, padding: `${spacing['3']} ${spacing['4']}`, borderRadius: radius.md, border: 'none', background: colors.primary, fontSize: font.size.base, fontWeight: font.weight.semibold, color: '#FFFFFF', cursor: 'pointer' }}
-                                onMouseOver={e => e.currentTarget.style.background = '#2563EB'}
+                            <button onClick={handleSaveAndLeave} style={{ flex: 1, padding: `${spacing['3']} ${spacing['4']}`, borderRadius: radius.md, border: 'none', background: colors.primary, fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.white, cursor: 'pointer' }}
+                                onMouseOver={e => e.currentTarget.style.background = colors.primaryDark}
                                 onMouseOut={e => e.currentTarget.style.background = colors.primary}>저장하고 나가기</button>
                         </div>
                     </div>
@@ -387,7 +387,7 @@ function ApplyScopeModal({ changedFields, onConfirm, onCancel }: {
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 background: scope === val ? colors.primary : 'transparent', transition: 'all 0.15s',
                             }}>
-                                {scope === val && <div style={{ width: '6px', height: '6px', borderRadius: radius.full, background: '#FFFFFF' }} />}
+                                {scope === val && <div style={{ width: '6px', height: '6px', borderRadius: radius.full, background: colors.white }} />}
                             </div>
                         </label>
                     ))}
@@ -409,8 +409,8 @@ function ApplyScopeModal({ changedFields, onConfirm, onCancel }: {
                     <button onClick={onCancel} style={{ flex: 1, padding: `${spacing['3']} ${spacing['4']}`, borderRadius: radius.md, border: `1px solid ${colors.border.default}`, background: colors.bg.surface, fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.text.secondary, cursor: 'pointer' }}
                         onMouseOver={e => e.currentTarget.style.background = colors.bg.subtle}
                         onMouseOut={e => e.currentTarget.style.background = colors.bg.surface}>취소</button>
-                    <button onClick={onConfirm} style={{ flex: 1, padding: `${spacing['3']} ${spacing['4']}`, borderRadius: radius.md, border: 'none', background: colors.primary, fontSize: font.size.base, fontWeight: font.weight.semibold, color: '#FFFFFF', cursor: 'pointer' }}
-                        onMouseOver={e => e.currentTarget.style.background = '#2563EB'}
+                    <button onClick={onConfirm} style={{ flex: 1, padding: `${spacing['3']} ${spacing['4']}`, borderRadius: radius.md, border: 'none', background: colors.primary, fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.white, cursor: 'pointer' }}
+                        onMouseOver={e => e.currentTarget.style.background = colors.primaryDark}
                         onMouseOut={e => e.currentTarget.style.background = colors.primary}>저장하기</button>
                 </div>
             </div>
@@ -452,11 +452,11 @@ function SalesContent({ draft, updateDraft }: { draft: DraftState; updateDraft: 
     const marginSignal = draft.marginValue < 15
         ? { color: colors.danger, Icon: AlertTriangle, text: '마진이 너무 낮아요. 수익이 거의 남지 않을 수 있어요.' }
         : draft.marginValue < 25
-            ? { color: '#E67E22', Icon: TrendingUp, text: '가격은 경쟁력 있지만, 수익이 많지 않을 수 있어요.' }
+            ? { color: colors.orangeIcon, Icon: TrendingUp, text: '가격은 경쟁력 있지만, 수익이 많지 않을 수 있어요.' }
             : draft.marginValue <= 40
                 ? { color: colors.primary, Icon: CheckCircle, text: '적정 마진율이에요. 초보 셀러에게 권장하는 범위입니다.' }
                 : draft.marginValue <= 50
-                    ? { color: '#E67E22', Icon: TrendingUp, text: '경쟁 상품 대비 가격이 높아 판매가 어려울 수 있어요.' }
+                    ? { color: colors.orangeIcon, Icon: TrendingUp, text: '경쟁 상품 대비 가격이 높아 판매가 어려울 수 있어요.' }
                     : { color: colors.danger, Icon: AlertTriangle, text: '가격이 너무 높아요.' };
     const sliderPct = ((draft.marginValue - 5) / (60 - 5)) * 100;
 
@@ -574,7 +574,7 @@ function SalesContent({ draft, updateDraft }: { draft: DraftState; updateDraft: 
                                         background: draft.exchangeRateMode === mode ? colors.primary : 'transparent',
                                         transition: 'all 0.25s ease',
                                     }}>
-                                        <div style={{ width: '6px', height: '6px', borderRadius: radius.full, background: '#FFFFFF', opacity: draft.exchangeRateMode === mode ? 1 : 0, transform: draft.exchangeRateMode === mode ? 'scale(1)' : 'scale(0)', transition: 'all 0.2s ease' }} />
+                                        <div style={{ width: '6px', height: '6px', borderRadius: radius.full, background: colors.white, opacity: draft.exchangeRateMode === mode ? 1 : 0, transform: draft.exchangeRateMode === mode ? 'scale(1)' : 'scale(0)', transition: 'all 0.2s ease' }} />
                                     </div>
                                     <span style={{ fontSize: font.size.md, fontWeight: font.weight.medium, color: colors.text.primary }}>
                                         {mode === 'realtime' ? '실시간 환율 적용' : '원하는 환율 고정'}
@@ -1009,7 +1009,7 @@ function PriceSimulation({ marginValue, prepCost, forwarder, intlShipping, excha
                         <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary }}>₩{sim.payoutKrw.toLocaleString()}</span>
                     </div>
                     <div style={{ height: '1px', background: colors.border.default, margin: `0 ${spacing['4']}` }} />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: `${spacing['3']} ${spacing['4']}`, background: sim.profit > 0 ? '#F0FFF4' : '#FEF2F2' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: `${spacing['3']} ${spacing['4']}`, background: sim.profit > 0 ? colors.successBg : colors.dangerBg }}>
                         <span style={{ fontSize: font.size.sm, color: sim.profit > 0 ? colors.success : colors.danger, fontWeight: font.weight.semibold }}>순수익</span>
                         <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: sim.profit > 0 ? colors.success : colors.danger }}>
                             {sim.profit >= 0 ? '+' : ''}₩{sim.profit.toLocaleString()}

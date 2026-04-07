@@ -76,7 +76,7 @@ export default function Qoo10ConnectPage() {
                         <h1
                             style={{
                                 fontSize: font.size['2xl'],
-                                fontWeight: 800,
+                                fontWeight: font.weight.extrabold,
                                 color: colors.text.primary,
                                 margin: `0 0 ${spacing['3']}`,
                                 letterSpacing: '-0.5px',
@@ -89,7 +89,7 @@ export default function Qoo10ConnectPage() {
                                 fontSize: font.size.base,
                                 color: colors.text.tertiary,
                                 margin: 0,
-                                fontWeight: 500,
+                                fontWeight: font.weight.medium,
                                 lineHeight: 1.5,
                             }}
                         >
@@ -103,7 +103,7 @@ export default function Qoo10ConnectPage() {
                         {/* Input Field */}
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'], marginBottom: spacing['2'], position: 'relative' }}>
-                                <label style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary }}>
+                                <label style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>
                                     Qoo10 API Key
                                 </label>
                                 <div
@@ -126,7 +126,7 @@ export default function Qoo10ConnectPage() {
                                         padding: `${spacing['3']} ${spacing['4']}`,
                                         borderRadius: radius.md,
                                         fontSize: font.size.sm,
-                                        fontWeight: 500,
+                                        fontWeight: font.weight.medium,
                                         lineHeight: 1.5,
                                         width: '280px',
                                         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
@@ -172,7 +172,7 @@ export default function Qoo10ConnectPage() {
                                 />
                                 {error && (
                                     <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: spacing['2'] }}>
-                                        <span style={{ fontSize: font.size.sm, color: colors.danger, fontWeight: 500 }}>{error}</span>
+                                        <span style={{ fontSize: font.size.sm, color: colors.danger, fontWeight: font.weight.medium }}>{error}</span>
                                     </div>
                                 )}
                             </div>
@@ -181,7 +181,7 @@ export default function Qoo10ConnectPage() {
                         {/* Guide Block */}
                         <div style={{ background: colors.bg.subtle, borderRadius: radius.lg, padding: spacing['4'], display: 'flex', flexDirection: 'column', gap: spacing['3'] }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span style={{ fontSize: '14px', fontWeight: 600, color: colors.text.secondary }}>
+                                <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.secondary }}>
                                     API Key 발급이 필요하신가요?
                                 </span>
                                 <button
@@ -189,7 +189,7 @@ export default function Qoo10ConnectPage() {
                                     onClick={() => window.open('https://qsm.qoo10.jp/GMKT.INC.Gsm.Web/Login.aspx', '_blank')}
                                     style={{
                                         display: 'flex', alignItems: 'center', gap: '6px',
-                                        fontSize: font.size.sm, fontWeight: 600, color: colors.text.primary,
+                                        fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary,
                                         background: colors.bg.surface, padding: '8px 14px',
                                         borderRadius: radius.md, border: `1px solid ${colors.border.default}`,
                                         cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
@@ -212,10 +212,10 @@ export default function Qoo10ConnectPage() {
                                 ].map((step) => (
                                     <div key={step.num} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '6px 0' }}>
                                         <span style={{
-                                            fontSize: font.size.sm, fontWeight: 700, color: colors.primary,
+                                            fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.primary,
                                             lineHeight: '20px', flexShrink: 0, width: '18px', textAlign: 'center',
                                         }}>{step.num}.</span>
-                                        <span style={{ fontSize: font.size.sm, color: colors.text.secondary, fontWeight: 500, lineHeight: '20px' }}>{step.text}</span>
+                                        <span style={{ fontSize: font.size.sm, color: colors.text.secondary, fontWeight: font.weight.medium, lineHeight: '20px' }}>{step.text}</span>
                                     </div>
                                 ))}
                             </div>
@@ -232,7 +232,7 @@ export default function Qoo10ConnectPage() {
                                 border: 'none',
                                 borderRadius: radius.lg,
                                 fontSize: font.size.md,
-                                fontWeight: 600,
+                                fontWeight: font.weight.semibold,
                                 cursor: (!apiKey.trim() || loading) ? 'not-allowed' : 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -271,7 +271,7 @@ export default function Qoo10ConnectPage() {
                     >
                         <div style={{ height: spacing['6'] }} />
 
-                        <h2 style={{ fontSize: font.size.xl, fontWeight: 800, color: colors.text.primary, textAlign: 'center', margin: `0 0 ${spacing['3']}`, lineHeight: 1.4, letterSpacing: '-0.5px' }}>
+                        <h2 style={{ fontSize: font.size.xl, fontWeight: font.weight.extrabold, color: colors.text.primary, textAlign: 'center', margin: `0 0 ${spacing['3']}`, lineHeight: 1.4, letterSpacing: '-0.5px' }}>
                             축하해요!<br />
                             {storeName} 스토어가 연결되었어요.
                         </h2>
@@ -283,7 +283,7 @@ export default function Qoo10ConnectPage() {
                         <div style={{
                             width: '96px',
                             height: '96px',
-                            borderRadius: '48px',
+                            borderRadius: radius.full,
                             background: colors.bg.surface,
                             boxShadow: '0 16px 32px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04)',
                             display: 'flex',
@@ -315,8 +315,8 @@ export default function Qoo10ConnectPage() {
                             textAlign: 'center',
                             marginBottom: spacing['8']
                         }}>
-                            <div style={{ fontSize: font.size.sm, color: colors.text.tertiary, fontWeight: 500, marginBottom: spacing['2'] }}>연결된 스토어 ID</div>
-                            <div style={{ fontSize: font.size.lg, color: colors.text.primary, fontWeight: 700, fontFamily: 'JetBrains Mono, Pretendard, sans-serif' }}>
+                            <div style={{ fontSize: font.size.sm, color: colors.text.tertiary, fontWeight: font.weight.medium, marginBottom: spacing['2'] }}>연결된 스토어 ID</div>
+                            <div style={{ fontSize: font.size.lg, color: colors.text.primary, fontWeight: font.weight.bold, fontFamily: 'JetBrains Mono, Pretendard, sans-serif' }}>
                                 {sellerId}
                             </div>
                         </div>
@@ -332,7 +332,7 @@ export default function Qoo10ConnectPage() {
                                     border: 'none',
                                     borderRadius: radius.lg,
                                     fontSize: font.size.md,
-                                    fontWeight: 600,
+                                    fontWeight: font.weight.semibold,
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -358,7 +358,7 @@ export default function Qoo10ConnectPage() {
                                     border: 'none',
                                     borderRadius: radius.lg,
                                     fontSize: font.size.base,
-                                    fontWeight: 500,
+                                    fontWeight: font.weight.medium,
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',

@@ -842,7 +842,7 @@ export default function AutoSourcingPage() {
                 }}>
                     <div style={{
                         background: colors.bg.surface,
-                        borderRadius: '24px',
+                        borderRadius: radius.full,
                         width: '90%',
                         maxWidth: testStep === 3 ? '800px' : '480px',
                         padding: spacing['8'],

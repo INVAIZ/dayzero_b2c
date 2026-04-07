@@ -93,7 +93,7 @@ const labelStyles: React.CSSProperties = {
 };
 
 const introLineStyle: React.CSSProperties = {
-    fontSize: '24px',
+    fontSize: font.size['xl+'],
     fontWeight: font.weight.semibold,
     color: colors.text.primary,
     lineHeight: '1.4',
@@ -123,8 +123,8 @@ const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
 };
 
 const MARGIN_SIGNALS = {
-    danger: { bg: '#FEF2F2', border: '#FECACA', text: '#DC2626', Icon: AlertTriangle },
-    warning: { bg: '#FFF7ED', border: '#FED7AA', text: '#EA580C', Icon: TrendingUp },
+    danger: { bg: colors.dangerBg, border: colors.dangerLight, text: colors.dangerDark, Icon: AlertTriangle },
+    warning: { bg: colors.warningLight, border: colors.warningBorder, text: colors.warningIcon, Icon: TrendingUp },
     success: { bg: colors.bg.info, border: colors.primaryLightBorder, text: colors.primary, Icon: CheckCircle },
 } as const;
 
@@ -229,11 +229,11 @@ export default function BasicMarginPage() {
     const marginSignal = marginValue < 15
         ? { text: '마진이 너무 낮아요. 판매해도 수익이 거의 남지 않을 수 있어요.', sliderColor: colors.danger, type: 'danger' as const }
         : marginValue < 25
-            ? { text: '가격은 경쟁력 있지만, 수익이 많지 않을 수 있어요.', sliderColor: '#E67E22', type: 'warning' as const }
+            ? { text: '가격은 경쟁력 있지만, 수익이 많지 않을 수 있어요.', sliderColor: colors.orangeIcon, type: 'warning' as const }
             : marginValue <= 40
                 ? { text: '적정 마진율이에요. 초보 셀러에게 권장하는 범위입니다.', sliderColor: colors.primary, type: 'success' as const }
                 : marginValue <= 50
-                    ? { text: '경쟁 상품 대비 가격이 높아 판매가 어려울 수 있어요.', sliderColor: '#E67E22', type: 'warning' as const }
+                    ? { text: '경쟁 상품 대비 가격이 높아 판매가 어려울 수 있어요.', sliderColor: colors.orangeIcon, type: 'warning' as const }
                     : { text: '가격이 너무 높아요. 경쟁 상품 대비 판매가 어려울 수 있어요.', sliderColor: colors.danger, type: 'danger' as const };
 
     const sliderPct = ((marginValue - 5) / (60 - 5)) * 100;
@@ -265,11 +265,11 @@ export default function BasicMarginPage() {
                             }}>
                                 <span style={{
                                     display: 'inline-flex', alignItems: 'center', gap: '9px',
-                                    padding: '6px 16px', borderRadius: '10px',
-                                    border: '2px solid #D9D9D9',
-                                    background: '#FFFFFF',
+                                    padding: '6px 16px', borderRadius: radius.img,
+                                    border: `2px solid ${colors.border.default}`,
+                                    background: colors.bg.surface,
                                     verticalAlign: 'middle',
-                                    fontSize: '20px', fontWeight: font.weight.semibold,
+                                    fontSize: font.size['lg+'], fontWeight: font.weight.semibold,
                                     marginRight: '4px',
                                     position: 'relative', top: '-2px',
                                 }}>
@@ -308,7 +308,7 @@ export default function BasicMarginPage() {
                     ) : (
                         <>
                     <h2 style={{
-                        fontSize: '26px', fontWeight: font.weight.bold, color: colors.text.primary,
+                        fontSize: font.size['2xl-'], fontWeight: font.weight.bold, color: colors.text.primary,
                         textAlign: 'center', margin: `0 0 ${spacing['3']}`, letterSpacing: '-0.5px',
                         animation: 'fadeSlideIn 0.4s ease both',
                     }}>
@@ -621,7 +621,7 @@ export default function BasicMarginPage() {
                                             </span>
                                         </div>
                                         <div style={{ height: '1px', background: colors.border.default, margin: `0 ${spacing['4']}` }} />
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: `${spacing['3']} ${spacing['4']}`, background: actualProfitKrw > 0 ? '#F0FFF4' : '#FEF2F2' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: `${spacing['3']} ${spacing['4']}`, background: actualProfitKrw > 0 ? colors.successBg : colors.dangerBg }}>
                                             <span style={{ fontSize: font.size.sm, color: actualProfitKrw > 0 ? colors.success : colors.danger, fontWeight: font.weight.semibold }}>순수익</span>
                                             <span style={{
                                                 fontSize: font.size.base, fontWeight: font.weight.bold, fontFamily: font.family.sans,
@@ -697,7 +697,7 @@ export default function BasicMarginPage() {
                                 width: '100%', height: '52px',
                                 background: colors.primary, color: colors.bg.surface,
                                 border: 'none', borderRadius: radius.lg,
-                                fontSize: '16px', fontWeight: font.weight.semibold, cursor: 'pointer',
+                                fontSize: font.size['base+'], fontWeight: font.weight.semibold, cursor: 'pointer',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: spacing['2'],
                                 transition: 'background 0.2s, transform 0.1s',
                             }}

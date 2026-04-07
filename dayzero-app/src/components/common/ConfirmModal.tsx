@@ -100,7 +100,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
                 <h3 style={{
                     fontSize: font.size.xl,
-                    fontWeight: 700,
+                    fontWeight: font.weight.bold,
                     color: colors.text.primary,
                     marginBottom: '12px',
                     wordBreak: 'keep-all',
@@ -134,7 +134,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                             background: colors.bg.subtle,
                             border: 'none',
                             fontSize: font.size.md,
-                            fontWeight: 600,
+                            fontWeight: font.weight.semibold,
                             color: colors.text.secondary,
                             cursor: 'pointer',
                             transition: 'background 0.2s',
@@ -156,8 +156,8 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                             background: type === 'danger' ? colors.danger : colors.primary,
                             border: 'none',
                             fontSize: font.size.md,
-                            fontWeight: 700,
-                            color: '#FFFFFF',
+                            fontWeight: font.weight.bold,
+                            color: colors.white,
                             cursor: 'pointer',
                             transition: 'opacity 0.2s',
                         }}

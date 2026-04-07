@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { colors, font, radius } from '../../design/tokens';
 
 interface PasswordInputProps {
   value: string;
@@ -37,10 +38,10 @@ export default function PasswordInput({
             outline: 'none',
             background: 'transparent',
             padding: '14px 40px 14px 16px',
-            fontSize: '15px',
-            color: '#191F28',
+            fontSize: font.size.base,
+            color: colors.text.primary,
             fontFamily: 'Pretendard, sans-serif',
-            borderRadius: '12px',
+            borderRadius: radius.lg,
           } : undefined}
         />
         <button
@@ -55,19 +56,19 @@ export default function PasswordInput({
             border: 'none',
             cursor: 'pointer',
             padding: '4px',
-            color: '#C4CAD4',
+            color: colors.text.placeholder,
             display: 'flex',
             alignItems: 'center',
             transition: 'color 0.15s',
           }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#8B95A1')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#C4CAD4')}
+          onMouseEnter={e => (e.currentTarget.style.color = colors.text.muted)}
+          onMouseLeave={e => (e.currentTarget.style.color = colors.text.placeholder)}
         >
           {visible ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
       {error && (
-        <p style={{ marginTop: '6px', fontSize: '13px', color: '#F04452', fontFamily: 'Pretendard, sans-serif' }}>
+        <p style={{ marginTop: '6px', fontSize: font.size.sm, color: colors.danger, fontFamily: 'Pretendard, sans-serif' }}>
           {error}
         </p>
       )}

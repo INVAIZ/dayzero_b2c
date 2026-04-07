@@ -41,7 +41,7 @@ const SortHeader: React.FC<{
             style={{
                 ...style,
                 display: 'flex', alignItems: 'center', gap: '3px',
-                fontSize: font.size.xs, fontWeight: 600,
+                fontSize: font.size.xs, fontWeight: font.weight.semibold,
                 color: colors.text.muted,
                 cursor: 'pointer', userSelect: 'none',
             }}
@@ -240,7 +240,7 @@ export default function EditingListPage() {
             {/* 페이지 헤더 */}
             <div style={{ marginBottom: spacing['6'], animation: 'fadeInUp 0.6s ease' }}>
                 <div style={{ marginBottom: '6px' }}>
-                    <h1 style={{ fontSize: font.size['2xl'], fontWeight: 700, color: colors.text.primary }}>수집된 상품</h1>
+                    <h1 style={{ fontSize: font.size['2xl'], fontWeight: font.weight.bold, color: colors.text.primary }}>수집된 상품</h1>
                 </div>
                 <p style={{ fontSize: font.size.md, color: colors.text.tertiary }}>
                     번역 후 Qoo10에 등록할 상품을 편집하고 등록하세요.
@@ -269,9 +269,9 @@ export default function EditingListPage() {
                         {label}
                         <span style={{
                             padding: '2px 7px', borderRadius: radius.full,
-                            fontSize: font.size.xs, fontWeight: 700,
+                            fontSize: font.size.xs, fontWeight: font.weight.bold,
                             background: activeTab === key ? colors.primary : colors.bg.subtle,
-                            color: activeTab === key ? '#fff' : colors.text.muted,
+                            color: activeTab === key ? colors.white : colors.text.muted,
                         }}>
                             {counts[key]}
                         </span>
@@ -338,7 +338,7 @@ export default function EditingListPage() {
                                 </div>
 
                                 {filter !== '전체' && logo && (
-                                    <img src={logo} alt={filter} style={{ width: '16px', height: '16px', borderRadius: '4px', objectFit: 'cover' }} />
+                                    <img src={logo} alt={filter} style={{ width: '16px', height: '16px', borderRadius: radius.xs, objectFit: 'cover' }} />
                                 )}
 
                                 <div style={{
@@ -362,12 +362,12 @@ export default function EditingListPage() {
                 padding: `0 ${spacing['5']}`, marginBottom: spacing['2'],
             }}>
                 <Checkbox checked={allPageSelected} onClick={handleSelectAll} />
-                <div style={{ width: '48px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600 }}>이미지</div>
+                <div style={{ width: '48px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.semibold }}>이미지</div>
                 <SortHeader label="상품명" sortKey="title" active={sortKey} dir={sortDir} onSort={handleSort} style={{ flex: 3 }} />
-                <div style={{ flex: 1.3, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600 }}>카테고리</div>
-                <div style={{ width: '90px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600, paddingLeft: '4px' }}>무게</div>
+                <div style={{ flex: 1.3, fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.semibold }}>카테고리</div>
+                <div style={{ width: '90px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.semibold, paddingLeft: '4px' }}>무게</div>
                 <SortHeader label="판매가" sortKey="salePriceJpy" active={sortKey} dir={sortDir} onSort={handleSort} style={{ width: '90px', flexShrink: 0 }} />
-                <div style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: 600 }}>원가</div>
+                <div style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.semibold }}>원가</div>
                 <SortHeader label="최근 수집일" sortKey="createdAt" active={sortKey} dir={sortDir} onSort={handleSort} style={{ width: '90px', flexShrink: 0 }} />
             </div>
 

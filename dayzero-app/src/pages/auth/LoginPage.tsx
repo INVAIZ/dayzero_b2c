@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from '../../components/auth/LoginForm';
 import SignupForm from '../../components/auth/SignupForm';
+import { colors, font, radius } from '../../design/tokens';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -12,9 +13,9 @@ interface Toast {
 }
 
 const toastColor: Record<ToastType, string> = {
-  success: '#3ED4A4',
-  error: '#F04452',
-  info: '#3182F6',
+  success: colors.successAlt,
+  error: colors.danger,
+  info: colors.primary,
 };
 
 let toastId = 0;
@@ -52,7 +53,7 @@ export default function LoginPage() {
     <div
       style={{
         minHeight: '100vh',
-        background: '#F9FAFB',
+        background: colors.bg.page,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -78,8 +79,8 @@ export default function LoginPage() {
           <div
             key={toast.id}
             style={{
-              background: '#FFFFFF',
-              borderRadius: '12px',
+              background: colors.bg.surface,
+              borderRadius: radius.lg,
               boxShadow: '0 4px 20px rgba(0,0,0,0.14)',
               display: 'flex',
               overflow: 'hidden',
@@ -91,9 +92,9 @@ export default function LoginPage() {
               style={{
                 padding: '13px 20px',
                 margin: 0,
-                fontSize: '14px',
-                fontWeight: 500,
-                color: '#191F28',
+                fontSize: font.size.md,
+                fontWeight: font.weight.medium,
+                color: colors.text.primary,
                 fontFamily: 'Pretendard, sans-serif',
               }}
             >
@@ -109,7 +110,7 @@ export default function LoginPage() {
         style={{
           width: '100%',
           maxWidth: '400px',
-          background: '#FFFFFF',
+          background: colors.bg.surface,
           borderRadius: '20px',
           padding: '40px 32px 32px',
           boxShadow: '0 2px 12px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.06)',

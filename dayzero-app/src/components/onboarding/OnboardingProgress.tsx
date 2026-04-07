@@ -1,5 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
+import { colors, font } from '../../design/tokens';
 
 interface OnboardingProgressProps {
     currentStep: number;
@@ -31,19 +32,19 @@ export const OnboardingProgress: React.FC<OnboardingProgressProps> = ({ currentS
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: '14px',
-                            fontWeight: 600,
+                            fontSize: font.size.md,
+                            fontWeight: font.weight.semibold,
                             transition: 'all 0.3s ease',
                             ...(isCompleted ? {
-                                background: '#3182F6',
-                                color: '#FFFFFF',
+                                background: colors.primary,
+                                color: colors.white,
                             } : isCurrent ? {
-                                background: '#FFFFFF',
-                                color: '#3182F6',
-                                border: '2px solid #3182F6',
+                                background: colors.bg.surface,
+                                color: colors.primary,
+                                border: `2px solid ${colors.primary}`,
                             } : {
-                                background: '#F2F4F6',
-                                color: '#8B95A1',
+                                background: colors.bg.subtle,
+                                color: colors.text.muted,
                                 border: '2px solid transparent',
                             })
                         }}>
@@ -57,7 +58,7 @@ export const OnboardingProgress: React.FC<OnboardingProgressProps> = ({ currentS
                                 height: '2px',
                                 borderRadius: '1px',
                                 transition: 'background 0.3s ease',
-                                background: isCompleted ? '#3182F6' : '#E5E8EB',
+                                background: isCompleted ? colors.primary : colors.border.default,
                             }} />
                         )}
                     </React.Fragment>

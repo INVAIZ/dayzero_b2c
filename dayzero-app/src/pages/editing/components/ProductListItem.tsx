@@ -40,8 +40,8 @@ const WeightSection: React.FC<{
                 <div style={{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                     background: tag.bg, color: tag.color,
-                    padding: '3px 5px', borderRadius: '4px', lineHeight: 1, flexShrink: 0,
-                }}>{source === 'ai' ? <AIIcon size={10} color="#fff" /> : <Globe size={10} />}</div>
+                    padding: '3px 5px', borderRadius: radius.xs, lineHeight: 1, flexShrink: 0,
+                }}>{source === 'ai' ? <AIIcon size={10} color={colors.white} /> : <Globe size={10} />}</div>
             )}
             <span>{SOURCE_TOOLTIPS[source] ?? ''}</span>
         </div>
@@ -56,7 +56,7 @@ const WeightSection: React.FC<{
                 style={{
                     display: 'flex', alignItems: 'center', gap: '5px',
                     fontSize: font.size.base,
-                    fontWeight: 700,
+                    fontWeight: font.weight.bold,
                     color: hasWeight ? colors.text.primary : colors.danger,
                     cursor: 'default',
                     padding: '4px 0',
@@ -77,13 +77,13 @@ const WeightSection: React.FC<{
                         background: tag.bg, color: tag.color,
                         padding: '2px 4px', borderRadius: '3px',
                         lineHeight: 1,
-                    }}>{source === 'ai' ? <AIIcon size={9} color="#fff" /> : <Globe size={9} />}</div>
+                    }}>{source === 'ai' ? <AIIcon size={9} color={colors.white} /> : <Globe size={9} />}</div>
                 )}
 
                 {hasWeight ? (
-                    <span>{product.weightKg}<span style={{ fontSize: font.size['2xs+'], marginLeft: '2px', opacity: 0.6, fontWeight: 500 }}>kg</span></span>
+                    <span>{product.weightKg}<span style={{ fontSize: font.size['2xs+'], marginLeft: '2px', opacity: 0.6, fontWeight: font.weight.medium }}>kg</span></span>
                 ) : (
-                    <span style={{ fontSize: font.size.xs, fontWeight: 600 }}>무게 설정 필요</span>
+                    <span style={{ fontSize: font.size.xs, fontWeight: font.weight.semibold }}>무게 설정 필요</span>
                 )}
             </div>
         </div>
@@ -179,10 +179,10 @@ export const ProductListItem: React.FC<Props> = ({
                     style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}
                     onMouseMove={isTranslated ? (e) => showTooltip(e, (
                         <div>
-                            <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: 500 }}>
+                            <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: font.weight.medium }}>
                                 한국어 원문
                             </div>
-                            <div style={{ fontSize: font.size.md, fontWeight: 600, lineHeight: '1.4' }}>
+                            <div style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, lineHeight: '1.4' }}>
                                 {stripPrefix(product.titleKo)}
                             </div>
                         </div>
@@ -191,11 +191,11 @@ export const ProductListItem: React.FC<Props> = ({
                 >
                     <img
                         src={getProviderLogo(product.provider)} alt={product.provider}
-                        style={{ width: '18px', height: '18px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
+                        style={{ width: '18px', height: '18px', borderRadius: radius.xs, objectFit: 'cover', flexShrink: 0 }}
                     />
                     {isProcessing ? (
                         <span style={{
-                            fontSize: font.size.base, fontWeight: 600,
+                            fontSize: font.size.base, fontWeight: font.weight.semibold,
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                             background: `linear-gradient(90deg, ${colors.text.muted} 0%, ${colors.text.primary} 40%, ${colors.text.muted} 80%)`,
                             backgroundSize: '200% 100%',
@@ -210,7 +210,7 @@ export const ProductListItem: React.FC<Props> = ({
                         <span
                             key={product.translationStatus}
                             style={{
-                                fontSize: font.size.base, fontWeight: 600, color: colors.text.primary,
+                                fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.text.primary,
                                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                                 textDecoration: isTranslated ? 'underline' : 'none',
                                 textDecorationStyle: 'dotted',
@@ -226,7 +226,7 @@ export const ProductListItem: React.FC<Props> = ({
                         <span style={{
                             flexShrink: 0, display: 'flex', alignItems: 'center', gap: '4px',
                             padding: '3px 8px', borderRadius: radius.xs,
-                            fontSize: font.size.xs, fontWeight: 600,
+                            fontSize: font.size.xs, fontWeight: font.weight.semibold,
                             background: colors.primaryLight, color: colors.primary,
                             whiteSpace: 'nowrap',
                         }}>
@@ -237,7 +237,7 @@ export const ProductListItem: React.FC<Props> = ({
                     {product.translationStatus === 'failed' && (
                         <span style={{
                             flexShrink: 0, padding: '2px 7px', borderRadius: radius.xs,
-                            fontSize: font.size.xs, fontWeight: 600,
+                            fontSize: font.size.xs, fontWeight: font.weight.semibold,
                             background: colors.dangerLight, color: colors.danger,
                         }}>
                             번역 실패
@@ -262,7 +262,7 @@ export const ProductListItem: React.FC<Props> = ({
                             : '등록하기 전에 편집이 필요해요.';
                     const tooltipContent = (
                         <div style={{ minWidth: '230px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: font.size.sm, fontWeight: 700, marginBottom: '10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: font.size.sm, fontWeight: font.weight.bold, marginBottom: '10px' }}>
                                 <Info size={13} style={{ flexShrink: 0 }} />
                                 {tooltipTitle}
                             </div>
@@ -271,11 +271,11 @@ export const ProductListItem: React.FC<Props> = ({
                                     <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                             <span style={{
-                                                fontSize: '10px', fontWeight: 700, color: colors.primary,
+                                                fontSize: font.size['2xs'], fontWeight: font.weight.bold, color: colors.primary,
                                                 background: 'rgba(49,130,246,0.15)', padding: '1px 5px',
                                                 borderRadius: '3px', flexShrink: 0,
                                             }}>필수</span>
-                                            <span style={{ fontSize: font.size.xs, fontWeight: 500, color: item.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)', whiteSpace: 'nowrap' }}>
+                                            <span style={{ fontSize: font.size.xs, fontWeight: font.weight.medium, color: item.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)', whiteSpace: 'nowrap' }}>
                                                 {item.label}
                                             </span>
                                         </div>
@@ -288,7 +288,7 @@ export const ProductListItem: React.FC<Props> = ({
                                 <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '4px 0' }} />
                                 {optionalItems.map(item => (
                                     <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
-                                        <span style={{ fontSize: font.size.xs, fontWeight: 500, color: item.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.65)', whiteSpace: 'nowrap' }}>
+                                        <span style={{ fontSize: font.size.xs, fontWeight: font.weight.medium, color: item.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.65)', whiteSpace: 'nowrap' }}>
                                             {item.label}
                                         </span>
                                         {item.done
@@ -309,7 +309,7 @@ export const ProductListItem: React.FC<Props> = ({
                                     style={{
                                         display: 'inline-flex', alignItems: 'center', gap: '3px',
                                         padding: '2px 8px', borderRadius: radius.full,
-                                        fontSize: font.size.xs, fontWeight: 600,
+                                        fontSize: font.size.xs, fontWeight: font.weight.semibold,
                                         background: colors.successLight, color: colors.success,
                                         cursor: 'default',
                                     }}>
@@ -327,7 +327,7 @@ export const ProductListItem: React.FC<Props> = ({
                                 style={{
                                     display: 'inline-flex', alignItems: 'center', gap: '4px',
                                     padding: '2px 8px', borderRadius: radius.full,
-                                    fontSize: font.size.xs, fontWeight: 500,
+                                    fontSize: font.size.xs, fontWeight: font.weight.medium,
                                     background: colors.warningLight, color: colors.warningIcon,
                                     cursor: 'default',
                                     whiteSpace: 'nowrap',
@@ -349,16 +349,16 @@ export const ProductListItem: React.FC<Props> = ({
                 style={{ flex: 1.3, minWidth: 0 }}
                 onMouseMove={(e) => showTooltip(e, (
                     <div>
-                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: 500 }}>
+                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: font.weight.medium }}>
                             원본 카테고리
                         </div>
-                        <div style={{ fontSize: font.size.sm, fontWeight: 500, marginBottom: '8px' }}>
+                        <div style={{ fontSize: font.size.sm, fontWeight: font.weight.medium, marginBottom: '8px' }}>
                             {product.sourceCategoryPath}
                         </div>
-                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: 500 }}>
+                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: font.weight.medium }}>
                             Qoo10 카테고리
                         </div>
-                        <span style={{ fontSize: font.size.sm, fontWeight: 500 }}>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.medium }}>
                             {toKoCategory(product.qoo10CategoryPath)}
                         </span>
                     </div>
@@ -382,10 +382,10 @@ export const ProductListItem: React.FC<Props> = ({
                 style={{ width: '90px', flexShrink: 0 }}
                 onMouseMove={(e) => showTooltip(e, (
                     <div>
-                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: 500 }}>
+                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: font.weight.medium }}>
                             한화 환산 (¥1 = ₩{EXCHANGE_RATE})
                         </div>
-                        <div style={{ fontSize: font.size.lg, fontWeight: 700 }}>
+                        <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold }}>
                             약 ₩{krwEquivalent.toLocaleString()}
                         </div>
                     </div>
@@ -393,7 +393,7 @@ export const ProductListItem: React.FC<Props> = ({
                 onMouseLeave={hideTooltip}
             >
                 <span style={{
-                    fontSize: font.size.base, fontWeight: 700, color: colors.text.primary,
+                    fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary,
                     textDecoration: 'underline', textDecorationStyle: 'dotted',
                     textUnderlineOffset: '3px', textDecorationColor: colors.text.muted,
                     cursor: 'default',
@@ -407,10 +407,10 @@ export const ProductListItem: React.FC<Props> = ({
                 style={{ width: '80px', flexShrink: 0 }}
                 onMouseMove={(e) => showTooltip(e, (
                     <div>
-                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: 500 }}>
+                        <div style={{ fontSize: font.size.xs, color: 'rgba(255,255,255,0.55)', marginBottom: '4px', fontWeight: font.weight.medium }}>
                             엔화 환산 (₩1 = ¥{(1 / EXCHANGE_RATE).toFixed(4)})
                         </div>
-                        <div style={{ fontSize: font.size.lg, fontWeight: 700 }}>
+                        <div style={{ fontSize: font.size.lg, fontWeight: font.weight.bold }}>
                             약 ¥{Math.round(product.originalPriceKrw / EXCHANGE_RATE).toLocaleString()}
                         </div>
                     </div>
@@ -418,7 +418,7 @@ export const ProductListItem: React.FC<Props> = ({
                 onMouseLeave={hideTooltip}
             >
                 <span style={{
-                    fontSize: font.size.base, fontWeight: 700, color: colors.text.primary,
+                    fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary,
                     textDecoration: 'underline', textDecorationStyle: 'dotted',
                     textUnderlineOffset: '3px', textDecorationColor: colors.text.muted,
                     cursor: 'default',

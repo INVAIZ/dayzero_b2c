@@ -35,7 +35,7 @@ const inputBase: React.CSSProperties = {
 };
 
 const sectionLabelStyle: React.CSSProperties = {
-    fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary,
+    fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary,
 };
 
 const ghostButtonBase: React.CSSProperties = {
@@ -49,9 +49,9 @@ const warningBorderStyle: React.CSSProperties = {
 const tooltipStyle: React.CSSProperties = {
     position: 'absolute', top: 'calc(100% + 8px)', left: '50%',
     transform: 'translateX(-50%)',
-    background: colors.text.primary, color: '#fff',
+    background: colors.text.primary, color: colors.white,
     borderRadius: radius.md, padding: `${spacing['2']} ${spacing['3']}`,
-    fontSize: font.size.xs, fontWeight: 500, lineHeight: font.lineHeight.normal,
+    fontSize: font.size.xs, fontWeight: font.weight.medium, lineHeight: font.lineHeight.normal,
     zIndex: zIndex.dropdown, pointerEvents: 'none',
     animation: 'tooltipFadeIn 0.15s ease',
     boxShadow: shadow.md,
@@ -133,7 +133,7 @@ const AIButton: React.FC<{
                 background: isDisabled ? colors.bg.subtle : colors.primaryLight,
                 border: `1px solid ${isDisabled ? colors.border.default : colors.primaryBorder}`,
                 borderRadius: radius.md,
-                fontSize: font.size.sm, fontWeight: 600,
+                fontSize: font.size.sm, fontWeight: font.weight.semibold,
                 color: isDisabled ? colors.text.muted : colors.primary,
                 cursor: isDisabled ? 'not-allowed' : 'pointer',
                 transition: 'all 0.15s', flexShrink: 0,
@@ -156,7 +156,7 @@ const StatusTag: React.FC<{
     return (
         <span style={{
             display: 'inline-flex', alignItems: 'center', gap: '3px',
-            fontSize: font.size.xs, fontWeight: 600,
+            fontSize: font.size.xs, fontWeight: font.weight.semibold,
             color: c.color, background: c.bg,
             padding: `2px ${spacing['2']}`, borderRadius: radius.full,
             marginLeft: spacing['2'],
@@ -229,7 +229,7 @@ const CustomSelect: React.FC<{
 
     return (
         <div ref={ref}>
-            <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>
+            <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.medium, marginBottom: spacing['1'] }}>
                 {label}
             </div>
             <div
@@ -302,7 +302,7 @@ const ShippingSelect: React.FC<{
         <div>
             <div style={{ marginBottom: spacing['2'] }}>
                 <span style={sectionLabelStyle}>발송가능일</span>
-                <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
+                <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: font.weight.bold }}>*</span>
             </div>
             <CustomSelect
                 label="발송 유형"
@@ -376,7 +376,7 @@ const OptionRow: React.FC<{
                             borderColor: colors.primaryBorder,
                         }}>
                             <Loader2 size={13} color={colors.primary} className="spin" style={{ flexShrink: 0 }} />
-                            <span className="ai-processing" style={{ fontWeight: 500 }}>번역하고 있어요...</span>
+                            <span className="ai-processing" style={{ fontWeight: font.weight.medium }}>번역하고 있어요...</span>
                         </div>
                     ) : (
                         <input
@@ -825,10 +825,10 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                         marginBottom: spacing['6'],
                     }}>
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: spacing['2'], marginBottom: spacing['3'] }}>
-                            <span style={{ fontSize: font.size.sm, fontWeight: 700, color: colors.text.primary }}>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>
                                 {allDone ? '등록 준비 완료!' : '등록하기 전 상품을 편집하세요'}
                             </span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: 400, color: colors.text.muted }}>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.regular, color: colors.text.muted }}>
                                 {progressDoneCount}/{progressItems.length} 완료
                             </span>
                         </div>
@@ -870,7 +870,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                         }} />
                                     )}
                                     <span style={{
-                                        flex: 1, fontSize: font.size.xs, fontWeight: 500,
+                                        flex: 1, fontSize: font.size.xs, fontWeight: font.weight.medium,
                                         color: item.done ? colors.primary : colors.text.secondary,
                                     }}>
                                         {item.label}
@@ -898,8 +898,8 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                         background: colors.primary,
                                         border: 'none',
                                         borderRadius: radius.md,
-                                        fontSize: font.size.sm, fontWeight: 600,
-                                        color: '#fff',
+                                        fontSize: font.size.sm, fontWeight: font.weight.semibold,
+                                        color: colors.white,
                                         cursor: (isIdle && !isAnyRunning) ? 'pointer' : 'default',
                                         transition: 'all 0.25s',
                                         opacity: (isIdle && isAnyRunning) ? 0.5 : 1,
@@ -914,7 +914,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                         </>
                                     ) : (
                                         <>
-                                            <AIIcon size={14} color="#fff" />
+                                            <AIIcon size={14} color={colors.white} />
                                             {remaining === progressItems.length
                                                 ? '한 번에 번역 및 작성하기'
                                                 : `남은 ${remaining}개 항목 번역 및 작성하기`}
@@ -931,13 +931,13 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
             <div>
                 <div style={{ marginBottom: spacing['2'] }}>
                     <span style={sectionLabelStyle}>브랜드</span>
-                    <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
+                    <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: font.weight.bold }}>*</span>
                 </div>
 
                 {/* 상품 브랜드 (브랜드가 있는 경우만 표시) */}
                 {product.brand && (
                     <>
-                        <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>상품 브랜드</div>
+                        <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.medium, marginBottom: spacing['1'] }}>상품 브랜드</div>
                         <div style={{
                             ...inputBase,
                             background: colors.bg.faint,
@@ -952,7 +952,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
 
                 {/* Qoo10에 등록될 브랜드 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: spacing['1'], marginBottom: spacing['1'], position: 'relative' }}>
-                    <span style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500 }}>Qoo10에 등록될 브랜드</span>
+                    <span style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.medium }}>Qoo10에 등록될 브랜드</span>
                     <div
                         style={{ display: 'flex', alignItems: 'center', cursor: 'help', position: 'relative' }}
                         onMouseEnter={() => setShowBrandInfoTooltip(true)}
@@ -968,9 +968,9 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                 transform: 'none',
                                 whiteSpace: 'nowrap',
                             }}>
-                                <div style={{ marginBottom: '6px', fontWeight: 600 }}>브랜드 매칭이란?</div>
+                                <div style={{ marginBottom: '6px', fontWeight: font.weight.semibold }}>브랜드 매칭이란?</div>
                                 <div style={{ marginBottom: '4px' }}>• Qoo10 등록 브랜드와 매칭하면 브랜드 검색에 노출돼요</div>
-                                <div>• 미등록 브랜드는 <span style={{ fontWeight: 700 }}>"브랜드 없음"</span>으로 등록됩니다</div>
+                                <div>• 미등록 브랜드는 <span style={{ fontWeight: font.weight.bold }}>"브랜드 없음"</span>으로 등록됩니다</div>
                             </div>
                         )}
                     </div>
@@ -1000,9 +1000,9 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                 background: colors.primary, borderRadius: radius.xs,
                                 padding: '3px 5px', lineHeight: 1,
                             }}>
-                                <AIIcon size={12} color="#fff" />
+                                <AIIcon size={12} color={colors.white} />
                             </div>
-                            <span style={{ fontSize: font.size.base, fontWeight: 600, color: colors.text.primary }}>
+                            <span style={{ fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.text.primary }}>
                                 {product.brand}
                             </span>
                             {showBrandAiTooltip && (
@@ -1086,7 +1086,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span style={sectionLabelStyle}>상품명</span>
-                        <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
+                        <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: font.weight.bold }}>*</span>
                         {hasJaTitle
                             ? <StatusTag type="translated" label="작성 완료" />
                             : <StatusTag type="needsTranslation" label="번역 필요" />
@@ -1111,7 +1111,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                     style={{
                                         display: 'none',
                                         position: 'absolute', bottom: 'calc(100% + 6px)', right: 0,
-                                        background: colors.text.primary, color: '#fff',
+                                        background: colors.text.primary, color: colors.white,
                                         fontSize: font.size.xs, padding: '5px 10px',
                                         borderRadius: radius.md, whiteSpace: 'nowrap',
                                         pointerEvents: 'none', zIndex: zIndex.dropdown,
@@ -1129,7 +1129,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                     </div>
                 </div>
                 {/* 수집 원본 */}
-                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>원본 상품명</div>
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.medium, marginBottom: spacing['1'] }}>원본 상품명</div>
                 <div style={{
                     ...inputBase,
                     background: colors.bg.faint,
@@ -1139,7 +1139,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 }}>
                     {stripPrefix(product.titleKo)}
                 </div>
-                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>판매 상품명</div>
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.medium, marginBottom: spacing['1'] }}>판매 상품명</div>
                 <div style={{ position: 'relative' }}>
                     {isTranslatingTitle ? (
                         <div style={{
@@ -1149,7 +1149,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                             borderColor: colors.primaryBorder,
                         }}>
                             <Loader2 size={14} color={colors.primary} className="spin" style={{ flexShrink: 0 }} />
-                            <span className="ai-processing" style={{ fontWeight: 500 }}>AI가 상품명을 번역하고 있어요...</span>
+                            <span className="ai-processing" style={{ fontWeight: font.weight.medium }}>AI가 상품명을 번역하고 있어요...</span>
                         </div>
                     ) : (
                         <input
@@ -1183,12 +1183,12 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 <div style={{ ...flexBetween, marginBottom: spacing['3'] }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span style={sectionLabelStyle}>옵션</span>
-                        <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
+                        <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: font.weight.bold }}>*</span>
                         {allOptionsDone
                             ? <StatusTag type="translated" label="작성 완료" />
                             : <StatusTag type="needsTranslation" label="번역 필요" />
                         }
-                        <span style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginLeft: spacing['2'] }}>
+                        <span style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.medium, marginLeft: spacing['2'] }}>
                             {options.length}개
                         </span>
                     </div>
@@ -1213,7 +1213,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                         {allOptionsDone && (
                             <div data-opt-tip="" style={{
                                 display: 'none', position: 'absolute', bottom: 'calc(100% + 6px)', right: 0,
-                                background: colors.text.primary, color: '#fff',
+                                background: colors.text.primary, color: colors.white,
                                 fontSize: font.size.xs, padding: '5px 10px',
                                 borderRadius: radius.md, whiteSpace: 'nowrap',
                                 pointerEvents: 'none', zIndex: zIndex.dropdown,
@@ -1233,7 +1233,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                     gap: spacing['3'],
                 }}>
                     {['사진', '옵션명', '재고', ''].map((h, i) => (
-                        <div key={i} style={{ fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted }}>{h}</div>
+                        <div key={i} style={{ fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.text.muted }}>{h}</div>
                     ))}
                 </div>
 
@@ -1283,7 +1283,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span style={sectionLabelStyle}>상세설명</span>
-                        <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
+                        <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: font.weight.bold }}>*</span>
                         {isDescDone
                             ? <StatusTag type="translated" label="작성 완료" />
                             : !hasDescContent && !isWritingDesc && !isTranslatingDesc && !showDescManual
@@ -1308,9 +1308,9 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                                 {showTranslateTooltip && (!descKo.trim() || !!descJa) && (
                                     <div style={{
                                         position: 'absolute', top: 'calc(100% + 6px)', right: 0,
-                                        background: colors.text.primary, color: '#fff',
+                                        background: colors.text.primary, color: colors.white,
                                         borderRadius: radius.md, padding: '6px 10px',
-                                        fontSize: font.size.xs, fontWeight: 500,
+                                        fontSize: font.size.xs, fontWeight: font.weight.medium,
                                         whiteSpace: 'nowrap', zIndex: zIndex.dropdown,
                                         pointerEvents: 'none',
                                         animation: 'tooltipFadeIn 0.15s ease',
@@ -1332,7 +1332,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                         cursor: 'default', userSelect: 'none', caretColor: 'transparent',
                     }}>
                         <Loader2 size={14} color={colors.primary} className="spin" style={{ flexShrink: 0 }} />
-                        <span className="ai-processing" style={{ fontWeight: 500 }}>
+                        <span className="ai-processing" style={{ fontWeight: font.weight.medium }}>
                             {isWritingDesc ? 'AI가 상품 정보를 분석해 초안을 작성하고 있어요...' : 'AI가 일본어로 번역하고 있어요...'}
                         </span>
                     </div>
@@ -1346,7 +1346,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                         textAlign: 'center',
                         minHeight: '280px',
                     }}>
-                        <p style={{ margin: 0, fontSize: font.size.md, fontWeight: 600, color: colors.text.primary, marginBottom: spacing['1'] }}>
+                        <p style={{ margin: 0, fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary, marginBottom: spacing['1'] }}>
                             AI가 상세 설명을 작성해 드려요
                         </p>
                         <p style={{ margin: 0, fontSize: font.size.sm, color: colors.text.tertiary, marginBottom: spacing['4'] }}>
@@ -1356,7 +1356,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                             onClick={() => setShowDescManual(true)}
                             style={{
                                 ...ghostButtonBase,
-                                fontSize: font.size.sm, fontWeight: 500,
+                                fontSize: font.size.sm, fontWeight: font.weight.medium,
                                 color: colors.text.muted, textDecoration: 'underline',
                             }}
                         >
@@ -1417,9 +1417,9 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
             <div>
                 <div style={{ marginBottom: spacing['2'] }}>
                     <span style={sectionLabelStyle}>카테고리</span>
-                    <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: 700 }}>*</span>
+                    <span style={{ color: colors.primary, marginLeft: '2px', fontWeight: font.weight.bold }}>*</span>
                 </div>
-                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>원본 카테고리</div>
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.medium, marginBottom: spacing['1'] }}>원본 카테고리</div>
                 <div style={{
                     ...inputBase,
                     background: colors.bg.faint,
@@ -1429,7 +1429,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 }}>
                     {product.sourceCategoryPath}
                 </div>
-                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: 500, marginBottom: spacing['1'] }}>Qoo10 카테고리</div>
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.medium, marginBottom: spacing['1'] }}>Qoo10 카테고리</div>
                 <div
                     onClick={() => setShowCategoryModal(true)}
                     style={{
@@ -1453,7 +1453,7 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                             flexShrink: 0,
                             lineHeight: 1,
                         }}>
-                            <AIIcon size={12} color="#fff" />
+                            <AIIcon size={12} color={colors.white} />
                         </div>
                     )}
                     <div style={{ minWidth: 0, flex: 1 }}>

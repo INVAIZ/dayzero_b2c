@@ -109,7 +109,7 @@ export const SourcingHistoryModal: React.FC<Props> = ({
                         <Package size={18} color={colors.primary} />
                         <span style={{
                             fontSize: font.size.lg,
-                            fontWeight: 700,
+                            fontWeight: font.weight.bold,
                             color: colors.text.primary,
                         }}>
                             수집 기록
@@ -230,7 +230,7 @@ export const SourcingHistoryModal: React.FC<Props> = ({
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                             <div style={{
                                                 fontSize: font.size.sm,
-                                                fontWeight: 600,
+                                                fontWeight: font.weight.semibold,
                                                 color: colors.text.primary,
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis',
@@ -239,7 +239,7 @@ export const SourcingHistoryModal: React.FC<Props> = ({
                                                 {label.name}
                                                 {label.suffix && (
                                                     <span style={{
-                                                        fontWeight: 500,
+                                                        fontWeight: font.weight.medium,
                                                         color: colors.text.muted,
                                                         marginLeft: spacing['1'],
                                                     }}>
@@ -266,7 +266,7 @@ export const SourcingHistoryModal: React.FC<Props> = ({
                                         }}>
                                             <span style={{
                                                 fontSize: font.size.xs,
-                                                fontWeight: 600,
+                                                fontWeight: font.weight.semibold,
                                                 padding: '2px 8px',
                                                 borderRadius: radius.full,
                                                 background: notif.type === 'url' ? colors.primaryLight : colors.warningLight,
@@ -279,7 +279,7 @@ export const SourcingHistoryModal: React.FC<Props> = ({
                                             {isRunning ? (
                                                 <span style={{
                                                     fontSize: font.size.xs,
-                                                    fontWeight: 600,
+                                                    fontWeight: font.weight.semibold,
                                                     color: colors.primary,
                                                 }}>
                                                     {notif.currentCount}/{notif.totalCount}
@@ -290,7 +290,7 @@ export const SourcingHistoryModal: React.FC<Props> = ({
                                                     alignItems: 'center',
                                                     gap: '3px',
                                                     fontSize: font.size.xs,
-                                                    fontWeight: 600,
+                                                    fontWeight: font.weight.semibold,
                                                     color: colors.success,
                                                 }}>
                                                     <CheckCircle2 size={13} />{notif.currentCount}건
@@ -342,7 +342,7 @@ const SummaryBadge: React.FC<{
     <div>
         <div style={{
             fontSize: font.size.xs,
-            fontWeight: 500,
+            fontWeight: font.weight.medium,
             color: colors.text.muted,
             marginBottom: '2px',
         }}>
@@ -350,7 +350,7 @@ const SummaryBadge: React.FC<{
         </div>
         <div style={{
             fontSize: font.size.base,
-            fontWeight: 700,
+            fontWeight: font.weight.bold,
             color: color ?? colors.text.primary,
         }}>
             {value}

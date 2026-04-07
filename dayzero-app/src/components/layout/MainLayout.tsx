@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Sidebar } from './Sidebar';
 import { ToastContainer } from '../common/ToastContainer';
 import { NotificationPanel } from '../common/NotificationPanel';
+import { colors } from '../../design/tokens';
 
 interface MainLayoutProps {
     children: ReactNode;
@@ -11,7 +12,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     return (
         <div style={{
             minHeight: '100vh',
-            background: '#FFFFFF', // Setting main area background to white as sidebar is F9FAFB
+            background: colors.bg.surface, // Setting main area background to white as sidebar is F9FAFB
             fontFamily: 'Pretendard, -apple-system, sans-serif',
             display: 'flex',
         }}>

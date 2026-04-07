@@ -24,7 +24,7 @@ const btnBase = (active: boolean): React.CSSProperties => ({
     background: active ? colors.primaryLight : colors.bg.subtle,
     border: `1px solid ${active ? colors.primaryBorder : colors.border.default}`,
     borderRadius: radius.sm,
-    fontSize: font.size.xs, fontWeight: 600,
+    fontSize: font.size.xs, fontWeight: font.weight.semibold,
     color: active ? colors.primary : colors.text.muted,
     cursor: active ? 'pointer' : 'not-allowed',
 });
@@ -77,7 +77,7 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
 
             {/* 상단 */}
             <div style={{ marginBottom: spacing['4'] }}>
-                <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary }}>썸네일 이미지</span>
+                <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>썸네일 이미지</span>
                 <span style={{ fontSize: font.size.xs, color: colors.text.muted, marginLeft: spacing['2'] }}>
                     {images.length}장 · 첫 번째 이미지가 대표
                 </span>
@@ -103,11 +103,11 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
                                 <div style={{
                                     position: 'absolute', top: spacing['2'], left: spacing['2'], zIndex: 2,
                                     display: 'flex', alignItems: 'center', gap: '3px',
-                                    background: colors.primary, color: '#fff',
+                                    background: colors.primary, color: colors.white,
                                     padding: '3px 7px', borderRadius: radius.full,
-                                    fontSize: font.size['2xs+'], fontWeight: 700,
+                                    fontSize: font.size['2xs+'], fontWeight: font.weight.bold,
                                 }}>
-                                    <Star size={9} fill="#fff" />
+                                    <Star size={9} fill={colors.white} />
                                     대표
                                 </div>
                             )}
@@ -116,9 +116,9 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
                                 <div style={{
                                     position: 'absolute', top: spacing['2'], right: spacing['2'], zIndex: 2,
                                     display: 'flex', alignItems: 'center', gap: '3px',
-                                    background: colors.primary, color: '#fff',
+                                    background: colors.primary, color: colors.white,
                                     padding: '3px 7px', borderRadius: radius.full,
-                                    fontSize: font.size['2xs+'], fontWeight: 600,
+                                    fontSize: font.size['2xs+'], fontWeight: font.weight.semibold,
                                 }}>
                                     <Check size={9} />
                                     배경 제거
@@ -143,7 +143,7 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
                                         gap: spacing['2'],
                                     }}>
                                         <Loader2 size={24} color={colors.primary} style={{ animation: 'spin 1s linear infinite' }} />
-                                        <span style={{ fontSize: font.size.xs, fontWeight: 600, color: colors.primary }}>처리 중...</span>
+                                        <span style={{ fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.primary }}>처리 중...</span>
                                     </div>
                                 )}
                                 {/* 호버 시 삭제 버튼 */}
@@ -160,7 +160,7 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
                                             opacity: 0, transition: 'opacity 0.15s',
                                         }}
                                     >
-                                        <Trash2 size={13} color="#fff" />
+                                        <Trash2 size={13} color={colors.white} />
                                     </button>
                                 )}
                             </div>

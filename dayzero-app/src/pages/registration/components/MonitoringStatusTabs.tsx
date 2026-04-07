@@ -168,7 +168,7 @@ const CountBadge: React.FC<{
     return (
         <span style={{
             fontSize: font.size.xs,
-            fontWeight: 700,
+            fontWeight: font.weight.bold,
             ...styles,
             borderRadius: radius.full,
             padding: '2px 7px',

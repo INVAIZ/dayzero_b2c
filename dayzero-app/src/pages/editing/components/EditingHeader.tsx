@@ -82,7 +82,7 @@ export const EditingHeader: React.FC<Props> = ({
                         <img
                             src={getProviderLogo(product.provider)}
                             alt={product.provider}
-                            style={{ width: '18px', height: '18px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
+                            style={{ width: '18px', height: '18px', borderRadius: radius.xs, objectFit: 'cover', flexShrink: 0 }}
                         />
                         {/* 상품명 — 항상 한국어 원문, 클릭 시 소싱처 사이트 이동 */}
                         <a
@@ -93,7 +93,7 @@ export const EditingHeader: React.FC<Props> = ({
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '5px',
                                 minWidth: 0,
-                                fontSize: font.size.base, fontWeight: 700,
+                                fontSize: font.size.base, fontWeight: font.weight.bold,
                                 color: colors.text.primary,
                                 textDecoration: 'none',
                                 cursor: 'pointer',
@@ -178,7 +178,7 @@ export const EditingHeader: React.FC<Props> = ({
                                 border: 'none',
                                 borderRadius: radius.md,
                                 padding: `${spacing['2']} ${spacing['4']}`,
-                                fontSize: font.size.sm, fontWeight: 600,
+                                fontSize: font.size.sm, fontWeight: font.weight.semibold,
                                 color: isTranslated ? colors.bg.surface : colors.text.disabled,
                                 cursor: isTranslated ? 'pointer' : 'not-allowed',
                                 transition: 'background 0.2s',
@@ -193,7 +193,7 @@ export const EditingHeader: React.FC<Props> = ({
                                 top: 'calc(100% + 8px)',
                                 right: 0,
                                 background: colors.text.primary,
-                                color: '#fff',
+                                color: colors.white,
                                 fontSize: font.size.xs,
                                 padding: '6px 10px',
                                 borderRadius: radius.md,

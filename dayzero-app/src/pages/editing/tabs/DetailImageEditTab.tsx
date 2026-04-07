@@ -49,7 +49,7 @@ export const DetailImageEditTab: React.FC<Props> = ({ product }) => {
             {/* 상단 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing['4'] }}>
                 <div>
-                    <span style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary }}>상세페이지 이미지</span>
+                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>상세페이지 이미지</span>
                 </div>
                 <div style={{ display: 'flex', gap: spacing['2'] }}>
                     {isDone && (
@@ -61,7 +61,7 @@ export const DetailImageEditTab: React.FC<Props> = ({ product }) => {
                                 background: 'none',
                                 border: `1px solid ${colors.border.default}`,
                                 borderRadius: radius.md,
-                                fontSize: font.size.sm, fontWeight: 600,
+                                fontSize: font.size.sm, fontWeight: font.weight.semibold,
                                 color: colors.text.secondary,
                                 cursor: 'pointer',
                             }}
@@ -78,7 +78,7 @@ export const DetailImageEditTab: React.FC<Props> = ({ product }) => {
                             background: (status === 'translating' || isDone) ? colors.bg.subtle : colors.primaryLight,
                             border: `1px solid ${(status === 'translating' || isDone) ? colors.border.default : colors.primaryBorder}`,
                             borderRadius: radius.md,
-                            fontSize: font.size.sm, fontWeight: 600,
+                            fontSize: font.size.sm, fontWeight: font.weight.semibold,
                             color: (status === 'translating' || isDone) ? colors.text.muted : colors.primary,
                             cursor: (status === 'translating' || isDone) ? 'not-allowed' : 'pointer',
                         }}
@@ -130,7 +130,7 @@ export const DetailImageEditTab: React.FC<Props> = ({ product }) => {
                         gap: spacing['3'],
                     }}>
                         <Loader2 size={36} color={colors.primary} style={{ animation: 'spin 1s linear infinite' }} />
-                        <span style={{ fontSize: font.size.base, fontWeight: 600, color: colors.primary }}>
+                        <span style={{ fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.primary }}>
                             상세페이지 번역 중...
                         </span>
                     </div>
@@ -139,9 +139,9 @@ export const DetailImageEditTab: React.FC<Props> = ({ product }) => {
                     <div style={{
                         position: 'absolute', top: spacing['3'], right: spacing['3'],
                         display: 'inline-flex', alignItems: 'center', gap: '4px',
-                        background: colors.primary, color: '#fff',
+                        background: colors.primary, color: colors.white,
                         padding: '4px 10px', borderRadius: radius.full,
-                        fontSize: font.size.xs, fontWeight: 700,
+                        fontSize: font.size.xs, fontWeight: font.weight.bold,
                     }}>
                         <Check size={11} /> 일본어 번역 완료
                     </div>

@@ -46,7 +46,7 @@ export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, se
                 </button>
 
                 <div style={{ marginBottom: spacing['5'] }}>
-                    <h2 style={{ fontSize: font.size.lg, fontWeight: 700, marginBottom: 0 }}>AI 편집 설정</h2>
+                    <h2 style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, marginBottom: 0 }}>AI 편집 설정</h2>
                 </div>
 
                 {alreadyTranslatedCount > 0 && selectedCount > 1 && (
@@ -87,18 +87,18 @@ export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, se
                                     background: isCompleted ? colors.primary : isSelected ? colors.primary : 'transparent',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}>
-                                    {(isCompleted || isSelected) && <Check size={14} color="#fff" />}
+                                    {(isCompleted || isSelected) && <Check size={14} color={colors.white} />}
                                 </div>
-                                <span style={{ fontSize: font.size.md, fontWeight: 600, color: isCompleted ? colors.text.tertiary : colors.text.primary, display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                                <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: isCompleted ? colors.text.tertiary : colors.text.primary, display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
                                     {(t === 'title' || t === 'options' || t === 'description') && (
                                         <span style={{
-                                            fontSize: font.size.xs, fontWeight: 700,
+                                            fontSize: font.size.xs, fontWeight: font.weight.bold,
                                             color: colors.primary, background: colors.primaryLight,
                                             padding: '2px 6px', borderRadius: radius.xs,
                                         }}>필수</span>
                                     )}
                                     {t === 'title' ? '상품명 번역' : t === 'description' ? '상세설명 작성 및 번역' : t === 'options' ? '옵션 번역' : t === 'thumbnail' ? '썸네일 번역' : '상세페이지 번역'}
-                                    {isCompleted && <span style={{ fontSize: font.size.sm, fontWeight: 400, marginLeft: spacing['2'] }}>이미 완료되었어요</span>}
+                                    {isCompleted && <span style={{ fontSize: font.size.sm, fontWeight: font.weight.regular, marginLeft: spacing['2'] }}>이미 완료되었어요</span>}
                                 </span>
                             </div>
                         );
@@ -109,8 +109,8 @@ export const TranslationModal: React.FC<Props> = ({ isOpen, onClose, onStart, se
                     onClick={() => onStart(targets)}
                     disabled={targets.length === 0}
                     style={{
-                        width: '100%', height: '48px', background: colors.primary, color: '#fff',
-                        border: 'none', borderRadius: radius.lg, fontSize: font.size.md, fontWeight: 600,
+                        width: '100%', height: '48px', background: colors.primary, color: colors.white,
+                        border: 'none', borderRadius: radius.lg, fontSize: font.size.md, fontWeight: font.weight.semibold,
                         cursor: targets.length > 0 ? 'pointer' : 'default',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: spacing['2'],
                         opacity: targets.length > 0 ? 1 : 0.5,

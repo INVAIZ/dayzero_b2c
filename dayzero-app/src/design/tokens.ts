@@ -12,8 +12,13 @@
 // ── Colors ──────────────────────────────────────────────────────────────────
 
 export const colors = {
+  /** 순수 흰색. 버튼 텍스트, 아이콘 색상 등 */
+  white: '#FFFFFF',
+
   /** 브랜드 파란색. CTA 버튼, 활성 상태, 링크 */
   primary: '#3182F6',
+  /** 프라이머리 다크. CTA 버튼 hover 상태 */
+  primaryDark: '#2563EB',
   /** 연한 파란색 배경. 선택된 필터·탭 배경 */
   primaryLight: '#EFF6FF',
   /** 파란색 테두리. AI 버튼·선택 상태 테두리 */
@@ -38,6 +43,8 @@ export const colors = {
 
   /** 에러·위험. 입력 오류, 삭제 액션 */
   danger: '#F04452',
+  /** 진한 에러 텍스트. 위험 피드백 메시지 */
+  dangerDark: '#DC2626',
   /** 연한 에러 배경. 칩·배지 테두리 */
   dangerLight: '#FDE2E4',
   /** 아주 연한 에러 배경. 실패 아이템 행 배경 */
@@ -53,6 +60,25 @@ export const colors = {
   warningIcon: '#D97706',
   /** 경고 텍스트 */
   warningTextDark: '#92400E',
+
+  /** 주황색. 재고 없음, 일시정지 상태 */
+  orange: '#FF9500',
+  /** 주황색 아이콘/텍스트. 마진 경고, 슬라이더 */
+  orangeIcon: '#E67E22',
+  /** 연한 주황색 배경. 재고 없음 상태 뱃지 */
+  orangeLight: '#FFF4E0',
+  /** 아주 연한 주황색 배경. 주의 카드 */
+  orangeBg: '#FFF8EE',
+  /** 주황색 테두리. 주의 카드 테두리 */
+  orangeBorder: '#FFD99A',
+
+  /** 예약 상태 배경 (보라) */
+  scheduledBg: '#F5F3FF',
+  /** 예약 상태 아이콘 (보라) */
+  scheduledIcon: '#8B5CF6',
+
+  /** 다크 호버. FAB 버튼 호버 등 */
+  darkHover: '#2D3540',
 
   text: {
     /** 제목, 강조 텍스트 */
@@ -80,6 +106,8 @@ export const colors = {
     faint: '#F8F9FA',
     /** 인포 박스 배경 */
     info: '#F0F6FF',
+    /** 읽지 않은 알림 배경 */
+    unread: '#F8FAFF',
   },
 
   border: {
@@ -110,18 +138,29 @@ export const font = {
     md: '14px',
     /** 15px – 본문 기본 */
     base: '15px',
+    /** 16px – 온보딩 CTA 버튼, 소제목 */
+    'base+': '16px',
     /** 18px – 섹션 제목 */
     lg: '18px',
+    /** 20px – 인트로 헤딩, 서브 타이틀 */
+    'lg+': '20px',
     /** 22px – 페이지 서브 타이틀 */
     xl: '22px',
+    /** 24px – 스텝 타이틀, 온보딩 제목 */
+    'xl+': '24px',
+    /** 26px – 온보딩 메인 타이틀 */
+    '2xl-': '26px',
     /** 28px – 페이지 메인 타이틀 */
     '2xl': '28px',
+    /** 32px – 대형 숫자 표시 */
+    '3xl': '32px',
   },
   weight: {
     regular: 400,
     medium: 500,
     semibold: 600,
     bold: 700,
+    extrabold: 800,
   },
   lineHeight: {
     tight: '1.3',
@@ -133,6 +172,8 @@ export const font = {
 // ── Border Radius ────────────────────────────────────────────────────────────
 
 export const radius = {
+  /** 2px – 프로그레스 바 내부 */
+  '2xs': '2px',
   /** 4px – 인라인 배지, 작은 태그 */
   xs: '4px',
   /** 6px – 태그, 뱃지 */

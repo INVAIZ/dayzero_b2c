@@ -31,8 +31,8 @@ const TAB_CONFIG: { key: FilterTab; label: string }[] = [
     { key: 'restocked', label: '재입고' },
 ];
 
-const UNREAD_BG = '#F8FAFF';
-const FAB_HOVER_BG = '#2D3540';
+const UNREAD_BG = colors.bg.unread;
+const FAB_HOVER_BG = colors.darkHover;
 
 const formatTimeAgo = (dateStr: string): string => {
     const d = new Date(dateStr);
@@ -104,8 +104,8 @@ function getAlertIcon(alert: AlertItem) {
         iconColor = alert.isAutoPaused ? colors.primary : colors.danger;
         IconComp = alert.isAutoPaused ? TrendingUp : AlertTriangle;
     } else {
-        iconBg = alert.isAutoPaused ? '#FFF4E0' : colors.dangerLight;
-        iconColor = alert.isAutoPaused ? '#FF9500' : colors.danger;
+        iconBg = alert.isAutoPaused ? colors.orangeLight : colors.dangerLight;
+        iconColor = alert.isAutoPaused ? colors.orange : colors.danger;
         IconComp = alert.isAutoPaused ? PauseCircle : PackageX;
     }
 

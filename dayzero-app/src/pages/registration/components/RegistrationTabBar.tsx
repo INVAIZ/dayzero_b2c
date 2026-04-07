@@ -46,7 +46,7 @@ export const RegistrationProviderFilter: React.FC<Props> = ({
                     </div>
 
                     {filter !== '전체' && logo && (
-                        <img src={logo} alt={filter} style={{ width: '16px', height: '16px', borderRadius: '4px', objectFit: 'cover' }} />
+                        <img src={logo} alt={filter} style={{ width: '16px', height: '16px', borderRadius: radius.xs, objectFit: 'cover' }} />
                     )}
 
                     <div style={{

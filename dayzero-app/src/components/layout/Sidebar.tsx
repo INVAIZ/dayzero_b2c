@@ -80,7 +80,7 @@ export const Sidebar: React.FC = () => {
                         background: isSourcingActive ? colors.border.default : 'transparent',
                         border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: isSourcingActive ? colors.text.primary : colors.text.tertiary,
-                        fontWeight: 500, fontSize: font.size.base,
+                        fontWeight: font.weight.medium, fontSize: font.size.base,
                         transition: 'all 0.2s',
                         boxShadow: isSourcingActive ? 'none' : 'none',
                     }}
@@ -99,7 +99,7 @@ export const Sidebar: React.FC = () => {
                         background: isEditingActive ? colors.border.default : 'transparent',
                         border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: isEditingActive ? colors.text.primary : colors.text.tertiary,
-                        fontWeight: 500, fontSize: font.size.base,
+                        fontWeight: font.weight.medium, fontSize: font.size.base,
                         transition: 'all 0.2s',
                         boxShadow: isEditingActive ? 'none' : 'none',
                     }}
@@ -115,7 +115,7 @@ export const Sidebar: React.FC = () => {
                             style={{
                                 marginLeft: 'auto', background: colors.primary, color: colors.bg.surface,
                                 borderRadius: radius.img, padding: `2px ${spacing['2']}`, fontSize: font.size.xs,
-                                fontWeight: 700, fontFamily: font.family.sans,
+                                fontWeight: font.weight.bold, fontFamily: font.family.sans,
                                 minWidth: '20px', textAlign: 'center',
                                 boxShadow: '0 2px 4px rgba(49,130,246,0.2)',
                             }}
@@ -133,7 +133,7 @@ export const Sidebar: React.FC = () => {
                         background: isRegistrationActive ? colors.border.default : 'transparent',
                         border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: isRegistrationActive ? colors.text.primary : colors.text.tertiary,
-                        fontWeight: 500, fontSize: font.size.base,
+                        fontWeight: font.weight.medium, fontSize: font.size.base,
                         transition: 'all 0.2s',
                         boxShadow: isRegistrationActive ? 'none' : 'none',
                     }}
@@ -156,7 +156,7 @@ export const Sidebar: React.FC = () => {
                         background: 'transparent',
                         border: 'none', borderRadius: radius.lg, cursor: 'pointer',
                         color: colors.text.tertiary,
-                        fontWeight: 500, fontSize: font.size.base,
+                        fontWeight: font.weight.medium, fontSize: font.size.base,
                         transition: 'all 0.2s',
                     }}
                     onMouseOver={e => e.currentTarget.style.background = colors.bg.subtle}
@@ -195,7 +195,7 @@ export const Sidebar: React.FC = () => {
                                             background: active ? colors.border.default : 'transparent',
                                             border: 'none', borderRadius: radius.md, cursor: 'pointer',
                                             color: active ? colors.text.primary : colors.text.tertiary,
-                                            fontWeight: 500,
+                                            fontWeight: font.weight.medium,
                                             fontSize: font.size.base, transition: 'all 0.15s', textAlign: 'left',
                                             boxShadow: active ? 'none' : 'none',
                                         }}

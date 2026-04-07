@@ -4,6 +4,7 @@ import PasswordInput from './PasswordInput';
 import SocialLoginButton from './SocialLoginButton';
 import { useAuthForm } from '../../hooks/useAuthForm';
 import { mockSignup, mockGoogleLogin } from '../../mock/authMock';
+import { colors, font } from '../../design/tokens';
 
 interface SignupFormProps {
   onSwitchToLogin: () => void;
@@ -79,9 +80,9 @@ export default function SignupForm({ onSwitchToLogin, onSuccess, onToast }: Sign
 
       {/* 구분선 */}
       <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
-        <div style={{ flex: 1, height: '1px', background: '#E5E8EB' }} />
-        <span style={{ padding: '0 12px', fontSize: '13px', color: '#C4CAD4' }}>또는</span>
-        <div style={{ flex: 1, height: '1px', background: '#E5E8EB' }} />
+        <div style={{ flex: 1, height: '1px', background: colors.border.default }} />
+        <span style={{ padding: '0 12px', fontSize: font.size.sm, color: colors.text.placeholder }}>또는</span>
+        <div style={{ flex: 1, height: '1px', background: colors.border.default }} />
       </div>
 
       {/* 이메일 */}
@@ -96,7 +97,7 @@ export default function SignupForm({ onSwitchToLogin, onSuccess, onToast }: Sign
           />
         </div>
         {emailError && (
-          <p style={{ marginTop: '6px', fontSize: '13px', color: '#F04452' }}>
+          <p style={{ marginTop: '6px', fontSize: font.size.sm, color: colors.danger }}>
             {emailError}
           </p>
         )}
@@ -113,10 +114,10 @@ export default function SignupForm({ onSwitchToLogin, onSuccess, onToast }: Sign
           {checkItems.map(item => (
             <div key={item.key} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               {item.met
-                ? <CheckCircle2 size={14} color="#3ED4A4" />
-                : <Circle size={14} color="#D1D6DB" />
+                ? <CheckCircle2 size={14} color={colors.successAlt} />
+                : <Circle size={14} color={colors.border.light} />
               }
-              <span style={{ fontSize: '13px', color: item.met ? '#3ED4A4' : '#B0B8C1' }}>
+              <span style={{ fontSize: font.size.sm, color: item.met ? colors.successAlt : colors.text.disabled }}>
                 {item.label}
               </span>
             </div>
@@ -146,13 +147,13 @@ export default function SignupForm({ onSwitchToLogin, onSuccess, onToast }: Sign
       </button>
 
       {/* 로그인 링크 */}
-      <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px', color: '#8B95A1' }}>
+      <p style={{ textAlign: 'center', marginTop: '20px', fontSize: font.size.md, color: colors.text.muted }}>
         이미 계정이 있으신가요?{' '}
         <button
           type="button"
           className="btn-link"
           onClick={onSwitchToLogin}
-          style={{ color: '#3182F6', fontWeight: 600, fontSize: '14px' }}
+          style={{ color: colors.primary, fontWeight: font.weight.semibold, fontSize: font.size.md }}
         >
           로그인하기
         </button>

@@ -114,7 +114,7 @@ const StatCard = ({
         }}>
             <span style={{
                 fontSize: font.size.sm,
-                fontWeight: 500,
+                fontWeight: font.weight.medium,
                 color: colors.text.tertiary,
             }}>
                 {label}
@@ -124,8 +124,8 @@ const StatCard = ({
 
         {/* 숫자 */}
         <div style={{
-            fontSize: '32px',
-            fontWeight: 700,
+            fontSize: font.size['3xl'],
+            fontWeight: font.weight.bold,
             color: valueColor ?? colors.text.primary,
             lineHeight: 1,
             letterSpacing: '-0.5px',
@@ -135,7 +135,7 @@ const StatCard = ({
             {subValue && (
                 <span style={{
                     fontSize: font.size.sm,
-                    fontWeight: 500,
+                    fontWeight: font.weight.medium,
                     color: colors.text.muted,
                     marginLeft: spacing['2'],
                 }}>
@@ -153,7 +153,7 @@ const StatCard = ({
         }}>
             {statusText ? (
                 <span style={{
-                    fontWeight: 600,
+                    fontWeight: font.weight.semibold,
                     color: statusPositive ? colors.success : colors.danger,
                 }}>
                     {statusText}
@@ -161,14 +161,14 @@ const StatCard = ({
             ) : diffText !== undefined && (
                 <>
                     <span style={{
-                        fontWeight: 600,
+                        fontWeight: font.weight.semibold,
                         color: diffPositive ? colors.success : colors.danger,
                     }}>
                         {diffText}
                     </span>
                     <span style={{
                         color: colors.text.muted,
-                        fontWeight: 400,
+                        fontWeight: font.weight.regular,
                     }}>
                         지난 달 대비
                     </span>

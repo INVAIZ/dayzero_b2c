@@ -156,7 +156,7 @@ export const BrandSelectModal: React.FC<BrandSelectModalProps> = ({
           padding: `${spacing['5']} ${spacing['5']}`,
           borderBottom: `1px solid ${colors.border.default}`,
         }}>
-          <span style={{ fontSize: font.size.lg, fontWeight: 700, color: colors.text.primary }}>
+          <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary }}>
             Qoo10 브랜드 선택
           </span>
           <button onClick={onClose} style={{
@@ -247,7 +247,7 @@ export const BrandSelectModal: React.FC<BrandSelectModalProps> = ({
               >
                 <div style={{ ...flexCenter, gap: spacing['2'], minWidth: 0, flex: 1 }}>
                   <span style={{
-                    fontSize: font.size.sm, fontWeight: isSelected ? 700 : 500,
+                    fontSize: font.size.sm, fontWeight: isSelected ? font.weight.bold : font.weight.medium,
                     color: isSelected ? colors.primary : colors.text.primary,
                   }}>
                     {highlight(brand.name)}
@@ -255,7 +255,7 @@ export const BrandSelectModal: React.FC<BrandSelectModalProps> = ({
                   {isAiRec && (
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', gap: '3px',
-                      fontSize: font.size['2xs+'], fontWeight: 600,
+                      fontSize: font.size['2xs+'], fontWeight: font.weight.semibold,
                       color: colors.primary, background: colors.primaryLight,
                       padding: '1px 6px', borderRadius: radius.full,
                     }}>

@@ -58,7 +58,7 @@ export const ProductDetailPage: React.FC = () => {
                             border: 'none',
                             borderRadius: radius.md,
                             fontSize: font.size.base,
-                            fontWeight: 600,
+                            fontWeight: font.weight.semibold,
                             cursor: 'pointer',
                         }}
                     >
@@ -150,7 +150,7 @@ export const ProductDetailPage: React.FC = () => {
                         style={{
                             display: 'flex', alignItems: 'center', gap: spacing['2'],
                             background: 'none', border: 'none', cursor: 'pointer',
-                            fontSize: font.size.base, fontWeight: 500, color: colors.text.tertiary,
+                            fontSize: font.size.base, fontWeight: font.weight.medium, color: colors.text.tertiary,
                         }}
                     >
                         <ArrowLeft size={18} />
@@ -232,12 +232,12 @@ export const ProductDetailPage: React.FC = () => {
                             <img
                                 src={getProviderLogo(product.provider)}
                                 alt={product.provider}
-                                style={{ width: '18px', height: '18px', borderRadius: '4px', objectFit: 'cover' }}
+                                style={{ width: '18px', height: '18px', borderRadius: radius.xs, objectFit: 'cover' }}
                             />
                             <span style={{
                                 fontSize: font.size.xs,
                                 color: colors.text.muted,
-                                fontWeight: 500,
+                                fontWeight: font.weight.medium,
                             }}>
                                 {product.provider}
                             </span>
@@ -249,7 +249,7 @@ export const ProductDetailPage: React.FC = () => {
                                     padding: '2px 8px',
                                     borderRadius: radius.full,
                                     fontSize: font.size.xs,
-                                    fontWeight: 700,
+                                    fontWeight: font.weight.bold,
                                     color: colors.danger,
                                     background: colors.dangerLight,
                                 }}>
@@ -260,7 +260,7 @@ export const ProductDetailPage: React.FC = () => {
                         </div>
                         <div style={{
                             fontSize: font.size.lg,
-                            fontWeight: 700,
+                            fontWeight: font.weight.bold,
                             color: colors.text.primary,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -316,7 +316,7 @@ export const ProductDetailPage: React.FC = () => {
                                 border: 'none',
                                 background: 'transparent',
                                 fontSize: font.size.xs,
-                                fontWeight: 600,
+                                fontWeight: font.weight.semibold,
                                 cursor: isPaused ? 'pointer' : 'default',
                                 color: !isPaused ? colors.primary : colors.text.muted,
                                 transition: 'color 0.25s',
@@ -342,7 +342,7 @@ export const ProductDetailPage: React.FC = () => {
                                 border: 'none',
                                 background: 'transparent',
                                 fontSize: font.size.xs,
-                                fontWeight: 600,
+                                fontWeight: font.weight.semibold,
                                 cursor: !isPaused ? 'pointer' : 'default',
                                 color: isPaused ? colors.warningIcon : colors.text.muted,
                                 transition: 'color 0.25s',
@@ -397,7 +397,7 @@ export const ProductDetailPage: React.FC = () => {
                                     padding: 0,
                                     background: 'none',
                                     border: 'none',
-                                    fontSize: font.size.xs, fontWeight: 600,
+                                    fontSize: font.size.xs, fontWeight: font.weight.semibold,
                                     color: colors.text.muted,
                                     cursor: 'pointer',
                                     transition: 'color 0.15s',
@@ -457,11 +457,11 @@ export const ProductDetailPage: React.FC = () => {
                             <img
                                 src={getProviderLogo(product.provider)}
                                 alt={product.provider}
-                                style={{ width: '20px', height: '20px', borderRadius: '4px' }}
+                                style={{ width: '20px', height: '20px', borderRadius: radius.xs }}
                             />
                             <span style={{
                                 fontSize: font.size.base,
-                                fontWeight: 600,
+                                fontWeight: font.weight.semibold,
                                 color: colors.text.primary,
                             }}>
                                 {product.provider}
@@ -483,7 +483,7 @@ export const ProductDetailPage: React.FC = () => {
                                         alignItems: 'center',
                                         gap: '2px',
                                         fontSize: font.size.xs,
-                                        fontWeight: 600,
+                                        fontWeight: font.weight.semibold,
                                         color: priceDiff > 0 ? colors.danger : colors.success,
                                         marginLeft: spacing['2'],
                                     }}>
@@ -523,7 +523,7 @@ export const ProductDetailPage: React.FC = () => {
                     }}>
                         <span style={{
                             fontSize: font.size.base,
-                            fontWeight: 700,
+                            fontWeight: font.weight.bold,
                             color: colors.text.primary,
                         }}>
                             가격·품절 확인
@@ -592,7 +592,7 @@ export const ProductDetailPage: React.FC = () => {
                             textAlign: 'center',
                         }}>
                             <Shield size={24} color={colors.text.muted} style={{ marginBottom: spacing['2'] }} />
-                            <div style={{ fontSize: font.size.sm, fontWeight: 600, color: colors.text.secondary, marginBottom: spacing['1'] }}>
+                            <div style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary, marginBottom: spacing['1'] }}>
                                 가격·품절 확인이 꺼져 있어요
                             </div>
                             <div style={{ fontSize: font.size.xs, color: colors.text.muted }}>
@@ -620,7 +620,7 @@ export const ProductDetailPage: React.FC = () => {
                     }}>
                         <div style={{
                             fontSize: font.size.xs,
-                            fontWeight: 600,
+                            fontWeight: font.weight.semibold,
                             color: colors.text.muted,
                             marginBottom: spacing['2'],
                         }}>
@@ -695,7 +695,7 @@ export const ProductDetailPage: React.FC = () => {
 const EVENT_STYLE: Record<MonitoringEventType, { color: string; bg: string; icon: React.ReactNode }> = {
     monitoring_started: { color: colors.primary, bg: colors.primaryLight, icon: <Play size={14} /> },
     price_changed: { color: colors.primary, bg: colors.primaryLight, icon: <TrendingUp size={14} /> },
-    out_of_stock: { color: '#FF9500', bg: '#FFF4E0', icon: <PauseCircle size={14} /> },
+    out_of_stock: { color: colors.orange, bg: colors.orangeLight, icon: <PauseCircle size={14} /> },
     restocked: { color: colors.success, bg: colors.successLight, icon: <PackageCheck size={14} /> },
     negative_margin: { color: colors.danger, bg: colors.dangerLight, icon: <AlertTriangle size={14} /> },
     error: { color: colors.danger, bg: colors.dangerLight, icon: <AlertCircle size={14} /> },
@@ -739,8 +739,8 @@ const ActivityLog: React.FC<{ logs: MonitoringActivityLog[] }> = ({ logs }) => {
                 marginBottom: spacing['1'],
             }}>
                 <span style={{ width: '32px', flexShrink: 0 }} />
-                <span style={{ flex: 1, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted }}>활동 내역</span>
-                <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, paddingLeft: '8px' }}>날짜</span>
+                <span style={{ flex: 1, fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.text.muted }}>활동 내역</span>
+                <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.text.muted, paddingLeft: '8px' }}>날짜</span>
             </div>
             {/* 로그 항목 */}
             <div>
@@ -769,7 +769,7 @@ const ActivityLog: React.FC<{ logs: MonitoringActivityLog[] }> = ({ logs }) => {
                             <div style={{
                                 flex: 1,
                                 fontSize: font.size.base,
-                                fontWeight: 500,
+                                fontWeight: font.weight.medium,
                                 color: colors.text.primary,
                                 lineHeight: '1.5',
                                 wordBreak: 'keep-all',

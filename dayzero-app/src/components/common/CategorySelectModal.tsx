@@ -79,7 +79,7 @@ const SearchResultItem: React.FC<{
       <div style={{ minWidth: 0, flex: 1 }}>
         <div style={{ ...flexCenter, gap: spacing['2'], flexWrap: 'wrap' }}>
           <span style={{
-            fontSize: font.size.sm, fontWeight: isSelected ? 700 : 500,
+            fontSize: font.size.sm, fontWeight: isSelected ? font.weight.bold : font.weight.medium,
             color: isSelected ? colors.primary : colors.text.primary,
           }}>
             {highlight(item.smallName)}
@@ -87,7 +87,7 @@ const SearchResultItem: React.FC<{
           {isAiRec && (
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: '3px',
-              fontSize: font.size['2xs+'], fontWeight: 600,
+              fontSize: font.size['2xs+'], fontWeight: font.weight.semibold,
               color: colors.primary, background: colors.primaryLight,
               padding: '1px 6px', borderRadius: radius.full,
             }}>
@@ -132,7 +132,7 @@ const DrillItem: React.FC<{
   >
     <div style={{ ...flexCenter, gap: spacing['2'], minWidth: 0, flex: 1 }}>
       <span style={{
-        fontSize: font.size.sm, fontWeight: isSelected ? 700 : 500,
+        fontSize: font.size.sm, fontWeight: isSelected ? font.weight.bold : font.weight.medium,
         color: isSelected ? colors.primary : colors.text.primary,
       }}>
         {name}
@@ -140,7 +140,7 @@ const DrillItem: React.FC<{
       {isAiRec && (
         <span style={{
           display: 'inline-flex', alignItems: 'center', gap: '3px',
-          fontSize: font.size['2xs+'], fontWeight: 600,
+          fontSize: font.size['2xs+'], fontWeight: font.weight.semibold,
           color: colors.primary, background: colors.primaryLight,
           padding: '1px 6px', borderRadius: radius.full,
         }}>
@@ -297,7 +297,7 @@ export const CategorySelectModal: React.FC<CategorySelectModalProps> = ({
           padding: `${spacing['5']} ${spacing['5']}`,
           borderBottom: `1px solid ${colors.border.default}`,
         }}>
-          <span style={{ fontSize: font.size.lg, fontWeight: 700, color: colors.text.primary }}>
+          <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary }}>
             Qoo10 카테고리 선택
           </span>
           <button onClick={onClose} style={{
@@ -352,7 +352,7 @@ export const CategorySelectModal: React.FC<CategorySelectModalProps> = ({
           }}>
             <button onClick={handleBack} style={{
               ...ghostBtn, ...flexCenter, gap: '2px',
-              color: colors.primary, fontSize: font.size.xs, fontWeight: 600,
+              color: colors.primary, fontSize: font.size.xs, fontWeight: font.weight.semibold,
             }}>
               <ChevronLeft size={14} />
               뒤로
@@ -363,7 +363,7 @@ export const CategorySelectModal: React.FC<CategorySelectModalProps> = ({
               style={{
                 ...ghostBtn, fontSize: font.size.xs,
                 color: colors.primary,
-                fontWeight: 500,
+                fontWeight: font.weight.medium,
               }}
             >
               전체
@@ -376,7 +376,7 @@ export const CategorySelectModal: React.FC<CategorySelectModalProps> = ({
                   style={{
                     ...ghostBtn, fontSize: font.size.xs,
                     color: step === 'medium' ? colors.text.primary : colors.primary,
-                    fontWeight: 500,
+                    fontWeight: font.weight.medium,
                   }}
                 >
                   {largeName}
@@ -386,7 +386,7 @@ export const CategorySelectModal: React.FC<CategorySelectModalProps> = ({
             {mediumName && (
               <>
                 <ChevronRight size={12} color={colors.text.muted} />
-                <span style={{ fontSize: font.size.xs, color: colors.text.primary, fontWeight: 500 }}>
+                <span style={{ fontSize: font.size.xs, color: colors.text.primary, fontWeight: font.weight.medium }}>
                   {mediumName}
                 </span>
               </>
@@ -481,7 +481,7 @@ export const CategorySelectModal: React.FC<CategorySelectModalProps> = ({
             <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginBottom: '2px' }}>
               현재 선택
             </div>
-            <div style={{ fontSize: font.size.sm, color: colors.text.primary, fontWeight: 600 }}>
+            <div style={{ fontSize: font.size.sm, color: colors.text.primary, fontWeight: font.weight.semibold }}>
               {currentFlat.path}
             </div>
           </div>

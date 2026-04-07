@@ -100,12 +100,12 @@ export const CollectionProgressBanner: React.FC = () => {
 
                         <div style={{ flex: 1, minWidth: 0 }}>
                             {jd.completed ? (
-                                <div style={{ fontSize: font.size.md, fontWeight: 600, color: colors.text.primary }}>
+                                <div style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary }}>
                                     수집 완료 — {jd.displayCount}건이 목록에 추가되었습니다
                                 </div>
                             ) : (
                                 <>
-                                    <div style={{ fontSize: font.size.md, fontWeight: 600, color: colors.text.primary, marginBottom: '6px' }}>
+                                    <div style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary, marginBottom: '6px' }}>
                                         {jd.provider} · {jd.categorySummary} 수집 중
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'] }}>

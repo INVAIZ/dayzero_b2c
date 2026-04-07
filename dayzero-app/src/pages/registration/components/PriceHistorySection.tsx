@@ -197,7 +197,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
                     }}>
                         <div style={{
                             fontSize: font.size.xs,
-                            fontWeight: 600,
+                            fontWeight: font.weight.semibold,
                             color: colors.text.secondary,
                             marginBottom: '2px',
                         }}>
@@ -206,7 +206,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: spacing['2'] }}>
                             <span style={{
                                 fontSize: font.size.base,
-                                fontWeight: 700,
+                                fontWeight: font.weight.bold,
                                 color: colors.primary,
                             }}>
                                 ₩{hEntry.sourcePriceKrw.toLocaleString()}
@@ -216,7 +216,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
                                 return (
                                     <span style={{
                                         fontSize: font.size.xs,
-                                        fontWeight: 600,
+                                        fontWeight: font.weight.semibold,
                                         color: p <= 0 ? colors.danger : colors.success,
                                     }}>
                                         수익 {p >= 0 ? '+' : ''}₩{p.toLocaleString()}
@@ -227,7 +227,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
                         {hEntry.stockStatus === 'out_of_stock' && (
                             <div style={{
                                 fontSize: font.size.xs,
-                                fontWeight: 600,
+                                fontWeight: font.weight.semibold,
                                 color: colors.danger,
                                 marginTop: '2px',
                             }}>
@@ -250,10 +250,10 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
                     marginBottom: spacing['1'],
                 }}>
                     <span style={{ width: '8px', flexShrink: 0 }} />
-                    <span style={{ flex: 1, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left' }}>원가</span>
-                    <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left' }}>변동</span>
-                    <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left' }}>예상 수익</span>
-                    <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: 600, color: colors.text.muted, textAlign: 'left', paddingLeft: '8px' }}>날짜</span>
+                    <span style={{ flex: 1, fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.text.muted, textAlign: 'left' }}>원가</span>
+                    <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.text.muted, textAlign: 'left' }}>변동</span>
+                    <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.text.muted, textAlign: 'left' }}>예상 수익</span>
+                    <span style={{ width: '80px', flexShrink: 0, fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.text.muted, textAlign: 'left', paddingLeft: '8px' }}>날짜</span>
                 </div>
                 {history.slice(-5).reverse().map((entry, i) => {
                     const profit = calcProfit(entry.sourcePriceKrw);
@@ -287,7 +287,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
                             }}>
                                 <span style={{
                                     fontSize: font.size.base,
-                                    fontWeight: 700,
+                                    fontWeight: font.weight.bold,
                                     color: colors.text.primary,
                                 }}>
                                     ₩{entry.sourcePriceKrw.toLocaleString()}
@@ -295,7 +295,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
                                 {entry.stockStatus === 'out_of_stock' && (
                                     <span style={{
                                         fontSize: font.size.xs,
-                                        fontWeight: 600,
+                                        fontWeight: font.weight.semibold,
                                         color: colors.text.primary,
                                         background: colors.bg.subtle,
                                         padding: '1px 6px',
@@ -307,7 +307,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
                             </span>
                             <span style={{
                                 fontSize: font.size.base,
-                                fontWeight: 700,
+                                fontWeight: font.weight.bold,
                                 color: entry.stockStatus === 'out_of_stock' ? colors.text.muted
                                     : priceChangeFromBase !== 0 ? changeColor : colors.text.muted,
                                 display: 'flex',
@@ -317,7 +317,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
                                 flexShrink: 0,
                             }}>
                                 {entry.stockStatus === 'out_of_stock' ? (
-                                    <span style={{ fontSize: font.size.sm, fontWeight: 500 }}>–</span>
+                                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.medium }}>–</span>
                                 ) : priceChangeFromBase !== 0 ? (
                                     <>
                                         <svg width="10" height="10" viewBox="0 0 10 10" fill={changeColor} style={{ flexShrink: 0 }}>
@@ -329,7 +329,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
                                         ₩{Math.abs(priceChangeFromBase).toLocaleString()}
                                     </>
                                 ) : (
-                                    <span style={{ fontSize: font.size.sm, fontWeight: 500 }}>–</span>
+                                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.medium }}>–</span>
                                 )}
                             </span>
                             <span style={{
@@ -375,7 +375,7 @@ export const PriceHistorySection: React.FC<Props> = ({ history, salePriceJpy, hi
         }}>
             <div style={{
                 fontSize: font.size.sm,
-                fontWeight: 700,
+                fontWeight: font.weight.bold,
                 color: colors.text.tertiary,
                 marginBottom: spacing['4'],
                 letterSpacing: '0.3px',
