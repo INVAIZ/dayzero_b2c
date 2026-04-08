@@ -504,7 +504,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         {autoSave && saveStatus === 'saved' && <span style={{ color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>}
                     </div>
                 </div>
-                <div style={{ fontSize: font.size.xs, color: colors.text.muted }}>
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted, paddingLeft: '27px' }}>
                     대표 옵션의 판매가를 수정하면 동일 마진율이 전체 옵션에 적용됩니다
                 </div>
             </div>
