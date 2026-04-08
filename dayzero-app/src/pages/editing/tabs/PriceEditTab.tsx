@@ -507,21 +507,21 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
             {/* 마진율 슬라이더 */}
             <div style={{ marginBottom: spacing['4'] }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing['3'] }}>
-                    <span style={{ fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.text.secondary }}>마진율</span>
-                    <div style={{ position: 'relative', width: '80px', flexShrink: 0 }}>
+                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>마진율</span>
+                    <div style={{ position: 'relative', width: '76px', flexShrink: 0 }}>
                         <input
                             type="number" className="price-input" value={Math.round(marginRate)}
                             onChange={e => handleMarginChange(Number(e.target.value))}
                             style={{
                                 ...priceInputBase,
-                                width: '80px', padding: '10px 26px 10px 10px',
-                                textAlign: 'right', fontWeight: font.weight.bold,
-                                fontSize: font.size.base,
+                                width: '76px', padding: '8px 24px 8px 8px',
+                                textAlign: 'right', fontWeight: font.weight.semibold,
+                                fontSize: font.size.sm,
                             }}
                         />
                         <span style={{
-                            position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
-                            fontSize: font.size.base, color: colors.text.muted, fontWeight: font.weight.medium,
+                            position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)',
+                            fontSize: font.size.sm, color: colors.text.muted, fontWeight: font.weight.medium,
                             pointerEvents: 'none',
                         }}>%</span>
                     </div>
