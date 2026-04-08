@@ -689,7 +689,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
             <SectionDivider />
 
             {/* ── ② 비용 ── */}
-            <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
+            <div style={{ ...flexBetween, marginBottom: spacing['4'] }}>
                 <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>2</span>비용</span>
             </div>
 
@@ -762,21 +762,13 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
 
             <SectionDivider />
 
-            {/* ── ③ 수익 계산 ── */}
+            {/* ── ③ 정산금 ── */}
             <div style={{ ...flexBetween, marginBottom: spacing['4'] }}>
-                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>3</span>수익 계산</span>
+                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>3</span>정산금</span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['4'] }}>
-                {/* ── 판매 정산 ── */}
                 <div style={{ borderRadius: radius.lg, border: `1px solid ${colors.border.default}`, overflow: 'hidden' }}>
-                    <div style={{
-                        padding: `${spacing['3']} ${spacing['4']}`,
-                        background: colors.bg.subtle,
-                        borderBottom: `1px solid ${colors.border.default}`,
-                    }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>판매 정산</span>
-                    </div>
                     <div style={{ padding: `0 ${spacing['4']}` }}>
                         <div style={calcRowStyle}>
                             <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>
@@ -813,7 +805,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                     padding: `${spacing['4']} ${spacing['4']}`,
                 }}>
                     <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>1건 판매 시 순이익</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>1건 판매 시 예상 순이익</span>
                         <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: isProfit ? colors.successDark : colors.danger }}>
                             {isProfit ? '+' : '−'}₩{Math.abs(profitKrw).toLocaleString()}
                         </span>
