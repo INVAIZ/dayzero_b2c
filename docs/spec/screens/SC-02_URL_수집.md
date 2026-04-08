@@ -126,6 +126,13 @@ MainLayout — 최대 너비 800px, 가운데 정렬, 하단 패딩 100px.
 - 클릭 시 해당 쇼핑몰 URL을 새 탭으로 열기 (`window.open(p.url, '_blank')`)
 - 호버: `background: colors.bg.subtle`, `borderColor: colors.border.light`
 
+#### 중복/판매 중 안내 문구
+- 위치: 수집 시작 버튼 바로 위
+- 아이콘: Info (14px, `colors.text.muted`)
+- 텍스트: `이미 판매 중이거나 수집된 상품은 자동으로 제외돼요.`
+- 스타일: `font.size.sm`, `colors.text.muted`, `font.weight.medium`
+- 표시 조건: URL이 1건 이상 입력되었을 때
+
 #### 수집 시작 버튼
 - 텍스트: `총 {validCount}건 수집 시작하기` (Link2 아이콘 포함)
 - 높이: 56px

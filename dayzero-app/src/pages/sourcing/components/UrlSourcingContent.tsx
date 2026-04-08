@@ -5,7 +5,7 @@ import type { SourcedProduct, ParsedUrl } from '../../../types/sourcing';
 import { useSourcingStore } from '../../../store/useSourcingStore';
 import { useEditingStore } from '../../../store/useEditingStore';
 
-import { Link2, AlertCircle, Loader2, CheckCircle2, XCircle, ArrowRight, X } from 'lucide-react';
+import { Link2, AlertCircle, Loader2, CheckCircle2, XCircle, ArrowRight, X, Info } from 'lucide-react';
 import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
 import { colors, font, radius, spacing } from '../../../design/tokens';
 
@@ -621,6 +621,15 @@ export const UrlSourcingContent = () => {
                             ))}
                         </div>
                     </div>
+                </div>
+            )}
+
+            {!collectionStarted && urls.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'], marginBottom: spacing['3'] }}>
+                    <Info size={14} style={{ color: colors.text.muted, flexShrink: 0 }} />
+                    <span style={{ fontSize: font.size.sm, color: colors.text.muted, fontWeight: font.weight.medium }}>
+                        이미 판매 중이거나 수집된 상품은 자동으로 제외돼요.
+                    </span>
                 </div>
             )}
 
