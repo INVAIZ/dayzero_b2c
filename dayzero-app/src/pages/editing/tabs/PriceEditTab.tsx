@@ -28,14 +28,6 @@ const sectionBadgeStyle: React.CSSProperties = {
     marginRight: '7px', flexShrink: 0,
 };
 
-const costSummaryBadgeStyle: React.CSSProperties = {
-    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-    width: '18px', height: '18px',
-    background: colors.white, color: colors.primary,
-    border: `1.5px solid ${colors.primary}`, borderRadius: radius.full,
-    fontSize: font.size['2xs'], fontWeight: font.weight.bold,
-};
-
 const summaryRowStyle: React.CSSProperties = {
     ...flexBetween,
     padding: `11px ${spacing['4']}`,
@@ -104,13 +96,6 @@ const FloatingTooltip: React.FC<{
         </div>
     );
 };
-
-// ── 섹션 레이블 ─────────────────────────────────────────────────────────────
-const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>
-        {children}
-    </span>
-);
 
 const Divider = () => (
     <div style={{ height: '1px', background: colors.border.default }} />
@@ -414,19 +399,6 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
     const handleMarginChange = (v: number) => {
         setMarginRate(v);
         recalcPrice(originalPrice, v, domesticShipping, prepCost, intlShipping);
-    };
-
-    const handleDirectSalePriceSave = () => {
-        const newJpy = Number(editInput) || 0;
-        if (newJpy <= 0) { cancelEditing(); return; }
-        setSalePriceJpy(newJpy);
-        priceRef.current = newJpy;
-        // 역산: 마진율 = (판매가 / 비용 - 1) * 100
-        const newMargin = totalCostJpy > 0 ? ((newJpy / totalCostJpy) - 1) * 100 : marginRate;
-        setMarginRate(Math.round(newMargin));
-        setEditingField(null);
-        setEditInput('');
-        triggerSave();
     };
 
     // ── 수익 계산 ─────────────────────────────────────────────────────────
