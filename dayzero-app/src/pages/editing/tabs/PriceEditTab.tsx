@@ -974,7 +974,6 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                     </div>
                 </div>
             </div>
-            )}
 
             {/* 확인 모달 (소싱원가 / 국내배송비 / 무게 공용) */}
             {confirmField && confirmConfig[confirmField] && (
