@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Loader2, Star, Trash2, Check, RotateCcw, Scissors, Languages } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Loader2, Star, Trash2, Check, RotateCcw, Scissors, Languages, Plus } from 'lucide-react';
 
 import type { ProductDetail, ProductImage } from '../../../types/editing';
 import { useEditingStore } from '../../../store/useEditingStore';
@@ -34,8 +34,25 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
     const [images, setImages] = useState<ProductImage[]>([...product.thumbnails]);
     const [processing, setProcessing] = useState<Set<string>>(new Set());
     const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const save = (imgs: ProductImage[]) => updateProduct(product.id, { thumbnails: imgs });
+
+    const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        const newImages: ProductImage[] = Array.from(files).map((file, i) => ({
+            id: `added-${Date.now()}-${i}`,
+            url: URL.createObjectURL(file),
+            translatedUrl: null,
+            translationStatus: 'none' as const,
+            backgroundRemoved: false,
+        }));
+        const next = [...images, ...newImages].slice(0, 10); // 최대 10장
+        setImages(next);
+        save(next);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
 
     const handleRemoveBg = (id: string) => {
         if (processing.has(id)) return;
@@ -204,6 +221,38 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
                         </div>
                     );
                 })}
+
+                {/* 이미지 추가 카드 */}
+                {images.length < 10 && (
+                    <div
+                        onClick={() => fileInputRef.current?.click()}
+                        style={{
+                            border: `2px dashed ${colors.border.default}`,
+                            borderRadius: radius.lg,
+                            display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', justifyContent: 'center',
+                            gap: spacing['2'],
+                            cursor: 'pointer',
+                            aspectRatio: '1',
+                            background: colors.bg.faint,
+                            transition: 'border-color 0.15s, background 0.15s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.background = colors.primaryLight; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = colors.border.default; e.currentTarget.style.background = colors.bg.faint; }}
+                    >
+                        <Plus size={24} color={colors.text.muted} />
+                        <span style={{ fontSize: font.size.xs, color: colors.text.muted, fontWeight: font.weight.medium }}>이미지 추가</span>
+                        <span style={{ fontSize: font.size['2xs'], color: colors.text.placeholder }}>최대 10장</span>
+                    </div>
+                )}
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleAddImage}
+                    style={{ display: 'none' }}
+                />
             </div>
 
             <ConfirmModal
