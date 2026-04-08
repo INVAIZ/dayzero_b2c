@@ -718,9 +718,9 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
 
             <SectionDivider />
 
-            {/* ── ② 국내 비용 ── */}
+            {/* ── ② 비용 ── */}
             <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
-                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>2</span>국내 비용</span>
+                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>2</span>비용</span>
             </div>
 
             <div style={{ border: `1px solid ${colors.border.default}`, borderRadius: radius.lg, overflow: 'hidden' }}>
@@ -749,23 +749,8 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                     ) : (
                         <CostRow label="작업비" sub="검수/포장" value={prepCost} prefix="₩" onClick={() => handleRowClick('prep')} />
                     )}
-                </div>
-                <div style={summaryRowStyle}>
-                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>국내 비용 소계</span>
-                    <div style={{ textAlign: 'right' }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>₩{totalCostKrw.toLocaleString()}</span>
-                        <div style={{ fontSize: font.size['2xs+'], color: colors.text.muted, marginTop: '2px' }}>≈ ¥{Math.round(costJpy).toLocaleString()}</div>
-                    </div>
-                </div>
-            </div>
-
-            {/* ── ③ 해외 배송비 ── */}
-            <div style={{ marginTop: spacing['8'], marginBottom: spacing['2'] }}>
-                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>3</span>해외 배송비</span>
-            </div>
-
-            <div style={{ border: `1px solid ${colors.border.default}`, borderRadius: radius.lg, overflow: 'hidden' }}>
-                <div style={{ padding: `0 ${spacing['4']}` }}>
+                    <Divider />
+                    {/* 상품 무게 → 해외 배송비 */}
                     {editingField === 'weight' ? (
                         <CostEditRow label="상품 무게" value={editInput} suffix="kg" hint="KSE(SAGAWA) 요금표 기준으로 해외 배송비가 자동 계산됩니다" onChange={setEditInput} onSave={handleSaveWeight} onCancel={cancelEditing} />
                     ) : (
@@ -773,93 +758,36 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                             onTooltipMove={!isWeightUserEdited && product.weightSource !== 'manual' ? showTooltip(product.weightSource as 'ai' | 'crawled', `${product.weightSource}_weight`) : undefined}
                             onTooltipLeave={hideTooltip} />
                     )}
+                    <Divider />
+                    {/* 해외 배송비 (자동 계산, 읽기 전용) */}
+                    <div style={{ ...flexBetween, padding: '13px 0' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: spacing['1'] }}>
+                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>해외 배송비</span>
+                            <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>KSE SAGAWA</span>
+                        </div>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>
+                            ₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}
+                        </span>
+                    </div>
                 </div>
+                {/* 비용 소계 */}
                 <div style={summaryRowStyle}>
-                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>
-                        해외 배송비
-                        <span style={{ fontSize: font.size.xs, fontWeight: font.weight.regular, color: colors.text.muted, marginLeft: '4px' }}>KSE SAGAWA 기준</span>
-                    </span>
+                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>비용 소계</span>
                     <div style={{ textAlign: 'right' }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}</span>
-                        <div style={{ fontSize: font.size['2xs+'], color: colors.text.muted, marginTop: '2px' }}>≈ ¥{intlShipping.toLocaleString()}</div>
+                        <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary }}>₩{Math.round(totalCostJpy * EXCHANGE_RATE).toLocaleString()}</span>
+                        <div style={{ fontSize: font.size['2xs+'], color: colors.text.muted, marginTop: '2px' }}>≈ ¥{Math.round(totalCostJpy).toLocaleString()}</div>
                     </div>
-                </div>
-            </div>
-
-            {/* 전체 비용 합계 — 파란 박스 */}
-            <div style={{
-                ...flexBetween,
-                padding: `${spacing['3']} ${spacing['4']}`,
-                background: colors.primaryLight, borderRadius: radius.lg,
-                border: `1px solid ${colors.primaryLightBorder}`,
-                marginTop: spacing['8'], marginBottom: spacing['6'],
-            }}>
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={costSummaryBadgeStyle}>2</span>
-                        <span style={{ fontSize: font.size.xs, color: colors.primary, fontWeight: font.weight.semibold }}>+</span>
-                        <span style={costSummaryBadgeStyle}>3</span>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.primary, marginLeft: '4px' }}>전체 비용 합계</span>
-                    </div>
-                    <div style={{ fontSize: font.size.xs, color: colors.primary, opacity: 0.7, marginTop: '2px' }}>
-                        국내 비용 + 해외 배송비 · 상품 구매에 드는 총 비용
-                    </div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.primary }}>₩{Math.round(totalCostJpy * EXCHANGE_RATE).toLocaleString()}</span>
-                    <div style={{ fontSize: font.size.xs, color: colors.primary, opacity: 0.7, marginTop: '2px' }}>≈ ¥{Math.round(totalCostJpy).toLocaleString()}</div>
                 </div>
             </div>
 
             <SectionDivider />
 
-            {/* ── ④ 수익 계산 ── */}
-            <div style={{ marginBottom: spacing['4'] }}>
-                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>4</span>수익 계산</span>
+            {/* ── ③ 수익 계산 ── */}
+            <div style={{ ...flexBetween, marginBottom: spacing['4'] }}>
+                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>3</span>수익 계산</span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['4'] }}>
-                {/* 투입 비용 */}
-                <div style={{ borderRadius: radius.lg, border: `1px solid ${colors.border.default}`, overflow: 'hidden' }}>
-                    <div style={{
-                        padding: `${spacing['3']} ${spacing['4']}`,
-                        background: colors.bg.subtle,
-                        borderBottom: `1px solid ${colors.border.default}`,
-                    }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>투입 비용</span>
-                    </div>
-                    <div style={{ padding: `0 ${spacing['4']}` }}>
-                        <div style={calcRowStyle}>
-                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>구매 원가</span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>−₩{originalPrice.toLocaleString()}</span>
-                        </div>
-                        <Divider />
-                        <div style={calcRowStyle}>
-                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>국내 배송비</span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>−₩{domesticShipping.toLocaleString()}</span>
-                        </div>
-                        <Divider />
-                        <div style={calcRowStyle}>
-                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>작업비</span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>−₩{prepCost.toLocaleString()}</span>
-                        </div>
-                        <Divider />
-                        <div style={calcRowStyle}>
-                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>해외 배송비</span>
-                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>−₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}</span>
-                        </div>
-                    </div>
-                    <div style={{
-                        ...flexBetween,
-                        padding: `${spacing['3']} ${spacing['4']}`,
-                        background: colors.bg.subtle,
-                        borderTop: `1px solid ${colors.border.default}`,
-                    }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.bold, color: colors.text.primary }}>합계</span>
-                        <span style={{ fontSize: font.size.base, fontWeight: font.weight.bold, color: colors.text.primary }}>−₩{Math.round(totalCostJpy * EXCHANGE_RATE).toLocaleString()}</span>
-                    </div>
-                </div>
-
                 {/* ── 판매 정산 ── */}
                 <div style={{ borderRadius: radius.lg, border: `1px solid ${colors.border.default}`, overflow: 'hidden' }}>
                     <div style={{
