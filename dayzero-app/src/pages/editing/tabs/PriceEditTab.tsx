@@ -495,19 +495,71 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                 }
             `}</style>
 
-            {/* ── ① 옵션별 판매가 ── */}
+            {/* ── ① 판매가 ── */}
             <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
-                <SectionLabel><span style={sectionBadgeStyle}>1</span>옵션별 판매가</SectionLabel>
+                <SectionLabel><span style={sectionBadgeStyle}>1</span>판매가</SectionLabel>
                 <div style={{ fontSize: font.size.xs }}>
                     {autoSave && saveStatus === 'saving' && <span style={{ color: colors.text.muted }}>저장 중...</span>}
                     {autoSave && saveStatus === 'saved' && <span style={{ color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>}
                 </div>
             </div>
 
+            {/* 마진율 슬라이더 */}
+            <div style={{ marginBottom: spacing['4'] }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing['3'] }}>
+                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>마진율</span>
+                    <div style={{ position: 'relative', width: '76px', flexShrink: 0 }}>
+                        <input
+                            type="number" className="price-input" value={Math.round(marginRate)}
+                            onChange={e => handleMarginChange(Number(e.target.value))}
+                            style={{
+                                ...priceInputBase,
+                                width: '76px', padding: '8px 24px 8px 8px',
+                                textAlign: 'right', fontWeight: font.weight.semibold,
+                                fontSize: font.size.sm,
+                            }}
+                        />
+                        <span style={{
+                            position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)',
+                            fontSize: font.size.sm, color: colors.text.muted, fontWeight: font.weight.medium,
+                            pointerEvents: 'none',
+                        }}>%</span>
+                    </div>
+                </div>
+
+                {(() => {
+                    const pct = Math.max(0, Math.min(100, ((marginRate - 5) / (60 - 5)) * 100));
+                    const sliderColor = marginRate < 15 ? colors.danger
+                        : marginRate <= 40 ? colors.primary
+                        : marginRate <= 50 ? colors.orangeIcon : colors.danger;
+                    return (
+                        <div>
+                            <input
+                                type="range" min={5} max={60} step={5}
+                                value={Math.round(marginRate)}
+                                onChange={e => handleMarginChange(Number(e.target.value))}
+                                className="margin-slider"
+                                style={{
+                                    '--slider-color': sliderColor,
+                                    width: '100%', height: '4px', appearance: 'none', WebkitAppearance: 'none',
+                                    background: `linear-gradient(to right, ${sliderColor} ${pct}%, ${colors.border.default} ${pct}%)`,
+                                    borderRadius: radius.full, outline: 'none', cursor: 'pointer',
+                                    transition: 'background 0.3s ease',
+                                } as React.CSSProperties}
+                            />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
+                                <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>5%</span>
+                                <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>60%</span>
+                            </div>
+                        </div>
+                    );
+                })()}
+            </div>
+
             {/* 옵션별 판매가 테이블 */}
             <div style={{ marginBottom: spacing['4'] }}>
                     <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginBottom: spacing['2'] }}>
-                        대표 옵션의 판매가를 수정하면 동일 마진율({Math.round(marginRate)}%)이 전체 옵션에 적용됩니다
+                        대표 옵션의 판매가를 수정하면 동일 마진율이 전체 옵션에 적용됩니다
                     </div>
                     <div style={{ borderRadius: radius.lg, border: `1px solid ${colors.border.default}`, overflow: 'hidden' }}>
                         <div style={{
@@ -662,58 +714,6 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                             );
                         })}
                     </div>
-            </div>
-
-            {/* 마진율 슬라이더 */}
-            <div style={{ marginTop: spacing['5'], marginBottom: spacing['4'] }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing['3'] }}>
-                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>마진율</span>
-                    <div style={{ position: 'relative', width: '76px', flexShrink: 0 }}>
-                        <input
-                            type="number" className="price-input" value={Math.round(marginRate)}
-                            onChange={e => handleMarginChange(Number(e.target.value))}
-                            style={{
-                                ...priceInputBase,
-                                width: '76px', padding: '8px 24px 8px 8px',
-                                textAlign: 'right', fontWeight: font.weight.semibold,
-                                fontSize: font.size.sm,
-                            }}
-                        />
-                        <span style={{
-                            position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)',
-                            fontSize: font.size.sm, color: colors.text.muted, fontWeight: font.weight.medium,
-                            pointerEvents: 'none',
-                        }}>%</span>
-                    </div>
-                </div>
-
-                {(() => {
-                    const pct = Math.max(0, Math.min(100, ((marginRate - 5) / (60 - 5)) * 100));
-                    const sliderColor = marginRate < 15 ? colors.danger
-                        : marginRate <= 40 ? colors.primary
-                        : marginRate <= 50 ? colors.orangeIcon : colors.danger;
-                    return (
-                        <div>
-                            <input
-                                type="range" min={5} max={60} step={5}
-                                value={Math.round(marginRate)}
-                                onChange={e => handleMarginChange(Number(e.target.value))}
-                                className="margin-slider"
-                                style={{
-                                    '--slider-color': sliderColor,
-                                    width: '100%', height: '4px', appearance: 'none', WebkitAppearance: 'none',
-                                    background: `linear-gradient(to right, ${sliderColor} ${pct}%, ${colors.border.default} ${pct}%)`,
-                                    borderRadius: radius.full, outline: 'none', cursor: 'pointer',
-                                    transition: 'background 0.3s ease',
-                                } as React.CSSProperties}
-                            />
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
-                                <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>5%</span>
-                                <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>60%</span>
-                            </div>
-                        </div>
-                    );
-                })()}
             </div>
 
             <SectionDivider />
