@@ -347,9 +347,12 @@ const OptionRow: React.FC<{
     option: ProductOption;
     imageUrl: string;
     isTranslating: boolean;
+    isRepresentative: boolean;
     onChange: (field: keyof ProductOption, value: string | number) => void;
     onDelete: () => void;
-}> = ({ option, imageUrl, isTranslating, onChange, onDelete }) => {
+    onSetRepresentative: () => void;
+    onFlushSave: () => void;
+}> = ({ option, imageUrl, isTranslating, isRepresentative, onChange, onDelete, onSetRepresentative, onFlushSave }) => {
     const [confirmOpen, setConfirmOpen] = useState(false);
     const needsTranslation = hasKorean(option.nameKo);
     const nameJaHasKorean = !!option.nameJa && hasKorean(option.nameJa);
@@ -357,7 +360,21 @@ const OptionRow: React.FC<{
 
     return (
         <div style={{ paddingBottom: spacing['3'], marginBottom: spacing['3'], borderBottom: `1px solid ${colors.border.default}` }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '44px 1fr 90px 36px', alignItems: 'center', gap: spacing['3'] }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '30px 44px 1fr 90px 36px', alignItems: 'center', gap: spacing['3'] }}>
+                {/* 대표 라디오 */}
+                <div
+                    onClick={onSetRepresentative}
+                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                    <div style={{
+                        width: '16px', height: '16px', borderRadius: radius.full,
+                        border: `2px solid ${isRepresentative ? colors.primary : colors.border.default}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'border-color 0.15s',
+                    }}>
+                        {isRepresentative && <div style={{ width: '8px', height: '8px', borderRadius: radius.full, background: colors.primary }} />}
+                    </div>
+                </div>
                 <img src={imageUrl} alt=""
                     onError={handleImgError}
                     style={{
@@ -380,22 +397,20 @@ const OptionRow: React.FC<{
                         </div>
                     ) : (
                         <input
-                            key={option.nameJa ? 'ja' : 'empty'}
-                            className={option.nameJa ? 'content-fade-in' : undefined}
                             value={option.nameJa ?? ''}
                             onChange={e => onChange('nameJa', e.target.value)}
                             placeholder={option.nameKo || '옵션명 입력'}
                             style={{ ...inputBase, ...(!hasNameJa ? warningBorderStyle : {}) }}
                             onFocus={handleWarningFocus}
-                            onBlur={createWarningBlur(hasNameJa)}
+                            onBlur={e => { createWarningBlur(hasNameJa)(e); onFlushSave(); }}
                         />
                     )}
                 </div>
 
                 <input
                     type="number" min={0}
-                    value={option.stock}
-                    onChange={e => onChange('stock', Number(e.target.value))}
+                    value={option.stock || ''}
+                    onChange={e => onChange('stock', Number(e.target.value) || 0)}
                     className="stock-input"
                     style={{ ...inputBase, textAlign: 'left' }}
                     onFocus={e => (e.target.style.borderColor = colors.primary)}
@@ -760,13 +775,48 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
     };
 
     const addOption = () => {
-        setOptions(prev => [...prev, { id: `opt-${Date.now()}`, nameKo: '', nameJa: '', stock: 0 }]);
-        triggerSave('options');
+        const newOpt = { id: `opt-${Date.now()}`, nameKo: '', nameJa: '', stock: 0, priceKrw: 0, isRepresentative: false };
+        const updated = [...options, newOpt];
+        setOptions(updated);
+        optionsRef.current = updated;
+        updateProduct(product.id, { options: updated });
     };
 
     const deleteOption = (id: string) => {
-        setOptions(prev => prev.filter(o => o.id !== id));
-        triggerSave('options');
+        const updated = options.filter(o => o.id !== id);
+        setOptions(updated);
+        optionsRef.current = updated;
+        updateProduct(product.id, { options: updated });
+    };
+
+    const [pendingRepId, setPendingRepId] = useState<string | null>(null);
+
+    const flushSave = useCallback(() => {
+        if (saveTimer.current) {
+            clearTimeout(saveTimer.current);
+            saveTimer.current = null;
+        }
+        updateProduct(product.id, {
+            titleJa: titleRef.current || null,
+            descriptionJa: descRef.current || null,
+            options: optionsRef.current,
+        });
+    }, [product.id, updateProduct]);
+
+    const handleSetRepresentative = (id: string) => {
+        const hasRep = options.some(o => o.isRepresentative);
+        const currentRepId = hasRep ? options.find(o => o.isRepresentative)?.id : options[0]?.id;
+        if (currentRepId === id) return; // 이미 대표
+        setPendingRepId(id);
+    };
+
+    const confirmRepresentative = () => {
+        if (!pendingRepId) return;
+        const updated = options.map(o => ({ ...o, isRepresentative: o.id === pendingRepId }));
+        setOptions(updated);
+        optionsRef.current = updated;
+        updateProduct(product.id, { options: updated });
+        setPendingRepId(null);
     };
 
     const descCount = (descMode === 'ko' ? descKo : descJa).length;
@@ -1228,12 +1278,12 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 </div>
 
                 <div style={{
-                    display: 'grid', gridTemplateColumns: '44px 1fr 90px 36px',
+                    display: 'grid', gridTemplateColumns: '30px 44px 1fr 90px 36px',
                     paddingBottom: spacing['2'],
                     gap: spacing['3'],
                 }}>
-                    {['사진', '옵션명', '재고', ''].map((h, i) => (
-                        <div key={i} style={{ fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.text.muted }}>{h}</div>
+                    {['대표', '사진', '옵션명', '재고', ''].map((h, i) => (
+                        <div key={i} style={{ fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.text.muted, textAlign: i === 0 ? 'center' : undefined }}>{h}</div>
                     ))}
                 </div>
 
@@ -1241,16 +1291,23 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                     <div style={{ padding: `${spacing['5']} 0`, fontSize: font.size.sm, color: colors.text.muted }}>
                         옵션이 없습니다
                     </div>
-                ) : options.map((opt, idx) => (
-                    <OptionRow
-                        key={opt.id}
-                        option={opt}
-                        imageUrl={getOptionImage(idx)}
-                        isTranslating={translatingOptionIds.has(opt.id)}
-                        onChange={(field, value) => updateOption(opt.id, field, value)}
-                        onDelete={() => deleteOption(opt.id)}
-                    />
-                ))}
+                ) : options.map((opt, idx) => {
+                    const hasRep = options.some(o => o.isRepresentative);
+                    const isRep = hasRep ? opt.isRepresentative : idx === 0;
+                    return (
+                        <OptionRow
+                            key={opt.id}
+                            option={opt}
+                            imageUrl={getOptionImage(idx)}
+                            isTranslating={translatingOptionIds.has(opt.id)}
+                            isRepresentative={isRep}
+                            onChange={(field, value) => updateOption(opt.id, field, value)}
+                            onDelete={() => deleteOption(opt.id)}
+                            onSetRepresentative={() => handleSetRepresentative(opt.id)}
+                            onFlushSave={flushSave}
+                        />
+                    );
+                })}
 
                 <button
                     onClick={addOption}
@@ -1274,6 +1331,20 @@ export const BasicEditTab: React.FC<Props> = ({ product, hideProgress }) => {
                 >
                     <Plus size={14} /> 옵션 추가
                 </button>
+
+                {/* 대표 옵션 변경 확인 모달 */}
+                {pendingRepId && (
+                    <ConfirmModal
+                        isOpen
+                        onClose={() => setPendingRepId(null)}
+                        onConfirm={confirmRepresentative}
+                        title="대표 옵션 변경"
+                        description={`'${options.find(o => o.id === pendingRepId)?.nameKo || options.find(o => o.id === pendingRepId)?.nameJa || '선택한'}' 옵션을 대표 상품으로 설정하시겠습니까? 대표 상품의 판매가가 Qoo10에 노출됩니다.`}
+                        confirmText="변경하기"
+                        cancelText="취소"
+                        type="info"
+                    />
+                )}
             </div>
 
             <Divider />

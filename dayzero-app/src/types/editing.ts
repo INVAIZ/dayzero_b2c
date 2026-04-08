@@ -3,6 +3,8 @@ export interface ProductOption {
     nameKo: string;
     nameJa: string | null;
     stock: number;
+    priceKrw: number;         // 옵션별 원가 (₩)
+    isRepresentative: boolean; // 대표 옵션 여부
 }
 
 export interface ProductImage {

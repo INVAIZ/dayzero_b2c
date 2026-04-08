@@ -25,18 +25,18 @@ const makeDetailImages = (count: number, productId: string) =>
     }));
 
 
-const makeOptions = (productId: string) => {
+const makeOptions = (productId: string, baseKrw: number) => {
     const n = prodNum(productId);
     if (n % 3 === 0) return [
-        { id: `opt-${productId}-0`, nameKo: '소', nameJa: null, stock: 50 },
-        { id: `opt-${productId}-1`, nameKo: '중', nameJa: null, stock: 80 },
-        { id: `opt-${productId}-2`, nameKo: '대', nameJa: null, stock: 30 },
+        { id: `opt-${productId}-0`, nameKo: '소', nameJa: null, stock: 50, priceKrw: Math.round(baseKrw * 0.8), isRepresentative: false },
+        { id: `opt-${productId}-1`, nameKo: '중', nameJa: null, stock: 80, priceKrw: baseKrw, isRepresentative: true },
+        { id: `opt-${productId}-2`, nameKo: '대', nameJa: null, stock: 30, priceKrw: Math.round(baseKrw * 1.3), isRepresentative: false },
     ];
     if (n % 2 === 0) return [
-        { id: `opt-${productId}-0`, nameKo: '화이트', nameJa: null, stock: 100 },
-        { id: `opt-${productId}-1`, nameKo: '블랙', nameJa: null, stock: 60 },
+        { id: `opt-${productId}-0`, nameKo: '화이트', nameJa: null, stock: 100, priceKrw: baseKrw, isRepresentative: true },
+        { id: `opt-${productId}-1`, nameKo: '블랙', nameJa: null, stock: 60, priceKrw: Math.round(baseKrw * 1.1), isRepresentative: false },
     ];
-    return [{ id: `opt-${productId}-0`, nameKo: '기본', nameJa: null, stock: 999 }];
+    return [{ id: `opt-${productId}-0`, nameKo: '기본', nameJa: null, stock: 999, priceKrw: baseKrw, isRepresentative: true }];
 };
 
 const pendingProductsData = [
@@ -172,7 +172,7 @@ const pendingProducts: ProductDetail[] = pendingProductsData.map((p) => ({
     titleJa: null,
     descriptionKo: PENDING_DESC,
     descriptionJa: null,
-    options: makeOptions(p.id),
+    options: makeOptions(p.id, p.krw),
     thumbnails: makeThumbnails(3, p.id),
     detailImages: makeDetailImages(5, p.id),
     thumbnailTranslated: false,

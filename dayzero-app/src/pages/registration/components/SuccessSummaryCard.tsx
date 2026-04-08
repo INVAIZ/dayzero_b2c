@@ -62,7 +62,7 @@ export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
                 diffPositive={productDiff >= 0}
             />
             <StatCard
-                label="평균 예상 수익"
+                label="건당 평균 예상 수익"
                 icon={<TrendingUp size={18} color={colors.text.muted} />}
                 value={`₩${avgProfit.toLocaleString()}`}
                 diffText={hasDiff ? `${profitDiff >= 0 ? '+' : ''}₩${profitDiff.toLocaleString()}` : undefined}

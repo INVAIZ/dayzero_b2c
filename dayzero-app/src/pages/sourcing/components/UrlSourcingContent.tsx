@@ -203,29 +203,31 @@ export const UrlSourcingContent = () => {
                 // 상품 유형별 다양한 옵션 생성
                 const makeOptions = () => {
                     const pid = mockProduct.id;
+                    const basePrice = mockProduct.originalPriceKrw;
                     if (isKpop) {
-                        // K-pop: 버전 옵션 2~3개
                         const versions = ['ver. A', 'ver. B', 'ver. C'];
-                        const count = 2 + (i % 2); // 2 or 3
+                        const count = 2 + (i % 2);
                         return versions.slice(0, count).map((v, vi) => ({
                             id: `opt-${pid}-${vi}`, nameKo: v, nameJa: null, stock: 500 + vi * 100,
+                            priceKrw: basePrice, isRepresentative: vi === 0,
                         }));
                     }
                     const beautyOptions = [
-                        [{ nameKo: '본품', stock: 999 }, { nameKo: '본품+리필', stock: 500 }],
-                        [{ nameKo: '21호 라이트', stock: 800 }, { nameKo: '23호 미디엄', stock: 600 }, { nameKo: '25호 딥', stock: 400 }],
-                        [{ nameKo: '기본', stock: 999 }],
-                        [{ nameKo: '50ml', stock: 700 }, { nameKo: '100ml', stock: 500 }],
+                        [{ nameKo: '본품', stock: 999, priceMul: 1 }, { nameKo: '본품+리필', stock: 500, priceMul: 1.6 }],
+                        [{ nameKo: '21호 라이트', stock: 800, priceMul: 1 }, { nameKo: '23호 미디엄', stock: 600, priceMul: 1 }, { nameKo: '25호 딥', stock: 400, priceMul: 1 }],
+                        [{ nameKo: '기본', stock: 999, priceMul: 1 }],
+                        [{ nameKo: '50ml', stock: 700, priceMul: 1 }, { nameKo: '100ml', stock: 500, priceMul: 1.5 }],
                     ];
                     const dailyOptions = [
-                        [{ nameKo: '기본', stock: 999 }],
-                        [{ nameKo: '소', stock: 800 }, { nameKo: '중', stock: 600 }, { nameKo: '대', stock: 400 }],
-                        [{ nameKo: '화이트', stock: 500 }, { nameKo: '블랙', stock: 500 }],
+                        [{ nameKo: '기본', stock: 999, priceMul: 1 }],
+                        [{ nameKo: '소', stock: 800, priceMul: 0.8 }, { nameKo: '중', stock: 600, priceMul: 1 }, { nameKo: '대', stock: 400, priceMul: 1.3 }],
+                        [{ nameKo: '화이트', stock: 500, priceMul: 1 }, { nameKo: '블랙', stock: 500, priceMul: 1.1 }],
                     ];
                     const optSet = catPath.includes('생활용품') || catPath.includes('소모품') ? dailyOptions : beautyOptions;
                     const chosen = optSet[i % optSet.length];
                     return chosen.map((o, vi) => ({
                         id: `opt-${pid}-${vi}`, nameKo: o.nameKo, nameJa: null, stock: o.stock,
+                        priceKrw: Math.round(basePrice * o.priceMul), isRepresentative: vi === 0,
                     }));
                 };
 

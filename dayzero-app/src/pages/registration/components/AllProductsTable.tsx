@@ -21,6 +21,7 @@ interface Props {
     showMonitoring?: boolean;
     onToggleMonitoring?: (resultId: string, enable: boolean) => void;
     emptyMessage?: string;
+    emptySubMessage?: string;
 }
 
 const Checkbox = ({ checked, onClick }: { checked: boolean; onClick: () => void }) => (
@@ -52,6 +53,7 @@ export const AllProductsTable: React.FC<Props> = ({
     showMonitoring = false,
     onToggleMonitoring,
     emptyMessage = '등록된 상품이 없어요',
+    emptySubMessage = '수집 목록에서 상품을 편집하고 Qoo10에 등록해 보세요.',
 }) => {
     const { state: onboarding } = useOnboarding();
     const marginRate = getMarginRate(onboarding);
@@ -84,22 +86,23 @@ export const AllProductsTable: React.FC<Props> = ({
         return (
             <div style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
-                padding: `${spacing['12']} 0`, gap: spacing['3'],
+                padding: `80px 0 ${spacing['12']}`, gap: spacing['3'],
             }}>
                 <div style={{
                     width: '52px', height: '52px',
                     borderRadius: radius.xl,
                     background: colors.bg.subtle,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    opacity: 0, animation: 'fadeInUp 0.4s ease 0.1s both',
                 }}>
                     <ShoppingBag size={24} color={colors.text.muted} />
                 </div>
-                <div style={{ textAlign: 'center' }}>
+                <div style={{ textAlign: 'center', opacity: 0, animation: 'fadeInUp 0.4s ease 0.2s both' }}>
                     <div style={{ fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.text.secondary, marginBottom: spacing['1'] }}>
                         {emptyMessage}
                     </div>
                     <div style={{ fontSize: font.size.sm, color: colors.text.muted }}>
-                        수집 목록에서 상품을 편집하고 Qoo10에 등록해 보세요.
+                        {emptySubMessage}
                     </div>
                 </div>
             </div>

@@ -27,9 +27,18 @@ const EMPTY_MESSAGES: Record<MonitoringTabFilter, string> = {
     '전체': '등록된 상품이 없어요',
     '판매 중': '판매 중인 상품이 없어요',
     '가격·품절 확인 중': '가격·품절 확인 중인 상품이 없어요',
-    '품절': '품절된 상품이 없어요',
-    '문제 발생': '문제가 발생한 상품이 없어요',
+    '품절': '품절된 상품이 없습니다',
+    '문제 발생': '문제가 발생한 상품이 없습니다',
     '일시 중지': '일시 중지된 상품이 없어요',
+};
+
+const EMPTY_SUB_MESSAGES: Record<MonitoringTabFilter, string> = {
+    '전체': '수집 목록에서 상품을 편집하고 Qoo10에 등록해 보세요.',
+    '판매 중': '수집 목록에서 상품을 편집하고 Qoo10에 등록해 보세요.',
+    '가격·품절 확인 중': '가격이나 품절 상태가 변동된 상품이 여기에 표시됩니다.',
+    '품절': '현재 모든 상품이 정상 판매 중입니다.',
+    '문제 발생': '현재 모든 상품이 정상 상태입니다.',
+    '일시 중지': '일시 중지한 상품이 여기에 표시됩니다.',
 };
 
 export const RegistrationResultPage: React.FC = () => {
@@ -208,8 +217,8 @@ export const RegistrationResultPage: React.FC = () => {
                     counts={filters.monitoringCounts}
                 />
 
-                {/* 검색 */}
-                {allSuccessResults.length > 0 && (
+                {/* 검색 — 해당 탭에 결과가 있을 때만 */}
+                {filters.tabFilteredResults.length > 0 && (
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: spacing['2'],
                         padding: `0 ${spacing['3']}`,
@@ -243,6 +252,7 @@ export const RegistrationResultPage: React.FC = () => {
 
                 {/* 상품 테이블 */}
                 <AllProductsTable
+                    key={filters.monitoringTab}
                     results={filters.filteredResults}
                     selectedIds={selection.selectedIds}
                     onToggleSelect={selection.handleToggleSelect}
@@ -251,6 +261,7 @@ export const RegistrationResultPage: React.FC = () => {
                     showMonitoring
                     onToggleMonitoring={handleToggleMonitoring}
                     emptyMessage={EMPTY_MESSAGES[filters.monitoringTab]}
+                    emptySubMessage={EMPTY_SUB_MESSAGES[filters.monitoringTab]}
                 />
             </div>
 
