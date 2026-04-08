@@ -750,24 +750,48 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         <CostRow label="작업비" sub="검수/포장" value={prepCost} prefix="₩" onClick={() => handleRowClick('prep')} />
                     )}
                     <Divider />
-                    {/* 상품 무게 → 해외 배송비 */}
-                    {editingField === 'weight' ? (
-                        <CostEditRow label="상품 무게" value={editInput} suffix="kg" hint="KSE(SAGAWA) 요금표 기준으로 해외 배송비가 자동 계산됩니다" onChange={setEditInput} onSave={handleSaveWeight} onCancel={cancelEditing} />
-                    ) : (
-                        <CostRow label="상품 무게" value={weight} suffix="kg" source={product.weightSource} showTag={!isWeightUserEdited} onClick={() => handleRowClick('weight')}
-                            onTooltipMove={!isWeightUserEdited && product.weightSource !== 'manual' ? showTooltip(product.weightSource as 'ai' | 'crawled', `${product.weightSource}_weight`) : undefined}
-                            onTooltipLeave={hideTooltip} />
-                    )}
-                    <Divider />
-                    {/* 해외 배송비 (자동 계산, 읽기 전용) */}
-                    <div style={{ ...flexBetween, padding: '13px 0' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: spacing['1'] }}>
+                    {/* 해외 배송비 + 상품 무게 (무게 변경 → 배송비 자동 재계산) */}
+                    <div style={{ padding: '13px 0' }}>
+                        <div style={flexBetween}>
                             <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>해외 배송비</span>
-                            <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>KSE SAGAWA</span>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>
+                                ₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}
+                            </span>
                         </div>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>
-                            ₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}
-                        </span>
+                        <div style={{ marginTop: spacing['2'], padding: `${spacing['2']} ${spacing['3']}`, background: colors.bg.faint, borderRadius: radius.md, ...flexBetween }}>
+                            <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>
+                                상품 무게 기준 자동 계산 · KSE SAGAWA
+                            </span>
+                            {editingField === 'weight' ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                    <input
+                                        type="text" inputMode="decimal" className="price-input" autoFocus
+                                        value={editInput}
+                                        onChange={e => setEditInput(e.target.value)}
+                                        onKeyDown={e => { if (e.key === 'Enter') handleSaveWeight(); if (e.key === 'Escape') cancelEditing(); }}
+                                        style={{
+                                            width: '48px', textAlign: 'right', padding: '2px 0',
+                                            fontSize: font.size.xs, fontWeight: font.weight.semibold,
+                                            color: colors.primary, background: 'transparent',
+                                            border: 'none', borderBottom: `2px solid ${colors.primary}`,
+                                            outline: 'none', fontFamily: 'inherit',
+                                        }}
+                                    />
+                                    <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>kg</span>
+                                </div>
+                            ) : (
+                                <span
+                                    onClick={() => handleRowClick('weight')}
+                                    style={{
+                                        fontSize: font.size.xs, fontWeight: font.weight.semibold, color: colors.primary,
+                                        cursor: 'pointer', textDecoration: 'underline', textDecorationStyle: 'dotted' as const,
+                                        textUnderlineOffset: '2px',
+                                    }}
+                                >
+                                    {weight}kg
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
                 {/* 비용 소계 */}
