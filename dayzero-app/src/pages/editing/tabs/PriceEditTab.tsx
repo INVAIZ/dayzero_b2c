@@ -758,16 +758,26 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                             onTooltipMove={!isWeightUserEdited && product.weightSource !== 'manual' ? showTooltip(product.weightSource as 'ai' | 'crawled', `${product.weightSource}_weight`) : undefined}
                             onTooltipLeave={hideTooltip} />
                     )}
-                    <Divider />
-                    {/* 해외 배송비 (무게 기준 자동 계산) */}
-                    <div style={{ ...flexBetween, padding: '13px 0' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: spacing['1'] }}>
-                            <span style={{ fontSize: font.size.sm, color: colors.text.secondary }}>해외 배송비</span>
-                            <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>KSE SAGAWA</span>
+                    {/* 해외 배송비 (무게 종속 — 들여쓰기로 연결 표현) */}
+                    <div style={{ paddingLeft: spacing['5'], position: 'relative' }}>
+                        {/* 연결선 */}
+                        <div style={{
+                            position: 'absolute', left: '10px', top: 0, bottom: '50%',
+                            width: '1px', background: colors.border.default,
+                        }} />
+                        <div style={{
+                            position: 'absolute', left: '10px', top: '50%',
+                            width: '10px', height: '1px', background: colors.border.default,
+                        }} />
+                        <div style={{ ...flexBetween, padding: '11px 0' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: spacing['1'] }}>
+                                <span style={{ fontSize: font.size.sm, color: colors.text.muted }}>해외 배송비</span>
+                                <span style={{ fontSize: font.size.xs, color: colors.text.placeholder }}>KSE SAGAWA</span>
+                            </div>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>
+                                ₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}
+                            </span>
                         </div>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.primary }}>
-                            ₩{Math.round(intlShipping * EXCHANGE_RATE).toLocaleString()}
-                        </span>
                     </div>
                 </div>
                 {/* 비용 소계 */}
