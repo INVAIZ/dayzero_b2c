@@ -565,7 +565,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
             <div style={{ marginBottom: spacing['4'] }}>
                     {/* 컬럼 헤더 */}
                     <div style={{
-                        display: 'grid', gridTemplateColumns: '44px 1fr 100px 100px',
+                        display: 'grid', gridTemplateColumns: '44px 1fr 100px 100px 100px',
                         padding: `0 0 ${spacing['2']}`,
                         gap: spacing['2'], alignItems: 'center',
                     }}>
@@ -573,6 +573,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>옵션명</span>
                         <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>원가</span>
                         <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>판매가</span>
+                        <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>예상 수익</span>
                     </div>
 
                     {/* 옵션 행 */}
@@ -632,7 +633,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
 
                             return (
                                 <div key={opt.id} style={{
-                                    display: 'grid', gridTemplateColumns: '44px 1fr 100px 100px',
+                                    display: 'grid', gridTemplateColumns: '44px 1fr 100px 100px 100px',
                                     gap: spacing['2'], alignItems: 'center',
                                 }}>
                                     {/* 사진 */}
@@ -680,6 +681,16 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                                             ¥{optSaleJpy.toLocaleString()}
                                         </div>
                                     )}
+                                    {/* 예상 수익 (읽기 전용, 자동 계산) */}
+                                    <div style={{
+                                        ...boxStyle,
+                                        background: colors.bg.subtle,
+                                        color: optProfitKrw > 0 ? colors.successDark : colors.danger,
+                                        fontWeight: font.weight.semibold,
+                                        cursor: 'default',
+                                    }}>
+                                        {optProfitKrw > 0 ? '+' : '−'}₩{Math.abs(optProfitKrw).toLocaleString()}
+                                    </div>
                                 </div>
                             );
                         })}
