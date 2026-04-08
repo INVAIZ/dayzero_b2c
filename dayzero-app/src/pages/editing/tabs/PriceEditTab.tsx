@@ -684,7 +684,8 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                                     {/* 예상 수익 (읽기 전용, 자동 계산) */}
                                     <div style={{
                                         ...boxStyle,
-                                        background: colors.bg.subtle,
+                                        background: optProfitKrw > 0 ? colors.successBg : colors.dangerBg,
+                                        borderColor: optProfitKrw > 0 ? (colors as any).successBorder ?? '#BBF7D0' : colors.dangerLight,
                                         color: optProfitKrw > 0 ? colors.successDark : colors.danger,
                                         fontWeight: font.weight.semibold,
                                         cursor: 'default',
