@@ -554,17 +554,17 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         </div>
                     );
                 })()}
+
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginTop: spacing['3'] }}>
+                    대표 옵션의 판매가를 수정하면 동일 마진율이 전체 옵션에 적용됩니다
+                </div>
             </div>
 
             {/* 옵션별 판매가 테이블 */}
             <div style={{ marginBottom: spacing['4'] }}>
-                    <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginBottom: spacing['2'] }}>
-                        대표 옵션의 판매가를 수정하면 동일 마진율이 전체 옵션에 적용됩니다
-                    </div>
-
                     {/* 컬럼 헤더 */}
                     <div style={{
-                        display: 'grid', gridTemplateColumns: '44px 1fr 100px 100px 90px',
+                        display: 'grid', gridTemplateColumns: '44px 1fr 100px 100px',
                         padding: `0 0 ${spacing['2']}`,
                         gap: spacing['2'], alignItems: 'center',
                     }}>
@@ -572,7 +572,6 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>옵션명</span>
                         <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>원가</span>
                         <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>판매가</span>
-                        <span style={{ fontSize: font.size.xs, color: colors.text.muted, textAlign: 'right' }}>예상 수익</span>
                     </div>
 
                     {/* 옵션 행 */}
@@ -632,7 +631,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
 
                             return (
                                 <div key={opt.id} style={{
-                                    display: 'grid', gridTemplateColumns: '44px 1fr 100px 100px 90px',
+                                    display: 'grid', gridTemplateColumns: '44px 1fr 100px 100px',
                                     gap: spacing['2'], alignItems: 'center',
                                 }}>
                                     {/* 사진 */}
@@ -680,13 +679,6 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                                             ¥{optSaleJpy.toLocaleString()}
                                         </div>
                                     )}
-                                    {/* 예상 수익 */}
-                                    <span style={{
-                                        fontSize: font.size.sm, fontWeight: font.weight.semibold, textAlign: 'right',
-                                        color: optProfitKrw > 0 ? colors.success : colors.danger,
-                                    }}>
-                                        {optProfitKrw > 0 ? '+' : '−'}₩{Math.abs(optProfitKrw).toLocaleString()}
-                                    </span>
                                 </div>
                             );
                         })}

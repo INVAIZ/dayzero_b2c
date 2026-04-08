@@ -233,7 +233,7 @@ export const ThumbnailEditTab: React.FC<Props> = ({ product }) => {
                             alignItems: 'center', justifyContent: 'center',
                             gap: spacing['2'],
                             cursor: 'pointer',
-                            aspectRatio: '1',
+                            minHeight: '200px',
                             background: colors.bg.faint,
                             transition: 'border-color 0.15s, background 0.15s',
                         }}
