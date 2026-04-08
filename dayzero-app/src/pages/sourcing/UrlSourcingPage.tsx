@@ -5,7 +5,7 @@ import { SOURCING_PROVIDERS, MOCK_URL_TO_PROVIDER } from '../../types/sourcing';
 import type { SourcingProvider, SourcedProduct } from '../../types/sourcing';
 import { useSourcingStore } from '../../store/useSourcingStore';
 import { Link2, ChevronDown, ChevronUp, AlertCircle, Loader2, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
-import { colors, font, radius, spacing } from '../../design/tokens';
+import { colors, font, radius } from '../../design/tokens';
 
 interface ParsedUrl {
     id: string;
