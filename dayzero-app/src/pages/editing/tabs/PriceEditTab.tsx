@@ -496,11 +496,16 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
             `}</style>
 
             {/* ── ① 판매가 ── */}
-            <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
-                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>1</span>판매가</span>
-                <div style={{ fontSize: font.size.xs }}>
-                    {autoSave && saveStatus === 'saving' && <span style={{ color: colors.text.muted }}>저장 중...</span>}
-                    {autoSave && saveStatus === 'saved' && <span style={{ color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>}
+            <div style={{ marginBottom: spacing['3'] }}>
+                <div style={{ ...flexBetween, marginBottom: spacing['1'] }}>
+                    <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>1</span>판매가</span>
+                    <div style={{ fontSize: font.size.xs }}>
+                        {autoSave && saveStatus === 'saving' && <span style={{ color: colors.text.muted }}>저장 중...</span>}
+                        {autoSave && saveStatus === 'saved' && <span style={{ color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>}
+                    </div>
+                </div>
+                <div style={{ fontSize: font.size.xs, color: colors.text.muted }}>
+                    대표 옵션의 판매가를 수정하면 동일 마진율이 전체 옵션에 적용됩니다
                 </div>
             </div>
 
@@ -555,9 +560,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                     );
                 })()}
 
-                <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginTop: spacing['3'] }}>
-                    대표 옵션의 판매가를 수정하면 동일 마진율이 전체 옵션에 적용됩니다
-                </div>
+                })()}
             </div>
 
             {/* 옵션별 판매가 테이블 */}
