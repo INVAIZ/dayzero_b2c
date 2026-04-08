@@ -2,7 +2,6 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import LoginPage from './pages/auth/LoginPage';
 import BasicInfoPage from './pages/onboarding/BasicInfoPage';
 import Qoo10ConnectPage from './pages/onboarding/Qoo10ConnectPage';
-import BasicMarginPage from './pages/onboarding/BasicMarginPage';
 import ExtensionInstallPage from './pages/onboarding/ExtensionInstallPage';
 import SourcingPage from './pages/SourcingPage';
 import UrlSourcingPage from './pages/sourcing/UrlSourcingPage';
@@ -19,7 +18,6 @@ const router = createBrowserRouter([
   { path: '/', element: <LoginPage /> },
   { path: '/basic-info', element: <BasicInfoPage /> },
   { path: '/qoo10-connect', element: <Qoo10ConnectPage /> },
-  { path: '/basic-margin', element: <BasicMarginPage /> },
   { path: '/extension-install', element: <ExtensionInstallPage /> },
 
   // Sourcing

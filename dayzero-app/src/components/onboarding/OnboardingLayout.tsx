@@ -17,8 +17,7 @@ interface OnboardingLayoutProps {
 const STEPS: StepItem[] = [
     { id: 1, label: '계정 연동' },
     { id: 2, label: '기본 정보' },
-    { id: 3, label: '배송비/마진' },
-    { id: 4, label: '프로그램 설치' },
+    { id: 3, label: '프로그램 설치' },
 ];
 
 const MAX_STEP_KEY = 'onboarding_max_step';

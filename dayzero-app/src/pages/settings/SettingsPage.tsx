@@ -462,94 +462,6 @@ function SalesContent({ draft, updateDraft }: { draft: DraftState; updateDraft: 
 
     return (
         <>
-            {/* 출하지 · 반품 주소 */}
-            <div id="forwarder-section" style={sectionStyle}>
-                <div style={sectionInfoStyle}>
-                    <div style={sectionTitleStyle}>출하지 · 반품 주소</div>
-                    <div style={sectionDescStyle}>배송대행사를 선택하면 출하지 주소와 배송 요율이 자동 적용됩니다.</div>
-                </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing['5'] }}>
-                    {/* 배송대행사 선택 */}
-                    <div>
-                        <div style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary, marginBottom: spacing['2'] }}>배송대행사</div>
-                        <div style={{ position: 'relative' }} ref={ddRef}>
-                            <div onClick={() => setForwarderOpen(!forwarderOpen)} style={{
-                                padding: `${spacing['3']} ${spacing['4']}`, borderRadius: radius.md,
-                                border: `1px solid ${forwarderOpen ? colors.primary : colors.border.default}`,
-                                boxShadow: forwarderOpen ? '0 0 0 3px rgba(49, 130, 246, 0.1)' : 'none',
-                                fontSize: font.size.md, fontWeight: font.weight.medium, cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                background: colors.bg.surface, color: colors.text.primary,
-                            }}>
-                                <span>{currentPreset?.label || '배송대행사를 선택하세요'}</span>
-                                <ChevronDown size={16} color={colors.text.muted} style={{ transform: forwarderOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
-                            </div>
-                            {forwarderOpen && (
-                                <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', background: colors.bg.surface, border: `1px solid ${colors.border.default}`, borderRadius: radius.lg, boxShadow: shadow.md, overflow: 'hidden', zIndex: 20 }}>
-                                    {FORWARDER_PRESETS.map(p => (
-                                        <div key={p.id} onClick={() => selectForwarder(p.id)} style={{
-                                            padding: `${spacing['3']} ${spacing['4']}`, fontSize: font.size.md, cursor: 'pointer',
-                                            background: draft.forwarder === p.id ? colors.primaryLight : colors.bg.surface,
-                                            color: draft.forwarder === p.id ? colors.primary : colors.text.primary,
-                                            fontWeight: draft.forwarder === p.id ? font.weight.semibold : font.weight.regular,
-                                        }}
-                                            onMouseEnter={e => { if (draft.forwarder !== p.id) e.currentTarget.style.background = colors.bg.page; }}
-                                            onMouseLeave={e => { if (draft.forwarder !== p.id) e.currentTarget.style.background = colors.bg.surface; }}
-                                        >{p.label}</div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* 출하지 주소 */}
-                    {draft.forwarder && (
-                        <div style={{ padding: spacing['4'], background: colors.bg.faint, borderRadius: radius.lg, border: `1px solid ${colors.border.default}` }}>
-                            <div style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.tertiary, marginBottom: spacing['2'] }}>
-                                {isOther ? '출하지 주소' : '출하지 (일본 창고 주소)'}
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>
-                                <input value={draft.zipCode} onChange={e => updateDraft({ zipCode: e.target.value })} placeholder="우편번호 (예: 273-0012)" className="settings-input" style={{ ...inputFieldStyle, background: !isOther ? colors.bg.subtle : colors.bg.surface }} disabled={!isOther} />
-                                <input value={draft.addressLine1} onChange={e => updateDraft({ addressLine1: e.target.value })} placeholder="기본 주소" className="settings-input" style={{ ...inputFieldStyle, background: !isOther ? colors.bg.subtle : colors.bg.surface }} disabled={!isOther} />
-                                <input value={draft.addressLine2} onChange={e => updateDraft({ addressLine2: e.target.value })} placeholder="상세 주소" className="settings-input" style={{ ...inputFieldStyle, background: !isOther ? colors.bg.subtle : colors.bg.surface }} disabled={!isOther} />
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 반품 주소 */}
-                    <div style={{ borderTop: `1px solid ${colors.bg.subtle}`, paddingTop: spacing['4'] }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: draft.sameAsShipping ? 0 : spacing['3'] }}>
-                            <div style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary }}>반품 주소</div>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: spacing['2'], cursor: 'pointer' }}>
-                                <input type="checkbox" checked={draft.sameAsShipping} onChange={e => updateDraft({ sameAsShipping: e.target.checked })} style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: colors.primary }} />
-                                <span style={{ fontSize: font.size.sm, fontWeight: font.weight.medium, color: colors.text.tertiary }}>출하지 주소와 동일</span>
-                            </label>
-                        </div>
-                        {!draft.sameAsShipping && (
-                            <div style={{ padding: spacing['4'], background: colors.bg.faint, borderRadius: radius.lg, border: `1px solid ${colors.border.default}` }}>
-                                <div style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.tertiary, marginBottom: spacing['2'] }}>반품 주소</div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>
-                                    <input value={draft.returnZipCode} onChange={e => updateDraft({ returnZipCode: e.target.value })} placeholder="우편번호 (예: 273-0012)" className="settings-input" style={inputFieldStyle} />
-                                    <input value={draft.returnAddressLine1} onChange={e => updateDraft({ returnAddressLine1: e.target.value })} placeholder="기본 주소" className="settings-input" style={inputFieldStyle} />
-                                    <input value={draft.returnAddressLine2} onChange={e => updateDraft({ returnAddressLine2: e.target.value })} placeholder="상세 주소" className="settings-input" style={inputFieldStyle} />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* 스토어 연락처 */}
-            <div style={sectionStyle}>
-                <div style={sectionInfoStyle}>
-                    <div style={sectionTitleStyle}>스토어 연락처</div>
-                    <div style={sectionDescStyle}>배송 문제나 클레임 발생 시 연락 가능한 번호입니다.</div>
-                </div>
-                <div style={{ flex: 1 }}>
-                    <input value={draft.contact} onChange={e => updateDraft({ contact: e.target.value })} placeholder="010-1234-5678" className="settings-input" style={inputFieldStyle} />
-                </div>
-            </div>
-
             {/* 환율 설정 */}
             <div style={sectionStyle}>
                 <div style={sectionInfoStyle}>
@@ -629,30 +541,120 @@ function SalesContent({ draft, updateDraft }: { draft: DraftState; updateDraft: 
                 </div>
             </div>
 
-            {/* 판매가 구성 (작업비, 배송비, 마진) */}
+            {/* 스토어 연락처 */}
+            <div style={sectionStyle}>
+                <div style={sectionInfoStyle}>
+                    <div style={sectionTitleStyle}>스토어 연락처</div>
+                    <div style={sectionDescStyle}>배송 문제나 클레임 발생 시 연락 가능한 번호입니다.</div>
+                </div>
+                <div style={{ flex: 1 }}>
+                    <input value={draft.contact} onChange={e => updateDraft({ contact: e.target.value })} placeholder="010-1234-5678" className="settings-input" style={inputFieldStyle} />
+                </div>
+            </div>
+
+            {/* 출하지 선정 */}
+            <div style={sectionStyle}>
+                <div style={sectionInfoStyle}>
+                    <div style={sectionTitleStyle}>출하지 선정</div>
+                    <div style={sectionDescStyle}>배송대행사를 선택하면 출하지 주소와 배송 요율이 자동 적용됩니다.</div>
+                </div>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing['5'] }}>
+                    {/* 배송대행사 선택 */}
+                    <div id="forwarder-section">
+                        <div style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary, marginBottom: spacing['2'] }}>배송대행사</div>
+                        <div style={{ position: 'relative' }} ref={ddRef}>
+                            <div onClick={() => setForwarderOpen(!forwarderOpen)} style={{
+                                padding: `${spacing['3']} ${spacing['4']}`, borderRadius: radius.md,
+                                border: `1px solid ${forwarderOpen ? colors.primary : colors.border.default}`,
+                                boxShadow: forwarderOpen ? '0 0 0 3px rgba(49, 130, 246, 0.1)' : 'none',
+                                fontSize: font.size.md, fontWeight: font.weight.medium, cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                background: colors.bg.surface, color: colors.text.primary,
+                            }}>
+                                <span>{currentPreset?.label || '배송대행사를 선택하세요'}</span>
+                                <ChevronDown size={16} color={colors.text.muted} style={{ transform: forwarderOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
+                            </div>
+                            {forwarderOpen && (
+                                <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '100%', background: colors.bg.surface, border: `1px solid ${colors.border.default}`, borderRadius: radius.lg, boxShadow: shadow.md, overflow: 'hidden', zIndex: 20 }}>
+                                    {FORWARDER_PRESETS.map(p => (
+                                        <div key={p.id} onClick={() => selectForwarder(p.id)} style={{
+                                            padding: `${spacing['3']} ${spacing['4']}`, fontSize: font.size.md, cursor: 'pointer',
+                                            background: draft.forwarder === p.id ? colors.primaryLight : colors.bg.surface,
+                                            color: draft.forwarder === p.id ? colors.primary : colors.text.primary,
+                                            fontWeight: draft.forwarder === p.id ? font.weight.semibold : font.weight.regular,
+                                        }}
+                                            onMouseEnter={e => { if (draft.forwarder !== p.id) e.currentTarget.style.background = colors.bg.page; }}
+                                            onMouseLeave={e => { if (draft.forwarder !== p.id) e.currentTarget.style.background = colors.bg.surface; }}
+                                        >{p.label}</div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* 출하지 주소 */}
+                        {draft.forwarder && (
+                            <div style={{ marginTop: spacing['3'], padding: spacing['4'], background: colors.bg.faint, borderRadius: radius.lg, border: `1px solid ${colors.border.default}` }}>
+                                <div style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.tertiary, marginBottom: spacing['2'] }}>
+                                    {isOther ? '출하지 주소' : '출하지 (일본 창고 주소)'}
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>
+                                    <input value={draft.zipCode} onChange={e => updateDraft({ zipCode: e.target.value })} placeholder="우편번호 (예: 273-0012)" className="settings-input" style={{ ...inputFieldStyle, background: !isOther ? colors.bg.subtle : colors.bg.surface }} disabled={!isOther} />
+                                    <input value={draft.addressLine1} onChange={e => updateDraft({ addressLine1: e.target.value })} placeholder="기본 주소" className="settings-input" style={{ ...inputFieldStyle, background: !isOther ? colors.bg.subtle : colors.bg.surface }} disabled={!isOther} />
+                                    <input value={draft.addressLine2} onChange={e => updateDraft({ addressLine2: e.target.value })} placeholder="상세 주소" className="settings-input" style={{ ...inputFieldStyle, background: !isOther ? colors.bg.subtle : colors.bg.surface }} disabled={!isOther} />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 반품 주소 */}
+                        <div style={{ borderTop: `1px solid ${colors.bg.subtle}`, paddingTop: spacing['4'], marginTop: spacing['4'] }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: draft.sameAsShipping ? 0 : spacing['3'] }}>
+                                <div style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary }}>반품 주소</div>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: spacing['2'], cursor: 'pointer' }}>
+                                    <input type="checkbox" checked={draft.sameAsShipping} onChange={e => updateDraft({ sameAsShipping: e.target.checked })} style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: colors.primary }} />
+                                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.medium, color: colors.text.tertiary }}>출하지 주소와 동일</span>
+                                </label>
+                            </div>
+                            {!draft.sameAsShipping && (
+                                <div style={{ padding: spacing['4'], background: colors.bg.faint, borderRadius: radius.lg, border: `1px solid ${colors.border.default}` }}>
+                                    <div style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.tertiary, marginBottom: spacing['2'] }}>반품 주소</div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['2'] }}>
+                                        <input value={draft.returnZipCode} onChange={e => updateDraft({ returnZipCode: e.target.value })} placeholder="우편번호 (예: 273-0012)" className="settings-input" style={inputFieldStyle} />
+                                        <input value={draft.returnAddressLine1} onChange={e => updateDraft({ returnAddressLine1: e.target.value })} placeholder="기본 주소" className="settings-input" style={inputFieldStyle} />
+                                        <input value={draft.returnAddressLine2} onChange={e => updateDraft({ returnAddressLine2: e.target.value })} placeholder="상세 주소" className="settings-input" style={inputFieldStyle} />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 판매가 구성 (해외 배송비 → 작업비 → 마진율) */}
             <div style={sectionStyle}>
                 <div style={sectionInfoStyle}>
                     <div style={sectionTitleStyle}>판매가 구성</div>
                     <div style={sectionDescStyle}>판매가를 구성하는 항목의 기본값을 설정해요. 이 항목의 금액은 자동으로 판매가에 가산돼요.</div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: spacing['5'] }}>
+                    {/* 해외 배송비 */}
+                    <ShippingFeeRow
+                        hasForwarderRate={hasForwarderRate}
+                        noForwarder={!draft.forwarder}
+                        presetLabel={currentPreset?.label || ''}
+                        forwarder={draft.forwarder}
+                        intlShipping={draft.intlShipping}
+                        onChangeShipping={v => updateDraft({ intlShipping: Math.max(0, Number(v)) })}
+                        exchangeRate={effectiveExchangeRate}
+                    />
+
                     {/* 작업비 */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${spacing['3']} 0`, borderBottom: `1px solid ${colors.bg.subtle}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${spacing['3']} 0`, borderTop: `1px solid ${colors.bg.subtle}`, borderBottom: `1px solid ${colors.bg.subtle}` }}>
                         <div>
                             <div style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary }}>작업비</div>
                             <div style={{ fontSize: font.size.sm, color: colors.text.muted }}>포장·검수 수수료</div>
                         </div>
                         <CompactInput value={draft.prepCost === 0 ? '' : draft.prepCost} onChange={v => updateDraft({ prepCost: Math.max(0, Number(v)) })} unit="원" />
                     </div>
-
-                    {/* 해외 배송비 */}
-                    <ShippingFeeRow
-                        hasForwarderRate={hasForwarderRate}
-                        presetLabel={currentPreset?.shortLabel || ''}
-                        forwarder={draft.forwarder}
-                        intlShipping={draft.intlShipping}
-                        onChangeShipping={v => updateDraft({ intlShipping: Math.max(0, Number(v)) })}
-                    />
 
                     {/* 마진율 — 가로 배치 + 슬라이더 */}
                     <div style={{ padding: `${spacing['3']} 0` }}>
@@ -813,76 +815,224 @@ function CompactInput({ value, onChange, unit, placeholder = '0' }: {
     );
 }
 
+/* ── 무게별 배송비 상수 ── */
+
+const WEIGHT_TIERS = [0.5, 1.0, 1.5, 2.0, 2.5] as const;
+
 /* ── 해외 배송비 행 ── */
 
-function ShippingFeeRow({ hasForwarderRate, presetLabel, forwarder, intlShipping, onChangeShipping }: {
-    hasForwarderRate: boolean; presetLabel: string; forwarder: ForwarderValue;
-    intlShipping: number; onChangeShipping: (v: string) => void;
+function ShippingFeeRow({ hasForwarderRate, noForwarder, presetLabel, forwarder, intlShipping, onChangeShipping, exchangeRate }: {
+    hasForwarderRate: boolean; noForwarder: boolean; presetLabel: string; forwarder: ForwarderValue;
+    intlShipping: number; onChangeShipping: (v: string) => void; exchangeRate: number;
 }) {
     const table = FORWARDER_RATES[forwarder];
     const rows = table?.rows;
 
+    const [showKrw, setShowKrw] = useState(false);
+    const [weightFees, setWeightFees] = useState<Record<number, number>>(() => {
+        const init: Record<number, number> = {};
+        WEIGHT_TIERS.forEach(w => { init[w] = w === 0.5 ? intlShipping : 0; });
+        return init;
+    });
+
+    const updateWeightFee = useCallback((weight: number, value: number) => {
+        setWeightFees(prev => {
+            const next = { ...prev, [weight]: value };
+            if (weight === 0.5) onChangeShipping(String(value));
+            return next;
+        });
+    }, [onChangeShipping]);
+
     return (
-        <div style={{ padding: `${spacing['3']} 0`, borderBottom: `1px solid ${colors.bg.subtle}` }}>
+        <div style={{ padding: `${spacing['3']} 0` }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
                     <div style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary }}>해외 배송비</div>
                     <div style={{ fontSize: font.size.sm, color: colors.text.muted }}>
-                        {hasForwarderRate ? `${presetLabel} 요율표 자동 적용` : '국제 배송 비용'}
+                        국제 배송 비용
                     </div>
                 </div>
-                {hasForwarderRate ? (
-                    <div /> /* 배송대행사 선택 시 오른쪽 빈 공간 — 아래 풀 배너로 표시 */
-                ) : (
-                    <CompactInput value={intlShipping === 0 ? '' : intlShipping} onChange={onChangeShipping} unit="엔" />
-                )}
             </div>
 
-            {/* 배송대행사 정보 배너 */}
-            {hasForwarderRate && (
-                <button
-                    onClick={() => document.getElementById('forwarder-section')?.scrollIntoView({ behavior: 'smooth' })}
-                    style={{
-                        display: 'flex', alignItems: 'center', gap: spacing['3'],
-                        width: '100%', marginTop: spacing['3'],
-                        padding: `${spacing['3']} ${spacing['4']}`,
-                        background: colors.bg.info, borderRadius: radius.md,
-                        border: `1px solid ${colors.primaryLightBorder}`,
-                        cursor: 'pointer', transition: 'all 0.15s',
-                        textAlign: 'left',
-                    }}
-                    onMouseOver={e => e.currentTarget.style.background = colors.primaryHover}
-                    onMouseOut={e => e.currentTarget.style.background = colors.bg.info}
-                >
-                    <Truck size={16} color={colors.primary} />
-                    <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.primary, flex: 1 }}>
-                        배송대행사 {presetLabel} 요율표 자동 적용 중
+            {/* 배송대행사 미선택 시 안내 */}
+            {noForwarder && (
+                <div style={{
+                    marginTop: spacing['3'],
+                    padding: `${spacing['4']} ${spacing['5']}`,
+                    background: colors.bg.subtle, borderRadius: radius.lg,
+                    border: `1px solid ${colors.border.default}`,
+                    display: 'flex', alignItems: 'center', gap: spacing['2'],
+                }}>
+                    <Truck size={16} color={colors.text.muted} />
+                    <span style={{ fontSize: font.size.sm, color: colors.text.muted }}>
+                        배송대행사를 먼저 선택해주세요.
                     </span>
-                    <span style={{ fontSize: font.size.sm, color: colors.primary, fontWeight: font.weight.medium }}>변경하기</span>
-                </button>
+                </div>
             )}
 
-            {/* 요율표 (항상 표시) */}
+            {/* 배송대행사 선택 시: 배너 + 요율표 */}
             {hasForwarderRate && rows && (
+                <>
+                    <div style={{
+                        marginTop: spacing['3'],
+                        background: colors.bg.info, borderRadius: radius.md,
+                        border: `1px solid ${colors.primaryLightBorder}`,
+                        padding: `${spacing['3']} ${spacing['4']}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                            <Truck size={16} color={colors.primary} />
+                            <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.primary }}>
+                                배송대행사 {presetLabel} 요율표 자동 적용 중
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => document.getElementById('forwarder-section')?.scrollIntoView({ behavior: 'smooth' })}
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: font.size.sm, color: colors.primary, fontWeight: font.weight.medium, padding: 0 }}
+                        >변경하기</button>
+                    </div>
+                    <div style={{
+                        marginTop: spacing['3'],
+                        background: colors.bg.info, borderRadius: radius.lg,
+                        padding: spacing['4'],
+                        border: `1px solid ${colors.primaryLightBorder}`,
+                        display: 'flex', flexDirection: 'column', gap: spacing['2'],
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <p style={{ margin: 0, fontSize: font.size.sm, color: colors.text.tertiary, lineHeight: font.lineHeight.normal }}>
+                                상품 무게에 따라 배송비가 자동으로 계산됩니다.
+                            </p>
+                            <div style={{ display: 'flex', borderRadius: radius.sm, overflow: 'hidden', border: `1px solid ${colors.border.default}`, flexShrink: 0 }}>
+                                <button onClick={() => setShowKrw(false)} style={{
+                                    padding: `2px ${spacing['2']}`, border: 'none', cursor: 'pointer',
+                                    fontSize: font.size.xs, fontWeight: font.weight.semibold,
+                                    background: !showKrw ? colors.primary : colors.bg.surface,
+                                    color: !showKrw ? colors.white : colors.text.muted,
+                                    transition: 'all 0.15s',
+                                }}>¥</button>
+                                <button onClick={() => setShowKrw(true)} style={{
+                                    padding: `2px ${spacing['2']}`, border: 'none', cursor: 'pointer',
+                                    fontSize: font.size.xs, fontWeight: font.weight.semibold,
+                                    background: showKrw ? colors.primary : colors.bg.surface,
+                                    color: showKrw ? colors.white : colors.text.muted,
+                                    borderLeft: `1px solid ${colors.border.default}`,
+                                    transition: 'all 0.15s',
+                                }}>₩</button>
+                            </div>
+                        </div>
+                        <div style={{
+                            background: colors.bg.surface, borderRadius: radius.md,
+                            padding: `${spacing['3']} ${spacing['3']}`,
+                            border: `1px solid ${colors.border.default}`, fontSize: font.size.xs,
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontWeight: font.weight.semibold, color: colors.text.secondary }}>
+                                <span>무게</span><span>배송비</span>
+                            </div>
+                            {rows.map((row, i) => (
+                                <div key={i} style={{
+                                    display: 'flex', justifyContent: 'space-between',
+                                    padding: '3px 0', color: colors.text.tertiary,
+                                    borderTop: i > 0 ? `1px solid ${colors.bg.subtle}` : 'none',
+                                }}>
+                                    <span>~{row.maxKg}kg</span>
+                                    <span style={{ fontWeight: font.weight.semibold, color: colors.text.primary, textAlign: 'right' }}>
+                                        {showKrw ? `₩${Math.round(row.fee * exchangeRate).toLocaleString()}` : `¥${row.fee.toLocaleString()}`}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {/* 직접 입력 시 무게별 5행 입력 */}
+            {!noForwarder && !hasForwarderRate && (
                 <div style={{
                     marginTop: spacing['3'],
                     background: colors.bg.faint, borderRadius: radius.md,
-                    padding: `${spacing['3']} ${spacing['4']}`,
-                    border: `1px solid ${colors.border.default}`, fontSize: font.size.xs,
+                    border: `1px solid ${colors.border.default}`,
+                    overflow: 'hidden',
                 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontWeight: font.weight.semibold, color: colors.text.secondary }}>
-                        <span>무게</span><span>배송비</span>
-                    </div>
-                    {rows.map((row, i) => (
-                        <div key={i} style={{
-                            display: 'flex', justifyContent: 'space-between',
-                            padding: '3px 0', color: colors.text.tertiary,
-                            borderTop: i > 0 ? `1px solid ${colors.bg.subtle}` : 'none',
-                        }}>
-                            <span>~{row.maxKg}kg</span>
-                            <span style={{ fontWeight: font.weight.semibold, color: colors.text.primary }}>¥{row.fee.toLocaleString()}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${spacing['2']} ${spacing['4']}` }}>
+                        <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>
+                            무게별 배송비를 입력해주세요.
+                        </span>
+                        <div style={{ display: 'flex', borderRadius: radius.sm, overflow: 'hidden', border: `1px solid ${colors.border.default}` }}>
+                            <button onClick={() => setShowKrw(false)} style={{
+                                padding: `2px ${spacing['2']}`, border: 'none', cursor: 'pointer',
+                                fontSize: font.size.xs, fontWeight: font.weight.semibold,
+                                background: !showKrw ? colors.primary : colors.bg.surface,
+                                color: !showKrw ? colors.white : colors.text.muted,
+                                transition: 'all 0.15s',
+                            }}>¥</button>
+                            <button onClick={() => setShowKrw(true)} style={{
+                                padding: `2px ${spacing['2']}`, border: 'none', cursor: 'pointer',
+                                fontSize: font.size.xs, fontWeight: font.weight.semibold,
+                                background: showKrw ? colors.primary : colors.bg.surface,
+                                color: showKrw ? colors.white : colors.text.muted,
+                                borderLeft: `1px solid ${colors.border.default}`,
+                                transition: 'all 0.15s',
+                            }}>₩</button>
                         </div>
-                    ))}
+                    </div>
+                    {WEIGHT_TIERS.map((weight) => {
+                        const krw = Math.round((weightFees[weight] || 0) * exchangeRate);
+                        return (
+                        <div key={weight} style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: `${spacing['2']} ${spacing['4']}`,
+                            borderTop: `1px solid ${colors.bg.subtle}`,
+                        }}>
+                            <span style={{ fontSize: font.size.sm, fontWeight: font.weight.medium, color: colors.text.primary }}>
+                                {weight}kg
+                            </span>
+                            {showKrw ? (
+                                <div style={{ position: 'relative', width: '100px' }}>
+                                    <input type="number" className="settings-input no-spinner"
+                                        value={krw === 0 ? '' : krw}
+                                        onChange={e => {
+                                            const krwVal = Number(e.target.value);
+                                            updateWeightFee(weight, Math.round(Math.max(0, krwVal) / exchangeRate));
+                                        }}
+                                        placeholder="0"
+                                        style={{
+                                            ...inputFieldStyle, width: '100px',
+                                            borderRadius: radius.sm,
+                                            padding: `${spacing['2']} ${spacing['2']}`, paddingRight: '22px',
+                                            textAlign: 'right', fontWeight: font.weight.semibold,
+                                            fontSize: font.size.sm,
+                                            MozAppearance: 'textfield' as never,
+                                        }}
+                                    />
+                                    <span style={{
+                                        position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)',
+                                        fontSize: font.size.xs, color: colors.text.muted, pointerEvents: 'none',
+                                    }}>₩</span>
+                                </div>
+                            ) : (
+                                <div style={{ position: 'relative', width: '100px' }}>
+                                    <input type="number" className="settings-input no-spinner"
+                                        value={weightFees[weight] === 0 ? '' : weightFees[weight]}
+                                        onChange={e => updateWeightFee(weight, Math.max(0, Number(e.target.value)))}
+                                        placeholder="0"
+                                        style={{
+                                            ...inputFieldStyle, width: '100px',
+                                            borderRadius: radius.sm,
+                                            padding: `${spacing['2']} ${spacing['2']}`, paddingRight: '22px',
+                                            textAlign: 'right', fontWeight: font.weight.semibold,
+                                            fontSize: font.size.sm,
+                                            MozAppearance: 'textfield' as never,
+                                        }}
+                                    />
+                                    <span style={{
+                                        position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)',
+                                        fontSize: font.size.xs, color: colors.text.muted, pointerEvents: 'none',
+                                    }}>¥</span>
+                                </div>
+                            )}
+                        </div>
+                        );
+                    })}
                 </div>
             )}
 

@@ -48,7 +48,7 @@ export default function Qoo10ConnectPage() {
 
     return (
         <>
-            <OnboardingLayout currentStep={1} exiting={exiting} onStepClick={(stepId) => { if (stepId === 2) transitionTo('/basic-info'); if (stepId === 3) transitionTo('/basic-margin'); }}>
+            <OnboardingLayout currentStep={1} exiting={exiting} onStepClick={(stepId) => { if (stepId === 2) transitionTo('/basic-info'); }}>
                 {/* Title Area - Large, isolated focus */}
                 {!connected && (
                     <div style={{ marginBottom: spacing['12'], textAlign: 'center' }}>

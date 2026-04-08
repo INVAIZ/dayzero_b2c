@@ -26,7 +26,6 @@ export default function ExtensionInstallPage() {
         window.open(WEBSTORE_URL, '_blank');
         setPhase('waiting');
         timerRef.current = setTimeout(() => {
-            setPhase('done');
             sessionStorage.setItem('ext_installed', 'true');
             setShowComplete(true);
         }, 10000);
@@ -43,12 +42,11 @@ export default function ExtensionInstallPage() {
     return (
         <>
             <OnboardingLayout
-                currentStep={4}
+                currentStep={3}
                 exiting={exiting}
                 onStepClick={(stepId) => {
                     if (stepId === 1) transitionTo('/qoo10-connect');
                     if (stepId === 2) transitionTo('/basic-info');
-                    if (stepId === 3) transitionTo('/basic-margin');
                 }}
             >
                 {phase === 'idle' && (
@@ -234,7 +232,7 @@ export default function ExtensionInstallPage() {
                                 나중에 설치할게요
                             </button>
                             <button
-                                onClick={() => transitionTo('/basic-margin')}
+                                onClick={() => transitionTo('/basic-info')}
                                 style={{
                                     width: '100%',
                                     height: '44px',
@@ -578,9 +576,8 @@ export default function ExtensionInstallPage() {
                         }}>
                             {[
                                 { label: 'Qoo10 JP 연동', desc: state.storeName || '연동 완료' },
-                                { label: '배송지 및 기본 정보', desc: '출하지 · 반품지 설정 완료' },
-                                { label: '배송비 및 마진', desc: '작업비 · 배송비 · 마진 설정 완료' },
-                                { label: '프로그램 설치', desc: phase === 'done' ? '설치 완료' : '나중에 설치' },
+                                { label: '기본 정보', desc: '연락처 · 출하지 · 배송비 · 마진 설정 완료' },
+                                { label: '프로그램 설치', desc: sessionStorage.getItem('ext_installed') === 'true' ? '설치 완료' : '나중에 설치' },
                             ].map((item, i) => (
                                 <div key={i} style={{
                                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
