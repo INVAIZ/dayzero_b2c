@@ -1,6 +1,6 @@
 /**
  * 배송대행사 프리셋, 요율표, 가격 계산 상수
- * SettingsPanel / BasicInfoPage / BasicMarginPage 에서 공용 사용
+ * SettingsPanel / BasicInfoPage 에서 공용 사용
  */
 
 import type { ForwarderValue } from '../components/onboarding/OnboardingContext';

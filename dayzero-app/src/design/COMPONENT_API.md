@@ -438,5 +438,4 @@ Props 없음. `useSourcingStore`, `useNavigate`, `useLocation` 사용.
 |------|------|--------|
 | 1 | 계정 연결 | Qoo10ConnectPage |
 | 2 | 기본 정보 | BasicInfoPage |
-| 3 | 판매 설정 | BasicMarginPage |
-| 4 | 프로그램 설치 | ExtensionInstallPage |
+| 3 | 프로그램 설치 | ExtensionInstallPage |
