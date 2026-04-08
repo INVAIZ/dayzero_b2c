@@ -561,19 +561,22 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                     <div style={{ fontSize: font.size.xs, color: colors.text.muted, marginBottom: spacing['2'] }}>
                         대표 옵션의 판매가를 수정하면 동일 마진율이 전체 옵션에 적용됩니다
                     </div>
-                    <div style={{ borderRadius: radius.lg, border: `1px solid ${colors.border.default}`, overflow: 'hidden' }}>
-                        <div style={{
-                            display: 'grid', gridTemplateColumns: '1fr 80px 80px 90px',
-                            padding: `${spacing['2']} ${spacing['4']}`,
-                            background: colors.bg.subtle,
-                            borderBottom: `1px solid ${colors.border.default}`,
-                            gap: spacing['2'],
-                        }}>
-                            <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>옵션명</span>
-                            <span style={{ fontSize: font.size.xs, color: colors.text.muted, textAlign: 'right' }}>원가</span>
-                            <span style={{ fontSize: font.size.xs, color: colors.text.muted, textAlign: 'right' }}>판매가</span>
-                            <span style={{ fontSize: font.size.xs, color: colors.text.muted, textAlign: 'right' }}>예상 수익</span>
-                        </div>
+
+                    {/* 컬럼 헤더 */}
+                    <div style={{
+                        display: 'grid', gridTemplateColumns: '44px 1fr 100px 100px 90px',
+                        padding: `0 0 ${spacing['2']}`,
+                        gap: spacing['2'], alignItems: 'center',
+                    }}>
+                        <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>사진</span>
+                        <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>옵션명</span>
+                        <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>원가</span>
+                        <span style={{ fontSize: font.size.xs, color: colors.text.muted }}>판매가</span>
+                        <span style={{ fontSize: font.size.xs, color: colors.text.muted, textAlign: 'right' }}>예상 수익</span>
+                    </div>
+
+                    {/* 옵션 행 */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['3'] }}>
                         {product.options.map((opt, idx) => {
                             const optPrice = opt.priceKrw ?? originalPrice;
                             const optCostJpy = (optPrice + domesticShipping + prepCost) / EXCHANGE_RATE + intlShipping;
@@ -619,97 +622,71 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                                 setEditInput('');
                             };
 
+                            const boxStyle: React.CSSProperties = {
+                                padding: `${spacing['3']} ${spacing['3']}`,
+                                border: `1px solid ${colors.border.default}`,
+                                borderRadius: radius.md,
+                                fontSize: font.size.sm,
+                                background: colors.bg.surface,
+                            };
+
                             return (
-                                <div key={opt.id}>
-                                    {idx > 0 && <div style={{ height: '1px', background: colors.border.default }} />}
+                                <div key={opt.id} style={{
+                                    display: 'grid', gridTemplateColumns: '44px 1fr 100px 100px 90px',
+                                    gap: spacing['2'], alignItems: 'center',
+                                }}>
+                                    {/* 사진 */}
                                     <div style={{
-                                        display: 'grid', gridTemplateColumns: '1fr 80px 80px 90px',
-                                        padding: `${spacing['3']} ${spacing['4']}`,
-                                        alignItems: 'center',
-                                        gap: spacing['2'],
-                                    }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
-                                            <span style={{ fontSize: font.size.sm, color: colors.text.primary }}>{opt.nameKo || opt.nameJa || ''}</span>
-                                            {isRep && <span style={{
-                                                    fontSize: font.size['2xs'], fontWeight: font.weight.bold,
-                                                    color: colors.primary, background: colors.primaryLight,
-                                                    borderRadius: radius.sm, padding: '2px 6px',
-                                                    flexShrink: 0,
-                                                }}>대표</span>}
-                                        </div>
-                                        {/* 원가 — 편집 가능 */}
-                                        {isEditingCost ? (
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
-                                                <span style={{ fontSize: font.size.xs, color: colors.primary }}>₩</span>
-                                                <input
-                                                    type="text" inputMode="decimal"
-                                                    value={editInput}
-                                                    onChange={e => setEditInput(e.target.value)}
-                                                    onKeyDown={e => { if (e.key === 'Enter') handleCostSave(); if (e.key === 'Escape') { setEditingField(null); setEditInput(''); } }}
-                                                    onBlur={handleCostSave}
-                                                    autoFocus
-                                                    style={{
-                                                        width: '56px', textAlign: 'right',
-                                                        padding: '2px 0', fontSize: font.size.sm,
-                                                        color: colors.primary, background: 'transparent',
-                                                        border: 'none', borderBottom: `2px solid ${colors.primary}`,
-                                                        outline: 'none', fontFamily: 'inherit',
-                                                    }}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <span
-                                                onClick={handleCostEdit}
-                                                style={{
-                                                    fontSize: font.size.sm, color: colors.text.secondary, textAlign: 'right',
-                                                    cursor: 'pointer',
-                                                    textDecoration: 'underline', textDecorationStyle: 'dotted' as const,
-                                                    textUnderlineOffset: '3px',
-                                                }}>
-                                                ₩{optPrice.toLocaleString()}
-                                            </span>
-                                        )}
-                                        {/* 판매가 — 모든 옵션 편집 가능 */}
-                                        {isEditingSale ? (
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
-                                                <span style={{ fontSize: font.size.xs, color: colors.primary }}>¥</span>
-                                                <input
-                                                    type="text" inputMode="decimal"
-                                                    value={editInput}
-                                                    onChange={e => setEditInput(e.target.value)}
-                                                    onKeyDown={e => { if (e.key === 'Enter') handlePriceSave(); if (e.key === 'Escape') { setEditingField(null); setEditInput(''); } }}
-                                                    onBlur={handlePriceSave}
-                                                    autoFocus
-                                                    style={{
-                                                        width: '56px', textAlign: 'right',
-                                                        padding: '2px 0', fontSize: font.size.sm, fontWeight: font.weight.semibold,
-                                                        color: colors.primary, background: 'transparent',
-                                                        border: 'none', borderBottom: `2px solid ${colors.primary}`,
-                                                        outline: 'none', fontFamily: 'inherit',
-                                                    }}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <span
-                                                onClick={handlePriceEdit}
-                                                style={{
-                                                    fontSize: font.size.sm, fontWeight: font.weight.semibold, textAlign: 'right',
-                                                    color: colors.text.primary,
-                                                    cursor: 'pointer',
-                                                    textDecoration: 'underline',
-                                                    textDecorationStyle: 'dotted' as const,
-                                                    textUnderlineOffset: '3px',
-                                                }}>
-                                                ¥{optSaleJpy.toLocaleString()}
-                                            </span>
-                                        )}
-                                        <span style={{
-                                            fontSize: font.size.sm, fontWeight: font.weight.semibold, textAlign: 'right',
-                                            color: optProfitKrw > 0 ? colors.success : colors.danger,
-                                        }}>
-                                            {optProfitKrw > 0 ? '+' : '−'}₩{Math.abs(optProfitKrw).toLocaleString()}
-                                        </span>
+                                        width: '44px', height: '44px', borderRadius: radius.md,
+                                        background: colors.bg.subtle, border: `1px solid ${colors.border.default}`,
+                                        flexShrink: 0,
+                                    }} />
+                                    {/* 옵션명 (읽기 전용) */}
+                                    <div style={{ ...boxStyle, background: colors.bg.subtle, color: colors.text.primary, display: 'flex', alignItems: 'center', gap: spacing['2'] }}>
+                                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{opt.nameKo || opt.nameJa || ''}</span>
+                                        {isRep && <span style={{
+                                            fontSize: font.size['2xs'], fontWeight: font.weight.bold,
+                                            color: colors.primary, background: colors.primaryLight,
+                                            borderRadius: radius.sm, padding: '1px 5px', flexShrink: 0,
+                                        }}>대표</span>}
                                     </div>
+                                    {/* 원가 (편집 가능) */}
+                                    {isEditingCost ? (
+                                        <input
+                                            type="text" inputMode="decimal" autoFocus
+                                            value={editInput}
+                                            onChange={e => setEditInput(e.target.value)}
+                                            onKeyDown={e => { if (e.key === 'Enter') handleCostSave(); if (e.key === 'Escape') { setEditingField(null); setEditInput(''); } }}
+                                            onBlur={handleCostSave}
+                                            style={{ ...boxStyle, borderColor: colors.primary, color: colors.primary, fontWeight: font.weight.semibold, outline: 'none', width: '100%', boxSizing: 'border-box' }}
+                                        />
+                                    ) : (
+                                        <div onClick={handleCostEdit} style={{ ...boxStyle, cursor: 'pointer', color: colors.text.secondary }}>
+                                            ₩{optPrice.toLocaleString()}
+                                        </div>
+                                    )}
+                                    {/* 판매가 (편집 가능) */}
+                                    {isEditingSale ? (
+                                        <input
+                                            type="text" inputMode="decimal" autoFocus
+                                            value={editInput}
+                                            onChange={e => setEditInput(e.target.value)}
+                                            onKeyDown={e => { if (e.key === 'Enter') handlePriceSave(); if (e.key === 'Escape') { setEditingField(null); setEditInput(''); } }}
+                                            onBlur={handlePriceSave}
+                                            style={{ ...boxStyle, borderColor: colors.primary, color: colors.primary, fontWeight: font.weight.bold, outline: 'none', width: '100%', boxSizing: 'border-box' }}
+                                        />
+                                    ) : (
+                                        <div onClick={handlePriceEdit} style={{ ...boxStyle, cursor: 'pointer', fontWeight: font.weight.semibold, color: colors.text.primary }}>
+                                            ¥{optSaleJpy.toLocaleString()}
+                                        </div>
+                                    )}
+                                    {/* 예상 수익 */}
+                                    <span style={{
+                                        fontSize: font.size.sm, fontWeight: font.weight.semibold, textAlign: 'right',
+                                        color: optProfitKrw > 0 ? colors.success : colors.danger,
+                                    }}>
+                                        {optProfitKrw > 0 ? '+' : '−'}₩{Math.abs(optProfitKrw).toLocaleString()}
+                                    </span>
                                 </div>
                             );
                         })}
