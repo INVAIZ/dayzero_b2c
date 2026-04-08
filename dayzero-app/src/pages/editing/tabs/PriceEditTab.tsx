@@ -497,7 +497,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
 
             {/* ── ① 판매가 ── */}
             <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
-                <SectionLabel><span style={sectionBadgeStyle}>1</span>판매가</SectionLabel>
+                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>1</span>판매가</span>
                 <div style={{ fontSize: font.size.xs }}>
                     {autoSave && saveStatus === 'saving' && <span style={{ color: colors.text.muted }}>저장 중...</span>}
                     {autoSave && saveStatus === 'saved' && <span style={{ color: colors.success, animation: 'savedIn 0.2s ease' }}>저장됨 ✓</span>}
@@ -507,21 +507,21 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
             {/* 마진율 슬라이더 */}
             <div style={{ marginBottom: spacing['4'] }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing['3'] }}>
-                    <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>마진율</span>
-                    <div style={{ position: 'relative', width: '76px', flexShrink: 0 }}>
+                    <span style={{ fontSize: font.size.base, fontWeight: font.weight.semibold, color: colors.text.secondary }}>마진율</span>
+                    <div style={{ position: 'relative', width: '80px', flexShrink: 0 }}>
                         <input
                             type="number" className="price-input" value={Math.round(marginRate)}
                             onChange={e => handleMarginChange(Number(e.target.value))}
                             style={{
                                 ...priceInputBase,
-                                width: '76px', padding: '8px 24px 8px 8px',
-                                textAlign: 'right', fontWeight: font.weight.semibold,
-                                fontSize: font.size.sm,
+                                width: '80px', padding: '10px 26px 10px 10px',
+                                textAlign: 'right', fontWeight: font.weight.bold,
+                                fontSize: font.size.base,
                             }}
                         />
                         <span style={{
-                            position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)',
-                            fontSize: font.size.sm, color: colors.text.muted, fontWeight: font.weight.medium,
+                            position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
+                            fontSize: font.size.base, color: colors.text.muted, fontWeight: font.weight.medium,
                             pointerEvents: 'none',
                         }}>%</span>
                     </div>
@@ -720,7 +720,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
 
             {/* ── ② 국내 비용 ── */}
             <div style={{ ...flexBetween, marginBottom: spacing['2'] }}>
-                <SectionLabel><span style={sectionBadgeStyle}>2</span>국내 비용</SectionLabel>
+                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>2</span>국내 비용</span>
             </div>
 
             <div style={{ border: `1px solid ${colors.border.default}`, borderRadius: radius.lg, overflow: 'hidden' }}>
@@ -761,7 +761,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
 
             {/* ── ③ 해외 배송비 ── */}
             <div style={{ marginTop: spacing['8'], marginBottom: spacing['2'] }}>
-                <SectionLabel><span style={sectionBadgeStyle}>3</span>해외 배송비</SectionLabel>
+                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>3</span>해외 배송비</span>
             </div>
 
             <div style={{ border: `1px solid ${colors.border.default}`, borderRadius: radius.lg, overflow: 'hidden' }}>
@@ -815,7 +815,7 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
 
             {/* ── ④ 수익 계산 ── */}
             <div style={{ marginBottom: spacing['4'] }}>
-                <SectionLabel><span style={sectionBadgeStyle}>4</span>수익 계산</SectionLabel>
+                <span style={{ fontSize: font.size.lg, fontWeight: font.weight.bold, color: colors.text.primary, display: 'flex', alignItems: 'center' }}><span style={sectionBadgeStyle}>4</span>수익 계산</span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: spacing['4'] }}>
