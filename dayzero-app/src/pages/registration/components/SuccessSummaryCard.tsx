@@ -69,7 +69,7 @@ export const SuccessSummaryCard: React.FC<Props> = ({ results }) => {
                 diffPositive={profitDiff >= 0}
             />
             <StatCard
-                label="총 예상 월 매출"
+                label="판매가 합계"
                 icon={<Coins size={18} color={colors.text.muted} />}
                 value={`¥${totalRevenue.toLocaleString()}`}
                 subValue={`₩${Math.round(totalRevenue * EXCHANGE_RATE).toLocaleString()}`}
