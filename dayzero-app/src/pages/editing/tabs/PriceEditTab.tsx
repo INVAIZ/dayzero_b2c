@@ -559,8 +559,6 @@ export const PriceEditTab: React.FC<Props> = ({ product, autoSave = true, onChan
                         </div>
                     );
                 })()}
-
-                })()}
             </div>
 
             {/* 옵션별 판매가 테이블 */}
