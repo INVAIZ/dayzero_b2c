@@ -81,6 +81,9 @@ export const UrlSourcingContent = () => {
         const mergedUrls = [...extParsed, ...parsedUrls.filter(p => !p.error)];
         if (mergedUrls.length > 0) setParsedUrls(mergedUrls);
 
+        // 수집 시작과 동시에 익스텐션 큐 전체 비우기 → 배지 즉시 0
+        extQueue.forEach(item => removeUrl(item.url));
+
         const notifId = `notif-url-${Date.now()}`;
         addNotification({
             id: notifId,
@@ -323,9 +326,6 @@ export const UrlSourcingContent = () => {
                 setParsedUrls(prev => prev.map(p =>
                     p.id === current.id ? { ...p, status: 'completed', product: mockProduct } : p
                 ));
-
-                // 수집 성공한 URL을 익스텐션 큐에서 제거 → 배지 카운트 즉시 감소
-                removeUrl(current.url);
 
                 successProcessed++;
 
