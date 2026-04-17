@@ -507,7 +507,7 @@ export const UrlSourcingContent = () => {
                                         onClick={(e) => { e.stopPropagation(); removeUrl(item.url); }}
                                         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', marginLeft: '2px', display: 'flex', color: colors.text.muted, borderRadius: radius.full }}
                                         onMouseOver={(e) => e.currentTarget.style.background = colors.bg.subtle}
-                                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'
+                                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                                     >
                                         <X size={14} />
                                     </button>
