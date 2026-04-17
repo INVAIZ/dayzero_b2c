@@ -40,13 +40,21 @@ export function useExtensionBridge(): UseExtensionBridgeResult {
 
     window.addEventListener('message', handler);
 
-    // 마운트 직후 현재 큐 + 핸드셰이크 요청
-    window.postMessage(
-      { type: MSG.REQUEST_QUEUE, v: PROTOCOL_VERSION, ts: Date.now() },
-      window.location.origin,
-    );
+    // 새 탭으로 열릴 때 content script 주입 지연 대비 — 즉시 + 500ms + 1500ms 재시도
+    const requestQueue = () =>
+      window.postMessage(
+        { type: MSG.REQUEST_QUEUE, v: PROTOCOL_VERSION, ts: Date.now() },
+        window.location.origin,
+      );
+    requestQueue();
+    const t1 = setTimeout(requestQueue, 500);
+    const t2 = setTimeout(requestQueue, 1500);
 
-    return () => window.removeEventListener('message', handler);
+    return () => {
+      window.removeEventListener('message', handler);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, []);
 
   const removeUrl = useCallback((url: string) => {
