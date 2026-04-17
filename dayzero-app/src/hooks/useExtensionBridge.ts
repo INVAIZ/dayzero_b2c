@@ -12,6 +12,8 @@ interface UseExtensionBridgeResult {
   extQueue: CollectedUrl[];
   providers: Record<MallId, ProviderMeta> | null;
   removeUrl: (url: string) => void;
+  removeUrls: (urls: string[]) => void;
+  reportProgress: (current: number, total: number, active: boolean) => void;
 }
 
 export function useExtensionBridge(): UseExtensionBridgeResult {
@@ -64,5 +66,19 @@ export function useExtensionBridge(): UseExtensionBridgeResult {
     );
   }, []);
 
-  return { extInstalled, extQueue, providers, removeUrl };
+  const removeUrls = useCallback((urls: string[]) => {
+    window.postMessage(
+      { type: MSG.REMOVE_URLS, v: PROTOCOL_VERSION, ts: Date.now(), payload: { urls } },
+      window.location.origin,
+    );
+  }, []);
+
+  const reportProgress = useCallback((current: number, total: number, active: boolean) => {
+    window.postMessage(
+      { type: MSG.COLLECTION_PROGRESS, v: PROTOCOL_VERSION, ts: Date.now(), payload: { current, total, active } },
+      window.location.origin,
+    );
+  }, []);
+
+  return { extInstalled, extQueue, providers, removeUrl, removeUrls, reportProgress };
 }

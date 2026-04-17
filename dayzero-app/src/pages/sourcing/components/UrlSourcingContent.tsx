@@ -60,7 +60,7 @@ export const UrlSourcingContent = () => {
         aladin: '알라딘', ktown4u: 'Ktown4u', weverse: '위버스샵',
         makestar: '메이크스타', fans: 'FANS',
     };
-    const { extInstalled, extQueue, providers, removeUrl } = useExtensionBridge();
+    const { extInstalled, extQueue, providers, removeUrl, removeUrls, reportProgress } = useExtensionBridge();
 
     const validCount = parsedUrls.filter(p => !p.error).length + extQueue.length;
     const completedCount = parsedUrls.filter(p => p.status === 'completed' || p.status === 'failed' || p.status === 'blocked').length;
@@ -81,8 +81,10 @@ export const UrlSourcingContent = () => {
         const mergedUrls = [...extParsed, ...parsedUrls.filter(p => !p.error)];
         if (mergedUrls.length > 0) setParsedUrls(mergedUrls);
 
-        // 수집 시작과 동시에 익스텐션 큐 전체 비우기 → 배지 즉시 0
-        extQueue.forEach(item => removeUrl(item.url));
+        // 수집 시작과 동시에 익스텐션 큐 전체 비우기 → 배지 즉시 0 (배치로 race condition 방지)
+        if (extQueue.length > 0) {
+            removeUrls(extQueue.map(item => item.url));
+        }
 
         const notifId = `notif-url-${Date.now()}`;
         addNotification({
@@ -99,7 +101,12 @@ export const UrlSourcingContent = () => {
         setIsCollecting(true);
 
         const urlsSnapshot = mergedUrls.length > 0 ? mergedUrls : parsedUrls;
+        const totalValid = urlsSnapshot.filter(p => !p.error).length;
         let successProcessed = 0;
+        let processedCount = 0;
+
+        // 수집 시작 → 프로그레스바 활성화
+        reportProgress(0, totalValid, true);
 
         // AI 무게 예측 최소 1개 보장: 유효한 URL 중 하나는 반드시 AI 예측
         const validIndices = urlsSnapshot.map((_, i) => i).filter(i => !urlsSnapshot[i].error);
@@ -141,6 +148,8 @@ export const UrlSourcingContent = () => {
                 setParsedUrls(prev => prev.map(p =>
                     p.id === current.id ? { ...p, status: 'blocked', product: blockedProduct } : p
                 ));
+                processedCount++;
+                reportProgress(processedCount, totalValid, true);
                 updateNotification(notifId, { currentCount: successProcessed });
                 continue;
             }
@@ -328,10 +337,14 @@ export const UrlSourcingContent = () => {
                 ));
 
                 successProcessed++;
+                processedCount++;
+                reportProgress(processedCount, totalValid, true);
 
             updateNotification(notifId, { currentCount: successProcessed });
         }
 
+        // 수집 완료 → 프로그레스바 비활성화
+        reportProgress(totalValid, totalValid, false);
         setIsCollecting(false);
 
         updateNotification(notifId, {

@@ -33,6 +33,8 @@ export const MSG = {
   QUEUE_UPDATED:  'DAYZERO_QUEUE_UPDATED',
   REQUEST_QUEUE:  'DAYZERO_REQUEST_QUEUE',
   REMOVE_URL:     'DAYZERO_REMOVE_URL',
+  REMOVE_URLS:    'DAYZERO_REMOVE_URLS',
+  COLLECTION_PROGRESS: 'DAYZERO_COLLECTION_PROGRESS',
   EXT_HANDSHAKE:  'DAYZERO_EXT_HANDSHAKE',
 } as const;
 
@@ -63,8 +65,20 @@ export interface RemoveUrlMsg extends BaseEnvelope {
   payload: { url: string };
 }
 
+export interface RemoveUrlsMsg extends BaseEnvelope {
+  type: typeof MSG.REMOVE_URLS;
+  payload: { urls: string[] };
+}
+
+export interface CollectionProgressMsg extends BaseEnvelope {
+  type: typeof MSG.COLLECTION_PROGRESS;
+  payload: { current: number; total: number; active: boolean };
+}
+
 export type DayzeroMessage =
   | QueueUpdatedMsg
   | ExtHandshakeMsg
   | RequestQueueMsg
-  | RemoveUrlMsg;
+  | RemoveUrlMsg
+  | RemoveUrlsMsg
+  | CollectionProgressMsg;
