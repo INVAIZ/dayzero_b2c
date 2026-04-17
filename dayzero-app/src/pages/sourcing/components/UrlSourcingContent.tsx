@@ -9,7 +9,6 @@ import { Link2, AlertCircle, Loader2, CheckCircle2, XCircle, ArrowRight, X, Info
 import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
 import { colors, font, radius, spacing } from '../../../design/tokens';
 import { useExtensionBridge } from '../../../hooks/useExtensionBridge';
-import { ExtensionTagList } from './ExtensionTagList';
 import type { MallId } from '../../../shared/extensionProtocol';
 
 export const UrlSourcingContent = () => {
@@ -55,6 +54,12 @@ export const UrlSourcingContent = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [urls, collectionStarted]);
 
+    const MALL_TO_PROVIDER: Partial<Record<MallId, SourcingProvider>> = {
+        oliveyoung: '올리브영', coupang: '쿠팡', daiso: '다이소',
+        smartstore: '네이버 스마트스토어', gmarket: 'G마켓', yes24: 'yes24',
+        aladin: '알라딘', ktown4u: 'Ktown4u', weverse: '위버스샵',
+        makestar: '메이크스타', fans: 'FANS',
+    };
     const { extInstalled, extQueue, providers, removeUrl } = useExtensionBridge();
 
     const validCount = parsedUrls.filter(p => !p.error).length + extQueue.length;
@@ -67,12 +72,6 @@ export const UrlSourcingContent = () => {
         if (validCount === 0) return;
 
         // 익스텐션 큐 → ParsedUrl 변환 후 수동 입력과 머지
-        const MALL_TO_PROVIDER: Partial<Record<MallId, SourcingProvider>> = {
-            oliveyoung: '올리브영', coupang: '쿠팡', daiso: '다이소',
-            smartstore: '네이버 스마트스토어', gmarket: 'G마켓', yes24: 'yes24',
-            aladin: '알라딘', ktown4u: 'Ktown4u', weverse: '위버스샵',
-            makestar: '메이크스타', fans: 'FANS',
-        };
         const extParsed: ParsedUrl[] = extQueue.map((item, i) => ({
             id: `ext-url-${i}`,
             url: item.url,
@@ -449,20 +448,11 @@ export const UrlSourcingContent = () => {
                 </div>
             )}
 
-            {/* 익스텐션 큐 태그 목록 */}
-            {!collectionStarted && (
-                <ExtensionTagList
-                    extQueue={extQueue}
-                    providers={providers}
-                    onRemove={removeUrl}
-                />
-            )}
-
             {/* Input Area */}
             {!collectionStarted && (
                 <div style={{ background: colors.bg.surface, borderRadius: radius.xl, border: `1px solid ${colors.border.default}`, padding: spacing['6'], marginBottom: spacing['6'], boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: spacing['2'] }}>
-                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>{`수집할 URL 목록 (최대 20개)`}</span>
+                        <span style={{ fontSize: font.size.sm, fontWeight: font.weight.semibold, color: colors.text.secondary }}>{`수집할 URL 목록`}</span>
                     </div>
                     <div
                         onClick={() => inputRef.current?.focus()}
@@ -520,6 +510,37 @@ export const UrlSourcingContent = () => {
                                 </button>
                             </div>
                         ))}
+
+                        {extQueue.map((item) => {
+                            const label = providers?.[item.provider]?.label ?? MALL_TO_PROVIDER[item.provider] ?? item.provider;
+                            const logo = SOURCING_PROVIDERS.find(s => s.name === label)?.logo;
+                            const stripped = item.url.replace(/^https?:\/\//, '');
+                            const shortUrl = stripped.length > 40 ? stripped.slice(0, 40) + '\u2026' : stripped;
+                            return (
+                                <div key={item.url} title={item.url} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '6px 10px',
+                                    borderRadius: radius.full,
+                                    background: colors.primaryLight,
+                                    border: `1px solid ${colors.primaryLightBorder}`,
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                                }}>
+                                    {logo && <img src={logo} alt={label} style={{ width: 16, height: 16, borderRadius: radius.xs, flexShrink: 0 }} />}
+                                    <span style={{ color: colors.primary, fontSize: font.size.sm, fontWeight: font.weight.semibold, whiteSpace: 'nowrap' }}>{label}</span>
+                                    <span style={{ color: colors.text.tertiary, fontSize: font.size.sm, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shortUrl}</span>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); removeUrl(item.url); }}
+                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', marginLeft: '2px', display: 'flex', color: colors.primary, borderRadius: radius.full, opacity: 0.7 }}
+                                        onMouseOver={(e) => { e.currentTarget.style.opacity = '1'; }}
+                                        onMouseOut={(e) => { e.currentTarget.style.opacity = '0.7'; }}
+                                    >
+                                        <X size={13} />
+                                    </button>
+                                </div>
+                            );
+                        })}
 
                         <input
                             ref={inputRef}
