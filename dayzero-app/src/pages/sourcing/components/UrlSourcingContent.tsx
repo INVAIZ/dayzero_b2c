@@ -395,15 +395,15 @@ export const UrlSourcingContent = () => {
 
     return (
         <div style={{ animation: 'fadeInUp 0.4s ease', position: 'relative' }}>
-            {/* 수집 프로그램 상태 콜아웃 — 익스텐션 미설치 시에만 표시 */}
-            {!collectionStarted && !extInstalled && (
+            {/* 수집 프로그램 상태 콜아웃 — 항상 표시 (설치/미설치 상태 반영) */}
+            {!collectionStarted && (
                 <div
                     style={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        background: colors.bg.faint,
-                        border: `1px solid ${colors.border.default}`,
+                        background: extInstalled ? colors.bg.info : colors.bg.faint,
+                        border: `1px solid ${extInstalled ? colors.primaryLightBorder : colors.border.default}`,
                         borderRadius: radius.lg,
                         padding: `${spacing['3']} ${spacing['5']}`,
                         marginBottom: spacing['5'],
@@ -413,24 +413,34 @@ export const UrlSourcingContent = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'], flex: 1 }}>
                         <div style={{
                             width: '28px', height: '28px', borderRadius: radius.full,
-                            background: colors.bg.subtle,
+                            background: extInstalled ? colors.primaryLight : colors.bg.subtle,
                             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                         }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.text.muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                                <polyline points="7 10 12 15 17 10" />
-                                <line x1="12" y1="15" x2="12" y2="3" />
-                            </svg>
+                            {extInstalled ? (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            ) : (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.text.muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                            )}
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
                             <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary }}>
-                                수집 프로그램 미설치
+                                {extInstalled ? '수집 프로그램이 설치되어 있어요' : '수집 프로그램 미설치'}
                             </span>
                             <span style={{ fontSize: font.size.sm, fontWeight: font.weight.medium, color: colors.text.tertiary, lineHeight: font.lineHeight.normal }}>
-                                프로그램을 설치하면 URL 복사 없이 쇼핑몰에서 바로 상품을 담을 수 있어요
+                                {extInstalled
+                                    ? '지원 쇼핑몰에서 상품을 둘러보면서 클릭 한 번으로 목록에 추가할 수 있어요'
+                                    : '프로그램을 설치하면 URL 복사 없이 쇼핑몰에서 바로 상품을 담을 수 있어요'
+                                }
                             </span>
                         </div>
                     </div>
+                    {!extInstalled && (
                         <button
                             onClick={() => {
                                 window.open('https://chromewebstore.google.com/', '_blank');
@@ -445,6 +455,7 @@ export const UrlSourcingContent = () => {
                         >
                             + 설치하기
                         </button>
+                    )}
                 </div>
             )}
 
@@ -603,7 +614,7 @@ export const UrlSourcingContent = () => {
                                     }
                                 }
                             }}
-                            placeholder={urls.length === 0 ? "지원 쇼핑몰의 상품 URL만 붙여넣으면 모든 상품 정보를 가져와요. 여러 개도 한 번에 요청할 수 있어요." : ""}
+                            placeholder={urls.length === 0 && extQueue.length === 0 ? "지원 쇼핑몰의 상품 URL만 붙여넣으면 모든 상품 정보를 가져와요. 여러 개도 한 번에 요청할 수 있어요." : ""}
                             style={{
                                 flex: 1,
                                 minWidth: '200px',
