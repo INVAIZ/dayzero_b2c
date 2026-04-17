@@ -486,7 +486,8 @@ export const UrlSourcingContent = () => {
                     >
                         {extQueue.map((item) => {
                             const label = providers?.[item.provider]?.label ?? MALL_TO_PROVIDER[item.provider] ?? item.provider;
-                            const logo = SOURCING_PROVIDERS.find(s => s.name === label)?.logo;
+                            const logoName = MALL_TO_PROVIDER[item.provider] ?? label;
+                            const logo = SOURCING_PROVIDERS.find(s => s.name === logoName)?.logo;
                             const stripped = item.url.replace(/^https?:\/\//, '');
                             const shortUrl = stripped.length > 40 ? stripped.slice(0, 40) + '\u2026' : stripped;
                             return (
