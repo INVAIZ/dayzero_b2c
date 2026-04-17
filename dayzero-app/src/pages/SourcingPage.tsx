@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSourcingStore } from '../store/useSourcingStore';
 import { MainLayout } from '../components/layout/MainLayout';
 import { getProviderLogo } from '../types/sourcing';
@@ -12,13 +12,12 @@ import { formatShortDate } from '../utils/formatDate';
 
 export default function SourcingPage() {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
     const {
         schedules, toggleSchedule, deleteSchedule, reorderSchedules,
         selectedAutoFilter: selectedFilter,
         setSelectedAutoFilter: setSelectedFilter,
     } = useSourcingStore();
-    const [activeTab, setActiveTab] = useState<'auto' | 'url'>(searchParams.get('tab') === 'url' ? 'url' : 'auto');
+    const [activeTab, setActiveTab] = useState<'auto' | 'url'>(() => new URLSearchParams(window.location.search).get('tab') === 'url' ? 'url' : 'auto');
     const [draggedId, setDraggedId] = useState<string | null>(null);
     const [hoveredId, setHoveredId] = useState<string | null>(null);
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; scheduleId: string | null }>({
