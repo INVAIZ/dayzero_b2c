@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SOURCING_PROVIDERS, MOCK_URL_TO_PROVIDER } from '../../../types/sourcing';
-import type { SourcedProduct, ParsedUrl } from '../../../types/sourcing';
+import type { SourcingProvider, SourcedProduct, ParsedUrl } from '../../../types/sourcing';
 import { useSourcingStore } from '../../../store/useSourcingStore';
 import { useEditingStore } from '../../../store/useEditingStore';
 
 import { Link2, AlertCircle, Loader2, CheckCircle2, XCircle, ArrowRight, X, Info } from 'lucide-react';
 import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
 import { colors, font, radius, spacing } from '../../../design/tokens';
+import { useExtensionBridge } from '../../../hooks/useExtensionBridge';
+import { ExtensionTagList } from './ExtensionTagList';
+import type { MallId } from '../../../shared/extensionProtocol';
 
 export const UrlSourcingContent = () => {
     const navigate = useNavigate();
@@ -52,7 +55,9 @@ export const UrlSourcingContent = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [urls, collectionStarted]);
 
-    const validCount = parsedUrls.filter(p => !p.error).length;
+    const { extInstalled, extQueue, providers, removeUrl } = useExtensionBridge();
+
+    const validCount = parsedUrls.filter(p => !p.error).length + extQueue.length;
     const completedCount = parsedUrls.filter(p => p.status === 'completed' || p.status === 'failed' || p.status === 'blocked').length;
     const isAllCompleted = collectionStarted && completedCount === parsedUrls.length;
     const successCount = parsedUrls.filter(p => p.status === 'completed').length;
@@ -60,6 +65,22 @@ export const UrlSourcingContent = () => {
 
     const handleStartCollection = async () => {
         if (validCount === 0) return;
+
+        // 익스텐션 큐 → ParsedUrl 변환 후 수동 입력과 머지
+        const MALL_TO_PROVIDER: Partial<Record<MallId, SourcingProvider>> = {
+            oliveyoung: '올리브영', coupang: '쿠팡', daiso: '다이소',
+            smartstore: '네이버 스마트스토어', gmarket: 'G마켓', yes24: 'yes24',
+            aladin: '알라딘', ktown4u: 'Ktown4u', weverse: '위버스샵',
+            makestar: '메이크스타', fans: 'FANS',
+        };
+        const extParsed: ParsedUrl[] = extQueue.map((item, i) => ({
+            id: `ext-url-${i}`,
+            url: item.url,
+            provider: MALL_TO_PROVIDER[item.provider] ?? null,
+            status: 'idle' as const,
+        }));
+        const mergedUrls = [...extParsed, ...parsedUrls.filter(p => !p.error)];
+        if (mergedUrls.length > 0) setParsedUrls(mergedUrls);
 
         const notifId = `notif-url-${Date.now()}`;
         addNotification({
@@ -75,7 +96,7 @@ export const UrlSourcingContent = () => {
         setCollectionStarted(true);
         setIsCollecting(true);
 
-        const urlsSnapshot = parsedUrls;
+        const urlsSnapshot = mergedUrls.length > 0 ? mergedUrls : parsedUrls;
         let successProcessed = 0;
 
         // AI 무게 예측 최소 1개 보장: 유효한 URL 중 하나는 반드시 AI 예측
@@ -373,19 +394,17 @@ export const UrlSourcingContent = () => {
         window.open(p.url, '_blank');
     };
 
-    const [extInstalled, setExtInstalled] = useState(() => sessionStorage.getItem('ext_installed') === 'true');
-
     return (
         <div style={{ animation: 'fadeInUp 0.4s ease', position: 'relative' }}>
-            {/* 수집 프로그램 상태 콜아웃 */}
-            {!collectionStarted && (
+            {/* 수집 프로그램 상태 콜아웃 — 익스텐션 미설치 시에만 표시 */}
+            {!collectionStarted && !extInstalled && (
                 <div
                     style={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        background: extInstalled ? colors.bg.info : colors.bg.faint,
-                        border: `1px solid ${extInstalled ? colors.primaryLightBorder : colors.border.default}`,
+                        background: colors.bg.faint,
+                        border: `1px solid ${colors.border.default}`,
                         borderRadius: radius.lg,
                         padding: `${spacing['3']} ${spacing['5']}`,
                         marginBottom: spacing['5'],
@@ -395,39 +414,27 @@ export const UrlSourcingContent = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: spacing['3'], flex: 1 }}>
                         <div style={{
                             width: '28px', height: '28px', borderRadius: radius.full,
-                            background: extInstalled ? colors.primaryLight : colors.bg.subtle,
+                            background: colors.bg.subtle,
                             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                         }}>
-                            {extInstalled ? (
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="20 6 9 17 4 12" />
-                                </svg>
-                            ) : (
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.text.muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                                    <polyline points="7 10 12 15 17 10" />
-                                    <line x1="12" y1="15" x2="12" y2="3" />
-                                </svg>
-                            )}
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.text.muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
                             <span style={{ fontSize: font.size.md, fontWeight: font.weight.semibold, color: colors.text.primary }}>
-                                {extInstalled ? '수집 프로그램이 설치되어 있어요' : '수집 프로그램 미설치'}
+                                수집 프로그램 미설치
                             </span>
                             <span style={{ fontSize: font.size.sm, fontWeight: font.weight.medium, color: colors.text.tertiary, lineHeight: font.lineHeight.normal }}>
-                                {extInstalled
-                                    ? '지원 쇼핑몰에서 상품을 둘러보면서 클릭 한 번으로 목록에 추가할 수 있어요'
-                                    : '프로그램을 설치하면 URL 복사 없이 쇼핑몰에서 바로 상품을 담을 수 있어요'
-                                }
+                                프로그램을 설치하면 URL 복사 없이 쇼핑몰에서 바로 상품을 담을 수 있어요
                             </span>
                         </div>
                     </div>
-                    {!extInstalled && (
                         <button
                             onClick={() => {
                                 window.open('https://chromewebstore.google.com/', '_blank');
-                                sessionStorage.setItem('ext_installed', 'true');
-                                setExtInstalled(true);
                             }}
                             style={{
                                 background: 'none', color: colors.text.tertiary,
@@ -439,8 +446,16 @@ export const UrlSourcingContent = () => {
                         >
                             + 설치하기
                         </button>
-                    )}
                 </div>
+            )}
+
+            {/* 익스텐션 큐 태그 목록 */}
+            {!collectionStarted && (
+                <ExtensionTagList
+                    extQueue={extQueue}
+                    providers={providers}
+                    onRemove={removeUrl}
+                />
             )}
 
             {/* Input Area */}

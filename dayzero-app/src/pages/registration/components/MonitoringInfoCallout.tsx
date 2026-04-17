@@ -74,7 +74,7 @@ export const MonitoringInfoCallout: React.FC<Props> = ({
                     gap: spacing['1'],
                 }}>
                     <Clock size={12} color={colors.primary} style={{ flexShrink: 0 }} />
-                    매일 7시부터 가격과 품절 여부를 확인하고, 변동 시 자동으로 처리해요
+                    매일 7시부터 원가와 품절 여부를 확인하고, 변동 시 자동으로 처리해요
                 </div>
             </div>
 
