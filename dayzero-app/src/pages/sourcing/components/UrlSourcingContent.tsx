@@ -324,6 +324,9 @@ export const UrlSourcingContent = () => {
                     p.id === current.id ? { ...p, status: 'completed', product: mockProduct } : p
                 ));
 
+                // 수집 성공한 URL을 익스텐션 큐에서 제거 → 배지 카운트 즉시 감소
+                removeUrl(current.url);
+
                 successProcessed++;
 
             updateNotification(notifId, { currentCount: successProcessed });
