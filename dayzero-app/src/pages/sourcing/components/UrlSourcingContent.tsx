@@ -5,7 +5,7 @@ import type { SourcingProvider, SourcedProduct, ParsedUrl } from '../../../types
 import { useSourcingStore } from '../../../store/useSourcingStore';
 import { useEditingStore } from '../../../store/useEditingStore';
 
-import { Link2, AlertCircle, Loader2, CheckCircle2, XCircle, ArrowRight, X, Info } from 'lucide-react';
+import { Link2, AlertCircle, Loader2, CheckCircle2, XCircle, ArrowRight, X, Info, Package } from 'lucide-react';
 import { useOnboarding } from '../../../components/onboarding/OnboardingContext';
 import { colors, font, radius, spacing } from '../../../design/tokens';
 import { useExtensionBridge } from '../../../hooks/useExtensionBridge';
@@ -484,6 +484,38 @@ export const UrlSourcingContent = () => {
                         onFocus={(e) => (e.currentTarget.style.borderColor = colors.primary)}
                         onBlur={(e) => (e.currentTarget.style.borderColor = colors.border.light)}
                     >
+                        {extQueue.map((item) => {
+                            const label = providers?.[item.provider]?.label ?? MALL_TO_PROVIDER[item.provider] ?? item.provider;
+                            const logo = SOURCING_PROVIDERS.find(s => s.name === label)?.logo;
+                            const stripped = item.url.replace(/^https?:\/\//, '');
+                            const shortUrl = stripped.length > 40 ? stripped.slice(0, 40) + '\u2026' : stripped;
+                            return (
+                                <div key={item.url} title={item.url} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '6px 10px',
+                                    borderRadius: radius.full,
+                                    background: colors.bg.surface,
+                                    border: `1px solid ${colors.border.default}`,
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                                }}>
+                                    {logo && <img src={logo} alt={label} style={{ width: 16, height: 16, borderRadius: radius.xs, flexShrink: 0 }} />}
+                                    <Package size={12} color={colors.primary} style={{ flexShrink: 0 }} />
+                                    <span style={{ color: colors.text.primary, fontSize: font.size.sm, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shortUrl}</span>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); removeUrl(item.url); }}
+                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', marginLeft: '2px', display: 'flex', color: colors.text.muted, borderRadius: radius.full }}
+                                        onMouseOver={(e) => e.currentTarget.style.background = colors.bg.subtle}
+                                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            );
+                        })}
+
+
                         {parsedUrls.map(p => (
                             <div key={p.id} style={{
                                 display: 'flex',
@@ -521,37 +553,6 @@ export const UrlSourcingContent = () => {
                                 </button>
                             </div>
                         ))}
-
-                        {extQueue.map((item) => {
-                            const label = providers?.[item.provider]?.label ?? MALL_TO_PROVIDER[item.provider] ?? item.provider;
-                            const logo = SOURCING_PROVIDERS.find(s => s.name === label)?.logo;
-                            const stripped = item.url.replace(/^https?:\/\//, '');
-                            const shortUrl = stripped.length > 40 ? stripped.slice(0, 40) + '\u2026' : stripped;
-                            return (
-                                <div key={item.url} title={item.url} style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    padding: '6px 10px',
-                                    borderRadius: radius.full,
-                                    background: colors.primaryLight,
-                                    border: `1px solid ${colors.primaryLightBorder}`,
-                                    boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-                                }}>
-                                    {logo && <img src={logo} alt={label} style={{ width: 16, height: 16, borderRadius: radius.xs, flexShrink: 0 }} />}
-                                    <span style={{ color: colors.primary, fontSize: font.size.sm, fontWeight: font.weight.semibold, whiteSpace: 'nowrap' }}>{label}</span>
-                                    <span style={{ color: colors.text.tertiary, fontSize: font.size.sm, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shortUrl}</span>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); removeUrl(item.url); }}
-                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', marginLeft: '2px', display: 'flex', color: colors.primary, borderRadius: radius.full, opacity: 0.7 }}
-                                        onMouseOver={(e) => { e.currentTarget.style.opacity = '1'; }}
-                                        onMouseOut={(e) => { e.currentTarget.style.opacity = '0.7'; }}
-                                    >
-                                        <X size={13} />
-                                    </button>
-                                </div>
-                            );
-                        })}
 
                         <input
                             ref={inputRef}
